@@ -1,0 +1,347 @@
+/* Auth Pages Styles */
+.authPage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    padding: var(--space-6);
+}
+
+.authContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1000px;
+    width: 100%;
+    min-height: 600px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
+@media (max-width: 900px) {
+    .authContainer {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+    }
+}
+
+/* Branding Side */
+.authBranding {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    padding: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+@media (max-width: 900px) {
+    .authBranding {
+        display: none;
+    }
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-16);
+}
+
+.logoIcon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brandingContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brandingContent h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+}
+
+.brandingContent p {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
+}
+
+.brandingFeatures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.brandingFeature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.checkmark {
+    color: var(--color-success-500);
+    font-weight: 600;
+}
+
+/* Form Side */
+.authForm {
+    padding: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.formHeader {
+    margin-bottom: var(--space-8);
+}
+
+.formHeader h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.formHeader p {
+    color: var(--text-secondary);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgotLink {
+    font-size: 0.8125rem;
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.forgotLink:hover {
+    color: var(--color-primary-700);
+}
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputIcon {
+    position: absolute;
+    left: var(--space-4);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    padding-left: 44px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    font-size: 0.9375rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+.input::placeholder {
+    color: var(--text-muted);
+}
+
+.passwordToggle {
+    position: absolute;
+    right: var(--space-3);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.passwordToggle:hover {
+    color: var(--text-secondary);
+}
+
+.submitButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: var(--space-2);
+}
+
+.submitButton:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+}
+
+.submitButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.formFooter {
+    margin-top: var(--space-8);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.authLink {
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.authLink:hover {
+    color: var(--color-primary-700);
+}
+
+/* Register Page Specific */
+.nameRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+@media (max-width: 500px) {
+    .nameRow {
+        grid-template-columns: 1fr;
+    }
+}
+
+.termsLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.termsLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary-600);
+    margin-top: 2px;
+}
+
+.termsLabel a {
+    color: var(--color-primary-600);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.socialLogin {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.socialButton {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.socialButton:hover {
+    background: var(--bg-tertiary);
+}

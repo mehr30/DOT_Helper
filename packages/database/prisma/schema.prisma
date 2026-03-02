@@ -1,0 +1,501 @@
+// DOT Compliance Helper - Database Schema
+// This schema defines all tables for DOT/FMCSA compliance management
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model Company {
+  id                String   @id @default(cuid())
+  name              String
+  usdotNumber       String   @unique
+  mcNumber          String?
+  address           String?
+  city              String?
+  state             String?
+  zip               String?
+  phone             String?
+  email             String?
+  
+  // Compliance dates
+  mcs150DueDate     DateTime?
+  ucrDueDate        DateTime?
+  ifta              Boolean  @default(false)
+  hazmat            Boolean  @default(false)
+  
+  drivers           Driver[]
+  vehicles          Vehicle[]
+  documents         Document[]
+  users             User[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String?
+  firstName         String
+  lastName          String
+  role              UserRole @default(DISPATCHER)
+  
+  companyId         String
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  DISPATCHER
+  DRIVER
+}
+
+// ============================================================================
+// DRIVER QUALIFICATION FILES (DQF)
+// ============================================================================
+
+model Driver {
+  id                    String       @id @default(cuid())
+  firstName             String
+  lastName              String
+  email                 String?
+  phone                 String?
+  dateOfBirth           DateTime?
+  ssn                   String?      // Last 4 digits only for verification
+  
+  // CDL Information
+  cdlNumber             String
+  cdlState              String
+  cdlClass              CDLClass     @default(A)
+  cdlExpiration         DateTime
+  endorsements          String[]     // ["H", "N", "T", "P", "S", "X"]
+  restrictions          String[]
+  
+  // Medical Certification
+  medicalCardExpiration DateTime
+  medicalExaminerName   String?
+  medicalExaminerNPI    String?
+  
+  // Employment
+  hireDate              DateTime
+  terminationDate       DateTime?
+  status                DriverStatus @default(ACTIVE)
+  
+  // Drug & Alcohol
+  clearinghouseQueryDate    DateTime?
+  clearinghouseConsentDate  DateTime?
+  lastDrugTestDate          DateTime?
+  lastAlcoholTestDate       DateTime?
+  
+  // Relations
+  hosLogs               HOSLog[]
+  drugTests             DrugTest[]
+  violations            Violation[]
+  documents             Document[]
+  inspections           Inspection[]
+  
+  companyId             String
+  company               Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+}
+
+enum CDLClass {
+  A
+  B
+  C
+}
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+// ============================================================================
+// HOURS OF SERVICE (HOS)
+// ============================================================================
+
+model HOSLog {
+  id            String     @id @default(cuid())
+  date          DateTime   @db.Date
+  
+  // Status changes throughout the day
+  entries       HOSEntry[]
+  
+  // Daily totals (in minutes)
+  drivingTime   Int        @default(0)
+  onDutyTime    Int        @default(0)
+  offDutyTime   Int        @default(0)
+  sleeperTime   Int        @default(0)
+  
+  // Violations on this day
+  hasViolations Boolean    @default(false)
+  violationNotes String?
+  
+  // Trip info
+  startOdometer Int?
+  endOdometer   Int?
+  trailerNumbers String[]
+  shippingDocs  String[]
+  
+  driverId      String
+  driver        Driver     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  vehicleId     String?
+  vehicle       Vehicle?   @relation(fields: [vehicleId], references: [id])
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([driverId, date])
+}
+
+model HOSEntry {
+  id            String     @id @default(cuid())
+  
+  status        DutyStatus
+  startTime     DateTime
+  endTime       DateTime?
+  duration      Int?       // in minutes
+  
+  location      String
+  remarks       String?
+  
+  hosLogId      String
+  hosLog        HOSLog     @relation(fields: [hosLogId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime   @default(now())
+}
+
+enum DutyStatus {
+  OFF_DUTY
+  SLEEPER_BERTH
+  DRIVING
+  ON_DUTY_NOT_DRIVING
+}
+
+// ============================================================================
+// DRUG & ALCOHOL TESTING
+// ============================================================================
+
+model DrugTest {
+  id                String         @id @default(cuid())
+  
+  testType          DrugTestType
+  testDate          DateTime
+  collectionSite    String?
+  mroName           String?        // Medical Review Officer
+  
+  drugResult        TestResult     @default(PENDING)
+  alcoholResult     TestResult?
+  alcoholBac        Float?         // Blood Alcohol Content if positive
+  
+  refusalToTest     Boolean        @default(false)
+  notes             String?
+  
+  driverId          String
+  driver            Driver         @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+enum DrugTestType {
+  PRE_EMPLOYMENT
+  RANDOM
+  POST_ACCIDENT
+  REASONABLE_SUSPICION
+  RETURN_TO_DUTY
+  FOLLOW_UP
+}
+
+enum TestResult {
+  PENDING
+  NEGATIVE
+  POSITIVE
+  CANCELLED
+}
+
+// ============================================================================
+// VEHICLES & INSPECTIONS
+// ============================================================================
+
+model Vehicle {
+  id                  String        @id @default(cuid())
+  
+  unitNumber          String
+  vin                 String?
+  make                String?
+  model               String?
+  year                Int?
+  licensePlate        String?
+  licensePlateState   String?
+  
+  vehicleType         VehicleType   @default(TRACTOR)
+  status              VehicleStatus @default(ACTIVE)
+  
+  // Inspection dates
+  annualInspectionDate    DateTime?
+  annualInspectionDue     DateTime?
+  lastPmDate              DateTime?   // Preventive Maintenance
+  nextPmDue               DateTime?
+  
+  // Registration
+  registrationExpiration  DateTime?
+  iftaDecalNumber         String?
+  
+  hosLogs             HOSLog[]
+  inspections         Inspection[]
+  documents           Document[]
+  maintenanceRecords  MaintenanceRecord[]
+  
+  companyId           String
+  company             Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+enum VehicleType {
+  TRACTOR
+  TRAILER
+  STRAIGHT_TRUCK
+  BUS
+}
+
+enum VehicleStatus {
+  ACTIVE
+  OUT_OF_SERVICE
+  MAINTENANCE
+  SOLD
+}
+
+model Inspection {
+  id                String          @id @default(cuid())
+  
+  inspectionType    InspectionType
+  inspectionDate    DateTime
+  location          String?
+  
+  // Inspection results
+  passed            Boolean
+  defectsFound      Boolean         @default(false)
+  defectDescription String?
+  defectsCorrected  Boolean?
+  correctionDate    DateTime?
+  
+  oosViolation      Boolean         @default(false)  // Out of Service
+  
+  inspectorName     String?
+  inspectorBadge    String?
+  reportNumber      String?
+  
+  vehicleId         String?
+  vehicle           Vehicle?        @relation(fields: [vehicleId], references: [id])
+  
+  driverId          String?
+  driver            Driver?         @relation(fields: [driverId], references: [id])
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+enum InspectionType {
+  ANNUAL_DOT
+  PRE_TRIP
+  POST_TRIP
+  ROADSIDE
+  RANDOM
+}
+
+model MaintenanceRecord {
+  id                String   @id @default(cuid())
+  
+  serviceDate       DateTime
+  serviceType       String
+  description       String
+  odometer          Int?
+  cost              Float?
+  vendor            String?
+  workOrderNumber   String?
+  
+  vehicleId         String
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+}
+
+// ============================================================================
+// VIOLATIONS & COMPLIANCE
+// ============================================================================
+
+model Violation {
+  id                String         @id @default(cuid())
+  
+  violationType     ViolationType
+  violationDate     DateTime
+  location          String?
+  
+  description       String
+  severity          ViolationSeverity @default(MINOR)
+  csaPoints         Int?
+  fineAmount        Float?
+  
+  resolved          Boolean        @default(false)
+  resolutionDate    DateTime?
+  resolutionNotes   String?
+  
+  driverId          String?
+  driver            Driver?        @relation(fields: [driverId], references: [id])
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+enum ViolationType {
+  HOS
+  VEHICLE_MAINTENANCE
+  DRIVER_FITNESS
+  DRUG_ALCOHOL
+  HAZMAT
+  CRASH
+  OTHER
+}
+
+enum ViolationSeverity {
+  MINOR
+  MODERATE
+  MAJOR
+  CRITICAL
+}
+
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
+model Document {
+  id                String       @id @default(cuid())
+  
+  name              String
+  description       String?
+  documentType      DocumentType
+  category          String?
+  
+  // File storage
+  fileName          String
+  fileUrl           String
+  fileSize          Int?
+  mimeType          String?
+  
+  // Expiration tracking
+  issueDate         DateTime?
+  expirationDate    DateTime?
+  
+  // Associations (one of these should be set)
+  driverId          String?
+  driver            Driver?      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  vehicleId         String?
+  vehicle           Vehicle?     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  companyId         String?
+  company           Company?     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  uploadedById      String?
+  
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+enum DocumentType {
+  // Driver documents
+  CDL
+  MEDICAL_CERTIFICATE
+  MVR
+  ROAD_TEST_CERTIFICATE
+  EMPLOYMENT_APPLICATION
+  DRUG_TEST_RESULT
+  TRAINING_CERTIFICATE
+  CLEARINGHOUSE_CONSENT
+  
+  // Vehicle documents
+  REGISTRATION
+  INSURANCE
+  ANNUAL_INSPECTION
+  LEASE_AGREEMENT
+  TITLE
+  
+  // Company documents
+  OPERATING_AUTHORITY
+  BOC3
+  UCR
+  IFTA_LICENSE
+  INSURANCE_POLICY
+  
+  OTHER
+}
+
+// ============================================================================
+// ALERTS & NOTIFICATIONS
+// ============================================================================
+
+model Alert {
+  id                String       @id @default(cuid())
+  
+  alertType         AlertType
+  title             String
+  message           String
+  dueDate           DateTime?
+  
+  severity          AlertSeverity @default(INFO)
+  status            AlertStatus   @default(ACTIVE)
+  
+  // What the alert is about
+  entityType        String?       // "driver", "vehicle", "company"
+  entityId          String?
+  
+  dismissedAt       DateTime?
+  dismissedBy       String?
+  
+  companyId         String
+  
+  createdAt         DateTime      @default(now())
+}
+
+enum AlertType {
+  EXPIRATION_WARNING
+  COMPLIANCE_ISSUE
+  MISSING_DOCUMENT
+  UPCOMING_DEADLINE
+  VIOLATION_ALERT
+  SYSTEM_NOTICE
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  URGENT
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  DISMISSED
+  RESOLVED
+}
