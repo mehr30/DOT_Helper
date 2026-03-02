@@ -70,17 +70,17 @@ const testimonials = [
     rating: 5
   },
   {
-    quote: "Before DOT Helper, I was drowning in paperwork. Now everything is organized and I can find any document in seconds.",
+    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. DOT Helper made it easy to get everything organized.",
     author: "Sarah Chen",
-    role: "Safety Manager, Chen Transport",
-    company: "15 Trucks • California",
+    role: "Operations Manager, Chen Heating & Air",
+    company: "12 Service Vans • California",
     rating: 5
   },
   {
-    quote: "The mobile DVIR app is a game-changer. My drivers complete inspections faster and everything syncs automatically.",
+    quote: "As a plumbing company with 20+ vehicles, DOT compliance was a nightmare. Now we handle everything in one place.",
     author: "James Thompson",
-    role: "Fleet Manager, Thompson Logistics",
-    company: "22 Trucks • Georgia",
+    role: "Fleet Manager, Thompson Plumbing",
+    company: "22 Vehicles • Georgia",
     rating: 5
   }
 ];
@@ -179,6 +179,7 @@ export default function HomePage() {
           <div className={styles.navLinks}>
             <Link href="#features" className={styles.navLink}>Features</Link>
             <Link href="#pricing" className={styles.navLink}>Pricing</Link>
+            <Link href="/blog" className={styles.navLink}>Resources</Link>
             <Link href="#testimonials" className={styles.navLink}>Testimonials</Link>
             <Link href="/login" className={styles.navLink}>Login</Link>
             <Link href="/register" className={styles.navLinkPrimary}>
@@ -201,6 +202,7 @@ export default function HomePage() {
           <div className={styles.mobileMenu}>
             <Link href="#features" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>Features</Link>
             <Link href="#pricing" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
+            <Link href="/blog" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>Resources</Link>
             <Link href="#testimonials" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>Testimonials</Link>
             <Link href="/login" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>Login</Link>
             <Link href="/register" className={styles.mobileNavPrimary} onClick={() => setMobileMenuOpen(false)}>
@@ -226,16 +228,17 @@ export default function HomePage() {
             <span className={styles.heroGradient}>Without the Headache</span>
           </h1>
           <p className={styles.heroDescription}>
-            The all-in-one compliance management platform for small trucking businesses.
-            Track driver qualifications, HOS, vehicle inspections, and never miss a deadline.
+            The all-in-one compliance management platform for any business with commercial vehicles.
+            From trucking fleets to HVAC, plumbing, electrical, and landscaping companies —
+            track driver qualifications, HOS, vehicle inspections, and never miss a deadline.
           </p>
           <div className={styles.heroCta}>
             <Link href="/register" className={styles.ctaPrimary}>
               Start Free Trial
               <ArrowRight size={18} />
             </Link>
-            <Link href="#demo" className={styles.ctaSecondary}>
-              Watch Demo
+            <Link href="#features" className={styles.ctaSecondary}>
+              See Features
             </Link>
           </div>
           <div className={styles.heroStats}>
@@ -252,11 +255,11 @@ export default function HomePage() {
       {/* Social Proof Bar */}
       <section className={styles.socialProof}>
         <div className={styles.socialProofContent}>
-          <span className={styles.socialProofLabel}>Helping fleets across America stay compliant</span>
+          <span className={styles.socialProofLabel}>Helping businesses across America stay DOT compliant</span>
           <div className={styles.socialProofLogos}>
-            <span>🚛 500+ Fleets</span>
+            <span>🚛 500+ Businesses</span>
             <span>🛡️ 10,000+ Drivers</span>
-            <span>📋 50,000+ Documents</span>
+            <span>🔧 HVAC • Plumbing • Electrical</span>
             <span>⭐ 4.9/5 Rating</span>
           </div>
         </div>
@@ -460,7 +463,7 @@ export default function HomePage() {
             Ready to simplify your DOT compliance?
           </h2>
           <p className={styles.ctaDescription}>
-            Join hundreds of trucking companies who trust DOT Helper. Start your free trial today.
+            Join hundreds of businesses who trust DOT Helper for their fleet compliance. Start your free trial today.
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/register" className={styles.ctaPrimaryLarge}>
@@ -486,7 +489,7 @@ export default function HomePage() {
               <span>DOT Helper</span>
             </Link>
             <p className={styles.footerTagline}>
-              Simplifying DOT compliance for small trucking businesses. Keep your fleet compliant with less stress.
+              Simplifying DOT compliance for any business with commercial vehicles — trucking, home services, and beyond.
             </p>
           </div>
           <div className={styles.footerLinks}>
@@ -494,7 +497,7 @@ export default function HomePage() {
               <h4>Product</h4>
               <Link href="#features">Features</Link>
               <Link href="#pricing">Pricing</Link>
-              <Link href="#demo">Demo</Link>
+              <Link href="/blog">Compliance Guides</Link>
               <Link href="/mobile">Mobile App</Link>
             </div>
             <div className={styles.footerColumn}>

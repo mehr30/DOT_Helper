@@ -1,9 +1,11 @@
+"use client";
+
 import {
     AlertTriangle,
     CheckCircle,
     Clock,
     FileWarning,
-    TrendingUp,
+    ClipboardList,
     Users,
     Truck,
     Calendar,
@@ -12,6 +14,20 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import styles from "./page.module.css";
+
+function computeDaysLeft(dateStr: string): number {
+    const target = new Date(dateStr);
+    const now = new Date();
+    const diff = target.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function getSeverity(daysLeft: number): string {
+    if (daysLeft < 0) return "expired";
+    if (daysLeft <= 7) return "urgent";
+    if (daysLeft <= 30) return "warning";
+    return "info";
+}
 
 // Mock data - in production this would come from the database
 const complianceScore = 87;
@@ -47,40 +63,38 @@ const stats = [
     },
 ];
 
-const upcomingDeadlines = [
+const upcomingDeadlinesRaw = [
     {
         id: 1,
         title: "CDL Expiration - John Smith",
         date: "Feb 15, 2026",
-        daysLeft: 6,
         type: "driver",
-        severity: "urgent",
     },
     {
         id: 2,
         title: "Annual DOT Inspection - Unit 103",
         date: "Feb 22, 2026",
-        daysLeft: 13,
         type: "vehicle",
-        severity: "warning",
     },
     {
         id: 3,
         title: "Medical Card - Mike Johnson",
-        date: "Mar 01, 2026",
-        daysLeft: 20,
+        date: "Apr 01, 2026",
         type: "driver",
-        severity: "info",
     },
     {
         id: 4,
         title: "MCS-150 Biennial Update",
-        date: "Mar 15, 2026",
-        daysLeft: 34,
+        date: "Jun 15, 2026",
         type: "company",
-        severity: "info",
     },
 ];
+
+const upcomingDeadlines = upcomingDeadlinesRaw.map(d => ({
+    ...d,
+    daysLeft: computeDaysLeft(d.date),
+    severity: getSeverity(computeDaysLeft(d.date)),
+}));
 
 const recentAlerts = [
     {
@@ -110,10 +124,10 @@ const recentAlerts = [
 ];
 
 const quickActions = [
-    { label: "Add Driver", href: "/dashboard/drivers/new", icon: Users },
-    { label: "Add Vehicle", href: "/dashboard/vehicles/new", icon: Truck },
-    { label: "Upload Document", href: "/dashboard/documents/upload", icon: FileWarning },
-    { label: "Run Report", href: "/dashboard/reports", icon: TrendingUp },
+    { label: "Add Driver", href: "/dashboard/drivers", icon: Users },
+    { label: "Add Vehicle", href: "/dashboard/vehicles", icon: Truck },
+    { label: "Document Wizard", href: "/dashboard/documents/wizard", icon: ClipboardList },
+    { label: "Compliance", href: "/dashboard/compliance", icon: Shield },
 ];
 
 export default function DashboardPage() {
@@ -239,7 +253,7 @@ export default function DashboardPage() {
                                     <span className={styles.deadlineDate}>{deadline.date}</span>
                                 </div>
                                 <span className={`${styles.daysLeft} ${styles[deadline.severity]}`}>
-                                    {deadline.daysLeft} days
+                                    {deadline.daysLeft < 0 ? `${Math.abs(deadline.daysLeft)}d overdue` : `${deadline.daysLeft} days`}
                                 </span>
                             </div>
                         ))}
@@ -250,7 +264,7 @@ export default function DashboardPage() {
                 <section className={styles.panel}>
                     <div className={styles.panelHeader}>
                         <h3 className={styles.sectionTitle}>Recent Alerts</h3>
-                        <Link href="/dashboard/notifications" className={styles.viewAll}>
+                        <Link href="/dashboard/alerts" className={styles.viewAll}>
                             View all <ArrowRight size={16} />
                         </Link>
                     </div>

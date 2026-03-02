@@ -19,13 +19,13 @@ export default function VehicleMaintenanceGuidePost() {
             </nav>
             <article className={styles.article}>
                 <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Vehicle Compliance • Pillar Guide</div>
+                    <div className={styles.articleCategory}>Vehicle Compliance • Complete Guide</div>
                     <h1 className={styles.articleTitle}>Complete Guide to DOT Vehicle Maintenance &amp; Inspection Compliance</h1>
                     <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 20, 2026</span><span>•</span><span>15 min read</span></div>
                 </header>
                 <div className={styles.articleContent}>
                     <p>Vehicle maintenance isn&apos;t just about keeping your trucks running — it&apos;s a <strong>federal requirement</strong>. Under <strong>FMCSA Part 396</strong>, every motor carrier must systematically inspect, repair, and maintain all commercial motor vehicles under its control. Brake violations alone account for <strong>over 30% of all roadside out-of-service orders</strong>, making vehicle maintenance the single most impactful compliance area for your fleet.</p>
-                    <p>This pillar guide covers every aspect of DOT vehicle maintenance compliance and links to deeper guides on specific topics.</p>
+                    <p>This comprehensive guide covers every aspect of DOT vehicle maintenance compliance and links to deeper guides on specific topics.</p>
 
                     <h2>Annual DOT Inspections (§396.17)</h2>
                     <p>Every CMV — including tractors, straight trucks, and trailers — must pass an <strong>annual inspection</strong> performed by a qualified inspector. The inspection must cover all items listed in <strong>Appendix G of Part 396</strong>, including:</p>

@@ -1,0 +1,756 @@
+/* ─── Document Wizard Page ─── */
+.wizard {
+    padding: 1.5rem 2rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ─── Header ─── */
+.header {
+    margin-bottom: 2rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    transition: color 0.15s;
+}
+
+.backLink:hover {
+    color: #3b82f6;
+}
+
+.title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 600px;
+}
+
+/* ─── Assessment Step ─── */
+.assessmentContainer {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.progressBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.progressDot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.progressDot.current {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: scale(1.1);
+}
+
+.progressDot.completed {
+    background: #dcfce7;
+    color: #16a34a;
+    border-color: #86efac;
+}
+
+.questionCard {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 2rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.questionNumber {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #3b82f6;
+    margin-bottom: 0.75rem;
+}
+
+.questionTitle {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.questionDesc {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.optionsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+}
+
+.optionButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.optionButton:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.optionButton.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.optionIcon {
+    font-size: 1.5rem;
+}
+
+.optionLabel {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.3;
+}
+
+.assessmentNav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.navButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    transition: all 0.15s;
+}
+
+.navButton:hover:not(:disabled) {
+    border-color: #93c5fd;
+    color: #3b82f6;
+}
+
+.navButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.navPrimary {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.navPrimary:hover:not(:disabled) {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.infoBox {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-top: 2rem;
+    padding: 1.25rem;
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    color: #92400e;
+    line-height: 1.6;
+}
+
+.infoBox strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.infoBox p {
+    margin: 0;
+    color: #a16207;
+}
+
+/* ─── Results Step ─── */
+.resultsContainer {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.summaryCard {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg dg, #eff6ff, #f0fdf4);
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    margin-bottom: 1.25rem;
+}
+
+.summaryIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.summaryContent h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.summaryContent p {
+    font-size: 0.875rem;
+    color: #475569;
+    margin: 0;
+}
+
+.restartButton {
+    margin-left: auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+}
+
+.restartButton:hover {
+    border-color: #93c5fd;
+    color: #3b82f6;
+}
+
+.jargonBox {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.825rem;
+    color: #475569;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.jargonBox strong {
+    color: #0f172a;
+}
+
+.jargonBox p {
+    margin: 0.25rem 0 0;
+}
+
+.formCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.formCard {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.formCard:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.formCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.formCategoryTag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.savedBadge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.formCardTitle {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.formCardDesc {
+    font-size: 0.84rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.formCardMeta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.formCardMeta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.fillButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 10px;
+    background: #3b82f6;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.fillButton:hover {
+    background: #2563eb;
+}
+
+/* ─── Fill Form Step ─── */
+.fillContainer {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.formSidebar {
+    position: sticky;
+    top: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem;
+}
+
+.sidebarTitle {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+
+.sidebarItem {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.6rem 0.5rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.825rem;
+    color: #475569;
+    transition: background 0.15s;
+}
+
+.sidebarItem:hover {
+    background: #f1f5f9;
+}
+
+.sidebarItem.active {
+    background: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.sidebarNumber {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.sidebarItem.active .sidebarNumber {
+    background: #3b82f6;
+    color: white;
+}
+
+.sidebarLabel {
+    flex: 1;
+    line-height: 1.3;
+}
+
+.sidebarProgress {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.sidebarActions {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formContent {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 2rem;
+}
+
+.formHeader {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.formHeader h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.formRef {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+.formSection {
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: none;
+    background: #f8fafc;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sectionHeader:hover {
+    background: #f1f5f9;
+}
+
+.sectionTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.15rem;
+}
+
+.sectionDesc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.sectionMeta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.sectionCount {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.fieldsGrid {
+    padding: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.fieldWrapper {
+    width: 100%;
+}
+
+.fieldWrapper.halfWidth {
+    width: calc(50% - 0.5rem);
+}
+
+.fieldLabel {
+    display: block;
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.35rem;
+}
+
+.requiredStar {
+    color: #ef4444;
+    margin-left: 0.2rem;
+}
+
+.fieldInput {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #0f172a;
+    background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.fieldInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.fieldInput::placeholder {
+    color: #94a3b8;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 72px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 0.1rem;
+    accent-color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.checkboxText {
+    flex: 1;
+}
+
+.helpText {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+}
+
+.formBottomActions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.saveButton,
+.backToResults {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.saveButton:hover,
+.backToResults:hover {
+    border-color: #93c5fd;
+    color: #3b82f6;
+}
+
+.downloadButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-left: auto;
+}
+
+.downloadButton:hover {
+    background: #2563eb;
+}
+
+.savedNotice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .wizard {
+        padding: 1rem;
+    }
+
+    .fillContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .formSidebar {
+        position: static;
+    }
+
+    .optionsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fieldWrapper.halfWidth {
+        width: 100%;
+    }
+
+    .summaryCard {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .restartButton {
+        margin-left: 0;
+    }
+
+    .formCardsGrid {
+        grid-template-columns: 1fr;
+    }
+}

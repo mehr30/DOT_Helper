@@ -171,7 +171,7 @@ export default function BlogIndexPage() {
                     📚 Comprehensive Guides
                 </h2>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "var(--space-6)", fontSize: "0.9375rem" }}>
-                    Our in-depth pillar guides cover everything you need to know about each major compliance area.
+                    Our in-depth compliance guides cover everything you need to know about each major area of DOT regulation.
                 </p>
             </div>
             <div className={styles.postsGrid}>
@@ -181,7 +181,7 @@ export default function BlogIndexPage() {
                             {post.emoji}
                         </div>
                         <div className={styles.postBody}>
-                            <div className={styles.postCategory}>{post.category} • Pillar Guide</div>
+                            <div className={styles.postCategory}>{post.category} • Complete Guide</div>
                             <h2 className={styles.postCardTitle}>{post.title}</h2>
                             <p className={styles.postExcerpt}>{post.excerpt}</p>
                             <div className={styles.postMeta}>

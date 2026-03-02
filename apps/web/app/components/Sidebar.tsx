@@ -110,7 +110,7 @@ export default function Sidebar() {
                     </div>
 
                     <div className={styles.bottomLinks}>
-                        <Link href="/dashboard/notifications" className={styles.bottomLink}>
+                        <Link href="/dashboard/alerts" className={styles.bottomLink}>
                             <Bell size={18} />
                             <span>Notifications</span>
                             <span className={styles.notificationBadge}>3</span>

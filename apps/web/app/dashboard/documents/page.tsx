@@ -10,7 +10,10 @@ import {
     Clock,
     CheckCircle,
     FolderOpen,
-    Plus
+    Plus,
+    ClipboardList,
+    Sparkles,
+    ArrowRight,
 } from "lucide-react";
 import styles from "./page.module.css";
 
@@ -117,6 +120,26 @@ function getStatusBadge(status: string) {
 export default function DocumentsPage() {
     return (
         <div className={styles.page}>
+            {/* Document Wizard Banner */}
+            <div className={styles.wizardBanner}>
+                <div className={styles.wizardBannerIcon}>
+                    <Sparkles size={24} />
+                </div>
+                <div className={styles.wizardBannerContent}>
+                    <h3>Not sure which documents you need?</h3>
+                    <p>
+                        Whether you run a trucking fleet, HVAC company, plumbing business, or any company
+                        with commercial vehicles — our wizard will tell you exactly which DOT forms you
+                        need and let you fill them out right here.
+                    </p>
+                </div>
+                <Link href="/dashboard/documents/wizard" className={styles.wizardBannerButton}>
+                    <ClipboardList size={18} />
+                    Start Document Wizard
+                    <ArrowRight size={16} />
+                </Link>
+            </div>
+
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.headerContent}>
@@ -125,10 +148,21 @@ export default function DocumentsPage() {
                         Store, organize, and track all your compliance documents
                     </p>
                 </div>
-                <Link href="/dashboard/documents/upload" className="btn btn-primary">
-                    <Upload size={18} />
-                    Upload Document
-                </Link>
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <Link href="/dashboard/documents/wizard" className="btn btn-secondary" style={{
+                        display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                        padding: "0.6rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0",
+                        background: "white", color: "#475569", fontWeight: 500, fontSize: "0.875rem",
+                        textDecoration: "none", whiteSpace: "nowrap",
+                    }}>
+                        <ClipboardList size={18} />
+                        Fill a Form
+                    </Link>
+                    <Link href="/dashboard/documents" className="btn btn-primary">
+                        <Upload size={18} />
+                        Upload Document
+                    </Link>
+                </div>
             </header>
 
             {/* Stats */}

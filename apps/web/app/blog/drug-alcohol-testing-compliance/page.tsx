@@ -19,7 +19,7 @@ export default function DrugAlcoholTestingPost() {
             </nav>
             <article className={styles.article}>
                 <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Drug &amp; Alcohol • Pillar Guide</div>
+                    <div className={styles.articleCategory}>Drug &amp; Alcohol • Complete Guide</div>
                     <h1 className={styles.articleTitle}>DOT Drug &amp; Alcohol Testing Compliance: The Complete Guide for Fleet Owners</h1>
                     <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 15, 2026</span><span>•</span><span>13 min read</span></div>
                 </header>

@@ -1,0 +1,488 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import {
+    ArrowLeft,
+    ArrowRight,
+    CheckCircle,
+    ClipboardList,
+    FileText,
+    Download,
+    Save,
+    AlertCircle,
+    HelpCircle,
+    ChevronDown,
+    ChevronUp,
+    Sparkles,
+} from "lucide-react";
+import styles from "./page.module.css";
+import {
+    assessmentQuestions,
+    getRecommendedForms,
+    DOTForm,
+    FormSection,
+    FormField,
+} from "./forms";
+
+type WizardStep = "assessment" | "results" | "fillForm";
+
+export default function DocumentWizardPage() {
+    const [step, setStep] = useState<WizardStep>("assessment");
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+    const [recommendedForms, setRecommendedForms] = useState<DOTForm[]>([]);
+    const [activeForm, setActiveForm] = useState<DOTForm | null>(null);
+    const [formData, setFormData] = useState<Record<string, string | boolean>>({});
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+    const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
+
+    // ─── Assessment Logic ──────────────────
+
+    const question = assessmentQuestions[currentQuestion];
+
+    const handleAnswer = (value: string) => {
+        if (!question) return;
+        if (question.type === "multi") {
+            const current = (answers[question.id] as string[]) || [];
+            if (value === "none") {
+                setAnswers({ ...answers, [question.id]: ["none"] });
+            } else {
+                const filtered = current.filter(v => v !== "none");
+                const updated = filtered.includes(value)
+                    ? filtered.filter(v => v !== value)
+                    : [...filtered, value];
+                setAnswers({ ...answers, [question.id]: updated });
+            }
+        } else {
+            setAnswers({ ...answers, [question.id]: value });
+            // Auto-advance for single-select
+            if (currentQuestion < assessmentQuestions.length - 1) {
+                setTimeout(() => setCurrentQuestion(currentQuestion + 1), 300);
+            }
+        }
+    };
+
+    const handleFinishAssessment = () => {
+        const forms = getRecommendedForms(answers);
+        setRecommendedForms(forms);
+        setStep("results");
+    };
+
+    const isAnswered = (qId: string) => {
+        const a = answers[qId];
+        if (Array.isArray(a)) return a.length > 0;
+        return !!a;
+    };
+
+    const isMultiSelected = (value: string) => {
+        if (question?.type !== "multi") return false;
+        return ((answers[question.id] as string[]) || []).includes(value);
+    };
+
+    // ─── Form Filling Logic ──────────────────
+
+    const startForm = (form: DOTForm) => {
+        setActiveForm(form);
+        setFormData({});
+        setExpandedSections(new Set([form.sections[0]?.id || ""]));
+        setStep("fillForm");
+    };
+
+    const handleFieldChange = (fieldId: string, value: string | boolean) => {
+        setFormData({ ...formData, [fieldId]: value });
+    };
+
+    const toggleSection = (sectionId: string) => {
+        setExpandedSections(prev => {
+            const next = new Set(prev);
+            if (next.has(sectionId)) next.delete(sectionId);
+            else next.add(sectionId);
+            return next;
+        });
+    };
+
+    const handleSaveForm = () => {
+        if (activeForm) {
+            setSavedForms(prev => new Set(prev).add(activeForm.id));
+        }
+    };
+
+    const getFilledCount = (section: FormSection) => {
+        return section.fields.filter(f => {
+            const val = formData[f.id];
+            if (f.type === "checkbox") return val === true;
+            return !!val;
+        }).length;
+    };
+
+    const getCategoryLabel = (category: string) => {
+        switch (category) {
+            case "driver": return "Driver Files";
+            case "vehicle": return "Vehicle Records";
+            case "company": return "Company Filing";
+            case "safety": return "Safety Program";
+            default: return category;
+        }
+    };
+
+    const getCategoryColor = (category: string) => {
+        switch (category) {
+            case "driver": return "#3b82f6";
+            case "vehicle": return "#10b981";
+            case "company": return "#8b5cf6";
+            case "safety": return "#f59e0b";
+            default: return "#64748b";
+        }
+    };
+
+    // ─── Render Field ──────────────────
+
+    const renderField = (field: FormField) => {
+        const value = formData[field.id];
+
+        return (
+            <div
+                key={field.id}
+                className={`${styles.fieldWrapper} ${field.halfWidth ? styles.halfWidth : ""}`}
+            >
+                <label className={styles.fieldLabel}>
+                    {field.label}
+                    {field.required && <span className={styles.requiredStar}>*</span>}
+                </label>
+
+                {field.type === "checkbox" ? (
+                    <label className={styles.checkboxLabel}>
+                        <input
+                            type="checkbox"
+                            checked={!!value}
+                            onChange={(e) => handleFieldChange(field.id, e.target.checked)}
+                            className={styles.checkbox}
+                        />
+                        <span className={styles.checkboxText}>{field.label}</span>
+                    </label>
+                ) : field.type === "select" ? (
+                    <select
+                        value={(value as string) || ""}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                        className={styles.fieldInput}
+                    >
+                        {field.options?.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                ) : field.type === "textarea" ? (
+                    <textarea
+                        value={(value as string) || ""}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                        placeholder={field.placeholder}
+                        className={`${styles.fieldInput} ${styles.textarea}`}
+                        rows={3}
+                    />
+                ) : (
+                    <input
+                        type={field.type === "ssn" ? "password" : field.type}
+                        value={(value as string) || ""}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                        placeholder={field.placeholder}
+                        className={styles.fieldInput}
+                    />
+                )}
+
+                {field.helpText && (
+                    <span className={styles.helpText}>
+                        <HelpCircle size={12} />
+                        {field.helpText}
+                    </span>
+                )}
+            </div>
+        );
+    };
+
+    // ─── RENDER ──────────────────────────
+
+    return (
+        <div className={styles.wizard}>
+            {/* Header */}
+            <header className={styles.header}>
+                <div className={styles.headerLeft}>
+                    <Link href="/dashboard/documents" className={styles.backLink}>
+                        <ArrowLeft size={18} />
+                        Back to Documents
+                    </Link>
+                    <h1 className={styles.title}>
+                        {step === "assessment" && "DOT Compliance Document Wizard"}
+                        {step === "results" && "Your Required Documents"}
+                        {step === "fillForm" && activeForm?.shortTitle}
+                    </h1>
+                    <p className={styles.subtitle}>
+                        {step === "assessment" && "Answer a few simple questions and we'll tell you exactly which DOT documents your business needs."}
+                        {step === "results" && "Based on your answers, here are the forms and documents you need to stay compliant."}
+                        {step === "fillForm" && activeForm?.description}
+                    </p>
+                </div>
+            </header>
+
+            {/* ─── ASSESSMENT STEP ─── */}
+            {step === "assessment" && (
+                <div className={styles.assessmentContainer}>
+                    {/* Progress */}
+                    <div className={styles.progressBar}>
+                        {assessmentQuestions.map((q, idx) => (
+                            <div
+                                key={q.id}
+                                className={`${styles.progressDot} ${idx === currentQuestion ? styles.current :
+                                    isAnswered(q.id) ? styles.completed : ""
+                                    }`}
+                                onClick={() => setCurrentQuestion(idx)}
+                            >
+                                {isAnswered(q.id) && idx !== currentQuestion ? (
+                                    <CheckCircle size={14} />
+                                ) : (
+                                    <span>{idx + 1}</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Question Card */}
+                    {question && (
+                        <div className={styles.questionCard}>
+                            <div className={styles.questionNumber}>
+                                Question {currentQuestion + 1} of {assessmentQuestions.length}
+                            </div>
+                            <h2 className={styles.questionTitle}>{question.question}</h2>
+                            <p className={styles.questionDesc}>{question.description}</p>
+
+                            <div className={styles.optionsGrid}>
+                                {question.options?.map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        className={`${styles.optionButton} ${question.type === "multi"
+                                            ? isMultiSelected(opt.value) ? styles.selected : ""
+                                            : answers[question.id] === opt.value ? styles.selected : ""
+                                            }`}
+                                        onClick={() => handleAnswer(opt.value)}
+                                    >
+                                        <span className={styles.optionIcon}>{opt.icon}</span>
+                                        <span className={styles.optionLabel}>{opt.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Navigation */}
+                    <div className={styles.assessmentNav}>
+                        <button
+                            className={styles.navButton}
+                            onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                            disabled={currentQuestion === 0}
+                        >
+                            <ArrowLeft size={16} /> Previous
+                        </button>
+
+                        {currentQuestion < assessmentQuestions.length - 1 ? (
+                            <button
+                                className={`${styles.navButton} ${styles.navPrimary}`}
+                                onClick={() => setCurrentQuestion(currentQuestion + 1)}
+                                disabled={!isAnswered(question?.id || "")}
+                            >
+                                Next <ArrowRight size={16} />
+                            </button>
+                        ) : (
+                            <button
+                                className={`${styles.navButton} ${styles.navPrimary}`}
+                                onClick={handleFinishAssessment}
+                                disabled={!isAnswered(question?.id || "")}
+                            >
+                                <Sparkles size={16} /> See My Required Documents
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Info box for home service businesses */}
+                    {currentQuestion === 0 && (
+                        <div className={styles.infoBox}>
+                            <AlertCircle size={18} />
+                            <div>
+                                <strong>Not sure if DOT regulations apply to you?</strong>
+                                <p>
+                                    If your business operates <em>any</em> vehicle over 10,001 lbs GVWR
+                                    (Gross Vehicle Weight Rating — the max weight your vehicle is designed to carry,
+                                    found on the sticker inside your driver&apos;s door), you likely need DOT compliance.
+                                    This includes many work vans, box trucks, and service vehicles with equipment.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ─── RESULTS STEP ─── */}
+            {step === "results" && (
+                <div className={styles.resultsContainer}>
+                    {/* Summary Card */}
+                    <div className={styles.summaryCard}>
+                        <div className={styles.summaryIcon}>
+                            <ClipboardList size={28} />
+                        </div>
+                        <div className={styles.summaryContent}>
+                            <h3>{recommendedForms.length} documents required</h3>
+                            <p>
+                                Based on your answers, these are the DOT forms and records you need.
+                                Click any form to start filling it out right here.
+                            </p>
+                        </div>
+                        <button
+                            className={styles.restartButton}
+                            onClick={() => { setStep("assessment"); setCurrentQuestion(0); setAnswers({}); }}
+                        >
+                            Retake Assessment
+                        </button>
+                    </div>
+
+                    {/* Jargon explainer */}
+                    <div className={styles.jargonBox}>
+                        <HelpCircle size={16} />
+                        <div>
+                            <strong>Understanding the abbreviations:</strong>
+                            <p>
+                                <strong>CFR</strong> = Code of Federal Regulations (the official rule book).{" "}
+                                <strong>FMCSA</strong> = Federal Motor Carrier Safety Administration (the agency that enforces DOT rules).{" "}
+                                <strong>CMV</strong> = Commercial Motor Vehicle (any vehicle over 10,001 lbs used for business).{" "}
+                                <strong>GVWR</strong> = Gross Vehicle Weight Rating (max weight your vehicle can carry — check your door sticker).
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Form Cards */}
+                    <div className={styles.formCardsGrid}>
+                        {recommendedForms.map(form => (
+                            <div key={form.id} className={styles.formCard}>
+                                <div className={styles.formCardHeader}>
+                                    <span
+                                        className={styles.formCategoryTag}
+                                        style={{ background: getCategoryColor(form.category) + "15", color: getCategoryColor(form.category) }}
+                                    >
+                                        {getCategoryLabel(form.category)}
+                                    </span>
+                                    {savedForms.has(form.id) && (
+                                        <span className={styles.savedBadge}>
+                                            <CheckCircle size={14} /> Saved
+                                        </span>
+                                    )}
+                                </div>
+                                <h3 className={styles.formCardTitle}>{form.shortTitle}</h3>
+                                <p className={styles.formCardDesc}>{form.description}</p>
+                                <div className={styles.formCardMeta}>
+                                    <span><FileText size={14} /> {form.cfrReference}</span>
+                                    <span>⏱ ~{form.estimatedTime}</span>
+                                </div>
+                                <button
+                                    className={styles.fillButton}
+                                    onClick={() => startForm(form)}
+                                >
+                                    {savedForms.has(form.id) ? "Edit Form" : "Start Filling Out"}
+                                    <ArrowRight size={16} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ─── FILL FORM STEP ─── */}
+            {step === "fillForm" && activeForm && (
+                <div className={styles.fillContainer}>
+                    {/* Form sidebar - sections */}
+                    <div className={styles.formSidebar}>
+                        <h4 className={styles.sidebarTitle}>Sections</h4>
+                        {activeForm.sections.map((section, idx) => {
+                            const filled = getFilledCount(section);
+                            const total = section.fields.length;
+                            return (
+                                <button
+                                    key={section.id}
+                                    className={`${styles.sidebarItem} ${expandedSections.has(section.id) ? styles.active : ""}`}
+                                    onClick={() => {
+                                        setExpandedSections(new Set([section.id]));
+                                        document.getElementById(`section-${section.id}`)?.scrollIntoView({ behavior: "smooth" });
+                                    }}
+                                >
+                                    <span className={styles.sidebarNumber}>{idx + 1}</span>
+                                    <span className={styles.sidebarLabel}>{section.title}</span>
+                                    <span className={styles.sidebarProgress}>
+                                        {filled}/{total}
+                                    </span>
+                                </button>
+                            );
+                        })}
+
+                        <div className={styles.sidebarActions}>
+                            <button className={styles.saveButton} onClick={handleSaveForm}>
+                                <Save size={16} /> Save Progress
+                            </button>
+                            <button className={styles.backToResults} onClick={() => setStep("results")}>
+                                <ArrowLeft size={16} /> All Documents
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Form content */}
+                    <div className={styles.formContent}>
+                        <div className={styles.formHeader}>
+                            <h2>{activeForm.title}</h2>
+                            <span className={styles.formRef}>{activeForm.cfrReference}</span>
+                        </div>
+
+                        {activeForm.sections.map(section => (
+                            <div key={section.id} id={`section-${section.id}`} className={styles.formSection}>
+                                <button
+                                    className={styles.sectionHeader}
+                                    onClick={() => toggleSection(section.id)}
+                                >
+                                    <div>
+                                        <h3 className={styles.sectionTitle}>{section.title}</h3>
+                                        {section.description && (
+                                            <p className={styles.sectionDesc}>{section.description}</p>
+                                        )}
+                                    </div>
+                                    <div className={styles.sectionMeta}>
+                                        <span className={styles.sectionCount}>
+                                            {getFilledCount(section)}/{section.fields.length} filled
+                                        </span>
+                                        {expandedSections.has(section.id) ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                    </div>
+                                </button>
+
+                                {expandedSections.has(section.id) && (
+                                    <div className={styles.fieldsGrid}>
+                                        {section.fields.map(field => renderField(field))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+
+                        {/* Bottom actions */}
+                        <div className={styles.formBottomActions}>
+                            <button className={styles.saveButton} onClick={handleSaveForm}>
+                                <Save size={16} /> Save Progress
+                            </button>
+                            <button className={styles.downloadButton}>
+                                <Download size={16} /> Download as PDF
+                            </button>
+                        </div>
+
+                        {savedForms.has(activeForm.id) && (
+                            <div className={styles.savedNotice}>
+                                <CheckCircle size={16} />
+                                Form saved successfully! You can come back to edit it anytime.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

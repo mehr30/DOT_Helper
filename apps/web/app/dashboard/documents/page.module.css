@@ -5,6 +5,73 @@
     gap: var(--space-6);
 }
 
+/* Wizard Banner */
+.wizardBanner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+}
+
+.wizardBannerIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wizardBannerContent {
+    flex: 1;
+}
+
+.wizardBannerContent h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.wizardBannerContent p {
+    font-size: 0.84rem;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.wizardBannerButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    background: #3b82f6;
+    color: white;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.wizardBannerButton:hover {
+    background: #2563eb;
+}
+
+@media (max-width: 768px) {
+    .wizardBanner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
 /* Header */
 .header {
     display: flex;
