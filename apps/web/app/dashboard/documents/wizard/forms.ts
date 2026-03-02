@@ -65,8 +65,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
         type: "single",
         options: [
             { value: "under10k", label: "Under 10,001 lbs", icon: "🚗" },
-            { value: "10k-26k", label: "10,001 – 26,000 lbs", icon: "🚐" },
-            { value: "over26k", label: "Over 26,000 lbs (CDL required)", icon: "🚛" },
+            { value: "10k-26k", label: "10,001 – 26,000 lbs (DOT rules apply, no CDL needed)", icon: "🚐" },
+            { value: "over26k", label: "Over 26,001 lbs (CDL required)", icon: "🚛" },
             { value: "unsure", label: "Not sure", icon: "❓" },
         ],
     },

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
     Search,
@@ -14,8 +17,12 @@ import {
     ClipboardList,
     Sparkles,
     ArrowRight,
+    Edit3,
+    Trash2,
+    Package,
 } from "lucide-react";
 import styles from "./page.module.css";
+import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
 
 // Document types and their categories
 const documentCategories = [
@@ -117,25 +124,46 @@ function getStatusBadge(status: string) {
     }
 }
 
+function getCategoryLabel(cat: string) {
+    switch (cat) {
+        case "driver": return "Driver Files";
+        case "vehicle": return "Vehicle Records";
+        case "company": return "Company Filing";
+        case "safety": return "Safety Program";
+        default: return cat;
+    }
+}
+
 export default function DocumentsPage() {
+    const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([]);
+
+    useEffect(() => {
+        setSavedDocs(getSavedDocuments());
+    }, []);
+
+    const handleDeleteSavedDoc = (id: string) => {
+        deleteDocument(id);
+        setSavedDocs(getSavedDocuments());
+    };
+
     return (
         <div className={styles.page}>
-            {/* Document Wizard Banner */}
+            {/* Compliance Setup Banner */}
             <div className={styles.wizardBanner}>
                 <div className={styles.wizardBannerIcon}>
                     <Sparkles size={24} />
                 </div>
                 <div className={styles.wizardBannerContent}>
-                    <h3>Not sure which documents you need?</h3>
+                    <h3>Set up your DOT compliance profile</h3>
                     <p>
-                        Whether you run a trucking fleet, HVAC company, plumbing business, or any company
-                        with commercial vehicles — our wizard will tell you exactly which DOT forms you
-                        need and let you fill them out right here.
+                        Answer a few questions about your business, vehicles, and operations.
+                        We&apos;ll figure out exactly which DOT requirements apply to you and
+                        set up everything you need — no jargon, no guesswork.
                     </p>
                 </div>
                 <Link href="/dashboard/documents/wizard" className={styles.wizardBannerButton}>
                     <ClipboardList size={18} />
-                    Start Document Wizard
+                    Start Compliance Setup
                     <ArrowRight size={16} />
                 </Link>
             </div>
@@ -164,6 +192,122 @@ export default function DocumentsPage() {
                     </Link>
                 </div>
             </header>
+
+            {/* Wizard-Saved Documents */}
+            {savedDocs.length > 0 && (
+                <section style={{ marginBottom: "1.5rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <h3 style={{
+                            fontSize: "1rem", fontWeight: 700, color: "#0f172a",
+                            display: "flex", alignItems: "center", gap: "0.5rem", margin: 0,
+                        }}>
+                            <ClipboardList size={18} style={{ color: "#3b82f6" }} />
+                            Your Compliance Documents
+                        </h3>
+                        <button
+                            onClick={() => {
+                                // Generate a simple text summary of all saved docs for now
+                                const docs = getSavedDocuments();
+                                if (docs.length === 0) return;
+                                let content = "DOT COMPLIANCE PACKET\n";
+                                content += `Generated: ${new Date().toLocaleDateString()}\n`;
+                                content += "=".repeat(50) + "\n\n";
+                                docs.forEach(doc => {
+                                    content += `${doc.title} (${doc.cfrReference})\n`;
+                                    content += `Status: ${doc.status === "completed" ? "Completed" : "Draft"} — ${doc.completedFields}/${doc.totalFields} fields\n`;
+                                    content += `-`.repeat(40) + "\n";
+                                    Object.entries(doc.data).forEach(([key, val]) => {
+                                        if (val) {
+                                            const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
+                                            content += `  ${label}: ${val === true ? "Yes" : val}\n`;
+                                        }
+                                    });
+                                    content += "\n";
+                                });
+                                const blob = new Blob([content], { type: "text/plain" });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `dot-compliance-packet-${new Date().toISOString().split("T")[0]}.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                            }}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "0.4rem",
+                                padding: "0.5rem 1rem", borderRadius: "8px",
+                                border: "1px solid #e2e8f0", background: "white",
+                                color: "#475569", fontSize: "0.8rem", fontWeight: 600,
+                                cursor: "pointer",
+                            }}
+                        >
+                            <Package size={16} />
+                            Download Compliance Packet
+                        </button>
+                    </div>
+                    <div style={{
+                        display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                        gap: "0.75rem"
+                    }}>
+                        {savedDocs.map(doc => (
+                            <div key={doc.id} style={{
+                                background: "white", border: "1px solid #e2e8f0",
+                                borderRadius: "12px", padding: "1rem 1.25rem",
+                                display: "flex", flexDirection: "column", gap: "0.5rem",
+                            }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                    <span style={{
+                                        fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
+                                        letterSpacing: "0.05em", padding: "0.2rem 0.5rem", borderRadius: "4px",
+                                        background: doc.status === "completed" ? "#dcfce7" : "#fef3c7",
+                                        color: doc.status === "completed" ? "#16a34a" : "#92400e",
+                                    }}>
+                                        {doc.status === "completed" ? "✓ Completed" : "● Draft"}
+                                    </span>
+                                    <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+                                        {getCategoryLabel(doc.category)}
+                                    </span>
+                                </div>
+                                <h4 style={{ fontSize: "0.925rem", fontWeight: 600, color: "#0f172a", margin: 0 }}>
+                                    {doc.shortTitle}
+                                </h4>
+                                <p style={{ fontSize: "0.8rem", color: "#64748b", margin: 0 }}>
+                                    {doc.cfrReference} · {doc.completedFields}/{doc.totalFields} fields filled
+                                </p>
+                                <p style={{ fontSize: "0.75rem", color: "#94a3b8", margin: 0 }}>
+                                    Saved {new Date(doc.savedAt).toLocaleDateString("en-US", {
+                                        month: "short", day: "numeric", year: "numeric",
+                                        hour: "numeric", minute: "2-digit",
+                                    })}
+                                </p>
+                                <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.25rem" }}>
+                                    <Link
+                                        href={`/dashboard/documents/wizard?form=${doc.formId}`}
+                                        style={{
+                                            flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                                            gap: "0.3rem", padding: "0.5rem", borderRadius: "8px",
+                                            background: "#3b82f6", color: "white", fontSize: "0.8rem",
+                                            fontWeight: 600, textDecoration: "none",
+                                        }}
+                                    >
+                                        <Edit3 size={14} /> Edit
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDeleteSavedDoc(doc.id)}
+                                        style={{
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            gap: "0.3rem", padding: "0.5rem 0.75rem", borderRadius: "8px",
+                                            border: "1px solid #e2e8f0", background: "white",
+                                            color: "#ef4444", fontSize: "0.8rem", fontWeight: 500, cursor: "pointer",
+                                        }}
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Stats */}
             <div className={styles.statsRow}>

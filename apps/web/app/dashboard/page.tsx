@@ -69,24 +69,28 @@ const upcomingDeadlinesRaw = [
         title: "CDL Expiration - John Smith",
         date: "Feb 15, 2026",
         type: "driver",
+        formId: "driverApp",
     },
     {
         id: 2,
         title: "Annual DOT Inspection - Unit 103",
         date: "Feb 22, 2026",
         type: "vehicle",
+        formId: "dvir",
     },
     {
         id: 3,
         title: "Medical Card - Mike Johnson",
         date: "Apr 01, 2026",
         type: "driver",
+        formId: "driverApp",
     },
     {
         id: 4,
         title: "MCS-150 Biennial Update",
         date: "Jun 15, 2026",
         type: "company",
+        formId: "mcs150",
     },
 ];
 
@@ -126,7 +130,7 @@ const recentAlerts = [
 const quickActions = [
     { label: "Add Driver", href: "/dashboard/drivers", icon: Users },
     { label: "Add Vehicle", href: "/dashboard/vehicles", icon: Truck },
-    { label: "Document Wizard", href: "/dashboard/documents/wizard", icon: ClipboardList },
+    { label: "Compliance Setup", href: "/dashboard/documents/wizard", icon: ClipboardList },
     { label: "Compliance", href: "/dashboard/compliance", icon: Shield },
 ];
 
@@ -246,7 +250,12 @@ export default function DashboardPage() {
                     </div>
                     <div className={styles.deadlineList}>
                         {upcomingDeadlines.map((deadline) => (
-                            <div key={deadline.id} className={styles.deadlineItem}>
+                            <Link
+                                key={deadline.id}
+                                href={`/dashboard/documents/wizard?form=${deadline.formId}`}
+                                className={styles.deadlineItem}
+                                style={{ textDecoration: "none", cursor: "pointer" }}
+                            >
                                 <div className={`${styles.deadlineIndicator} ${styles[deadline.severity]}`} />
                                 <div className={styles.deadlineContent}>
                                     <span className={styles.deadlineTitle}>{deadline.title}</span>
@@ -255,7 +264,7 @@ export default function DashboardPage() {
                                 <span className={`${styles.daysLeft} ${styles[deadline.severity]}`}>
                                     {deadline.daysLeft < 0 ? `${Math.abs(deadline.daysLeft)}d overdue` : `${deadline.daysLeft} days`}
                                 </span>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </section>

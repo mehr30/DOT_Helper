@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeft,
@@ -20,15 +21,18 @@ import styles from "./page.module.css";
 import {
     assessmentQuestions,
     getRecommendedForms,
+    dotForms,
     DOTForm,
     FormSection,
     FormField,
     ComplianceAlert,
 } from "./forms";
+import { saveDocument, getDocumentByFormId, SavedDocument } from "../savedDocuments";
 
 type WizardStep = "assessment" | "results" | "fillForm";
 
-export default function DocumentWizardPage() {
+function WizardContent() {
+    const searchParams = useSearchParams();
     const [step, setStep] = useState<WizardStep>("assessment");
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -38,6 +42,25 @@ export default function DocumentWizardPage() {
     const [formData, setFormData] = useState<Record<string, string | boolean>>({});
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
+    const [saveNotice, setSaveNotice] = useState(false);
+
+    // Handle ?form= query parameter to jump directly to a form
+    useEffect(() => {
+        const formId = searchParams.get("form");
+        if (formId) {
+            const form = dotForms.find(f => f.id === formId);
+            if (form) {
+                // Load any existing saved data
+                const existingDoc = getDocumentByFormId(formId);
+                if (existingDoc) {
+                    setFormData(existingDoc.data);
+                }
+                setActiveForm(form);
+                setExpandedSections(new Set([form.sections[0]?.id || ""]));
+                setStep("fillForm");
+            }
+        }
+    }, [searchParams]);
 
     // ─── Assessment Logic ──────────────────
 
@@ -86,8 +109,10 @@ export default function DocumentWizardPage() {
     // ─── Form Filling Logic ──────────────────
 
     const startForm = (form: DOTForm) => {
+        // Load any existing saved data
+        const existingDoc = getDocumentByFormId(form.id);
         setActiveForm(form);
-        setFormData({});
+        setFormData(existingDoc ? existingDoc.data : {});
         setExpandedSections(new Set([form.sections[0]?.id || ""]));
         setStep("fillForm");
     };
@@ -107,7 +132,34 @@ export default function DocumentWizardPage() {
 
     const handleSaveForm = () => {
         if (activeForm) {
+            const totalFields = activeForm.sections.reduce((acc, s) => acc + s.fields.length, 0);
+            const completedFields = activeForm.sections.reduce((acc, s) => acc + getFilledCount(s), 0);
+            const isComplete = completedFields >= totalFields * 0.8; // 80%+ = completed
+
+            const doc: SavedDocument = {
+                id: `wizard_${activeForm.id}_${Date.now()}`,
+                formId: activeForm.id,
+                title: activeForm.title,
+                shortTitle: activeForm.shortTitle,
+                category: activeForm.category,
+                cfrReference: activeForm.cfrReference,
+                data: formData,
+                savedAt: new Date().toISOString(),
+                completedFields,
+                totalFields,
+                status: isComplete ? "completed" : "draft",
+            };
+
+            // Check if we already saved this form — update instead of creating new
+            const existing = getDocumentByFormId(activeForm.id);
+            if (existing) {
+                doc.id = existing.id;
+            }
+
+            saveDocument(doc);
             setSavedForms(prev => new Set(prev).add(activeForm.id));
+            setSaveNotice(true);
+            setTimeout(() => setSaveNotice(false), 4000);
         }
     };
 
@@ -214,7 +266,7 @@ export default function DocumentWizardPage() {
                         Back to Documents
                     </Link>
                     <h1 className={styles.title}>
-                        {step === "assessment" && "DOT Compliance Document Wizard"}
+                        {step === "assessment" && "DOT Compliance Setup"}
                         {step === "results" && "Your Required Documents"}
                         {step === "fillForm" && activeForm?.shortTitle}
                     </h1>
@@ -444,7 +496,7 @@ export default function DocumentWizardPage() {
 
                         <div className={styles.sidebarActions}>
                             <button className={styles.saveButton} onClick={handleSaveForm}>
-                                <Save size={16} /> Save Progress
+                                <Save size={16} /> Save to Documents
                             </button>
                             <button className={styles.backToResults} onClick={() => setStep("results")}>
                                 <ArrowLeft size={16} /> All Documents
@@ -490,22 +542,30 @@ export default function DocumentWizardPage() {
                         {/* Bottom actions */}
                         <div className={styles.formBottomActions}>
                             <button className={styles.saveButton} onClick={handleSaveForm}>
-                                <Save size={16} /> Save Progress
+                                <Save size={16} /> Save to Documents
                             </button>
                             <button className={styles.downloadButton}>
                                 <Download size={16} /> Download as PDF
                             </button>
                         </div>
 
-                        {savedForms.has(activeForm.id) && (
+                        {saveNotice && (
                             <div className={styles.savedNotice}>
                                 <CheckCircle size={16} />
-                                Form saved successfully! You can come back to edit it anytime.
+                                Form saved to your <Link href="/dashboard/documents" style={{ color: "#16a34a", fontWeight: 600 }}>Documents</Link>! You can come back to edit it anytime.
                             </div>
                         )}
                     </div>
                 </div>
             )}
         </div>
+    );
+}
+
+export default function DocumentWizardPage() {
+    return (
+        <Suspense fallback={<div style={{ padding: "2rem", textAlign: "center", color: "#64748b" }}>Loading wizard...</div>}>
+            <WizardContent />
+        </Suspense>
     );
 }
