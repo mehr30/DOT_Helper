@@ -15,9 +15,18 @@ import {
     LogOut,
     Menu,
     X,
+    ChevronDown,
+    Building2,
+    Check,
 } from "lucide-react";
 import { useState } from "react";
 import styles from "./Sidebar.module.css";
+
+const organizations = [
+    { id: "org1", name: "Transport Co.", initials: "TC", usdot: "1234567", location: "Kansas City, KS" },
+    { id: "org2", name: "Transport Co. — Denver", initials: "TD", usdot: "2345678", location: "Denver, CO" },
+    { id: "org3", name: "Southwest Fleet", initials: "SF", usdot: "3456789", location: "Dallas, TX" },
+];
 
 interface NavItem {
     name: string;
@@ -40,6 +49,8 @@ const navigation: NavItem[] = [
 export default function Sidebar() {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+    const [activeOrg, setActiveOrg] = useState(organizations[0]!);
 
     return (
         <>
@@ -102,11 +113,43 @@ export default function Sidebar() {
                 {/* Bottom section */}
                 <div className={styles.bottomSection}>
                     <div className={styles.companyInfo}>
-                        <div className={styles.companyAvatar}>TC</div>
-                        <div className={styles.companyDetails}>
-                            <span className={styles.companyName}>Transport Co.</span>
-                            <span className={styles.usdot}>USDOT: 1234567</span>
-                        </div>
+                        <button
+                            className={styles.orgSwitcher}
+                            onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                        >
+                            <div className={styles.companyAvatar}>{activeOrg.initials}</div>
+                            <div className={styles.companyDetails}>
+                                <span className={styles.companyName}>{activeOrg.name}</span>
+                                <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
+                            </div>
+                            <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
+                        </button>
+
+                        {orgDropdownOpen && (
+                            <div className={styles.orgDropdown}>
+                                <div className={styles.orgDropdownHeader}>
+                                    <Building2 size={14} />
+                                    <span>Switch Business Unit</span>
+                                </div>
+                                {organizations.map(org => (
+                                    <button
+                                        key={org.id}
+                                        className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
+                                        onClick={() => {
+                                            setActiveOrg(org);
+                                            setOrgDropdownOpen(false);
+                                        }}
+                                    >
+                                        <div className={styles.orgOptionAvatar}>{org.initials}</div>
+                                        <div className={styles.orgOptionDetails}>
+                                            <span className={styles.orgOptionName}>{org.name}</span>
+                                            <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
+                                        </div>
+                                        {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.bottomLinks}>

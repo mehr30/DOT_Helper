@@ -242,3 +242,117 @@
     color: var(--color-danger-400);
     background: rgba(239, 68, 68, 0.1);
 }
+
+/* Org Switcher */
+.orgSwitcher {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.orgChevron {
+    color: rgba(255, 255, 255, 0.4);
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.orgChevron.rotated {
+    transform: rotate(180deg);
+}
+
+.orgDropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0.75rem;
+    right: 0.75rem;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 200;
+}
+
+.orgDropdownHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0.25rem;
+}
+
+.orgOption {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.orgOption:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.orgOption.activeOrg {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.orgOptionAvatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.orgOptionDetails {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.orgOptionName {
+    color: white;
+    font-size: 0.825rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.orgOptionMeta {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.7rem;
+}
+
+.orgCheck {
+    color: #3b82f6;
+    flex-shrink: 0;
+}

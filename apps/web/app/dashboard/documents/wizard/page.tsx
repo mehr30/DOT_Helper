@@ -309,21 +309,39 @@ function WizardContent() {
                             <h2 className={styles.questionTitle}>{question.question}</h2>
                             <p className={styles.questionDesc}>{question.description}</p>
 
-                            <div className={styles.optionsGrid}>
-                                {question.options?.map(opt => (
-                                    <button
-                                        key={opt.value}
-                                        className={`${styles.optionButton} ${question.type === "multi"
-                                            ? isMultiSelected(opt.value) ? styles.selected : ""
-                                            : answers[question.id] === opt.value ? styles.selected : ""
-                                            }`}
-                                        onClick={() => handleAnswer(opt.value)}
-                                    >
-                                        <span className={styles.optionIcon}>{opt.icon}</span>
-                                        <span className={styles.optionLabel}>{opt.label}</span>
-                                    </button>
-                                ))}
-                            </div>
+                            {/* State question uses a dropdown */}
+                            {question.id === "state" ? (
+                                <select
+                                    className={styles.stateDropdown}
+                                    value={(answers.state as string) || ""}
+                                    onChange={(e) => {
+                                        handleAnswer(e.target.value);
+                                    }}
+                                >
+                                    <option value="" disabled>Select your state...</option>
+                                    {question.options?.map(opt => (
+                                        <option key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className={styles.optionsGrid}>
+                                    {question.options?.map(opt => (
+                                        <button
+                                            key={opt.value}
+                                            className={`${styles.optionButton} ${question.type === "multi"
+                                                ? isMultiSelected(opt.value) ? styles.selected : ""
+                                                : answers[question.id] === opt.value ? styles.selected : ""
+                                                }`}
+                                            onClick={() => handleAnswer(opt.value)}
+                                        >
+                                            <span className={styles.optionIcon}>{opt.icon}</span>
+                                            <span className={styles.optionLabel}>{opt.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
