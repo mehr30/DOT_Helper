@@ -23,6 +23,7 @@ import {
     DOTForm,
     FormSection,
     FormField,
+    ComplianceAlert,
 } from "./forms";
 
 type WizardStep = "assessment" | "results" | "fillForm";
@@ -32,6 +33,7 @@ export default function DocumentWizardPage() {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
     const [recommendedForms, setRecommendedForms] = useState<DOTForm[]>([]);
+    const [complianceAlerts, setComplianceAlerts] = useState<ComplianceAlert[]>([]);
     const [activeForm, setActiveForm] = useState<DOTForm | null>(null);
     const [formData, setFormData] = useState<Record<string, string | boolean>>({});
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
@@ -64,8 +66,9 @@ export default function DocumentWizardPage() {
     };
 
     const handleFinishAssessment = () => {
-        const forms = getRecommendedForms(answers);
-        setRecommendedForms(forms);
+        const result = getRecommendedForms(answers);
+        setRecommendedForms(result.forms);
+        setComplianceAlerts(result.alerts);
         setStep("results");
     };
 
@@ -309,9 +312,9 @@ export default function DocumentWizardPage() {
                                 <strong>Not sure if DOT regulations apply to you?</strong>
                                 <p>
                                     If your business operates <em>any</em> vehicle over 10,001 lbs GVWR
-                                    (Gross Vehicle Weight Rating — the max weight your vehicle is designed to carry,
-                                    found on the sticker inside your driver&apos;s door), you likely need DOT compliance.
-                                    This includes many work vans, box trucks, and service vehicles with equipment.
+                                    (check the sticker inside your driver&apos;s door), you likely need DOT compliance.
+                                    And remember: the weight of your vehicle <strong>plus any trailer</strong> counts too.
+                                    A work truck pulling an equipment trailer can easily push past 10,001 lbs combined.
                                 </p>
                             </div>
                         </div>
@@ -342,6 +345,25 @@ export default function DocumentWizardPage() {
                         </button>
                     </div>
 
+                    {/* Compliance Alerts */}
+                    {complianceAlerts.length > 0 && (
+                        <div className={styles.alertsSection}>
+                            {complianceAlerts.map((alert, idx) => (
+                                <div key={idx} className={`${styles.alertCard} ${styles[alert.type]}`}>
+                                    <div className={styles.alertIcon}>
+                                        {alert.type === "danger" ? <AlertCircle size={18} /> :
+                                            alert.type === "warning" ? <AlertCircle size={18} /> :
+                                                <HelpCircle size={18} />}
+                                    </div>
+                                    <div>
+                                        <strong>{alert.title}</strong>
+                                        <p>{alert.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Jargon explainer */}
                     <div className={styles.jargonBox}>
                         <HelpCircle size={16} />
@@ -351,7 +373,8 @@ export default function DocumentWizardPage() {
                                 <strong>CFR</strong> = Code of Federal Regulations (the official rule book).{" "}
                                 <strong>FMCSA</strong> = Federal Motor Carrier Safety Administration (the agency that enforces DOT rules).{" "}
                                 <strong>CMV</strong> = Commercial Motor Vehicle (any vehicle over 10,001 lbs used for business).{" "}
-                                <strong>GVWR</strong> = Gross Vehicle Weight Rating (max weight your vehicle can carry — check your door sticker).
+                                <strong>GVWR</strong> = Gross Vehicle Weight Rating (max weight your vehicle can carry — check your door sticker).{" "}
+                                <strong>GCWR</strong> = Gross Combined Weight Rating (your vehicle + trailer combined weight).
                             </p>
                         </div>
                     </div>

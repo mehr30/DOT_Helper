@@ -61,30 +61,89 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     {
         id: "vehicleWeight",
         question: "What's the heaviest vehicle in your fleet (GVWR)?",
-        description: "Gross Vehicle Weight Rating — found on the driver's door sticker",
+        description: "GVWR means Gross Vehicle Weight Rating — the max weight your vehicle is designed for. Check the sticker inside the driver's side door.",
         type: "single",
         options: [
             { value: "under10k", label: "Under 10,001 lbs", icon: "🚗" },
             { value: "10k-26k", label: "10,001 – 26,000 lbs", icon: "🚐" },
             { value: "over26k", label: "Over 26,000 lbs (CDL required)", icon: "🚛" },
-            { value: "combination", label: "Combination > 26,000 lbs", icon: "🚚" },
+            { value: "unsure", label: "Not sure", icon: "❓" },
+        ],
+    },
+    {
+        id: "towsTrailer",
+        question: "Do any of your vehicles tow trailers?",
+        description: "Important: The DOT counts the combined weight of your vehicle + trailer. A pickup truck (7,000 lbs) pulling an equipment trailer (5,000 lbs) = 12,000 lbs combined — putting you over the 10,001 lb threshold.",
+        type: "single",
+        options: [
+            { value: "noTrailer", label: "No trailers", icon: "🚐" },
+            { value: "lightTrailer", label: "Yes, combined weight still under 10,001 lbs", icon: "🏋️" },
+            { value: "medTrailer", label: "Yes, combined weight 10,001 – 26,000 lbs", icon: "⚖️" },
+            { value: "heavyTrailer", label: "Yes, combined weight over 26,000 lbs", icon: "🚛" },
+            { value: "unsureTrailer", label: "Not sure of combined weight", icon: "❓" },
+        ],
+    },
+    {
+        id: "crewTransport",
+        question: "Do any of your vehicles carry crew members or employees to job sites?",
+        description: "This is critical — if a crew leader drives employees in a van or truck with 9+ seats, special license requirements may apply, even if you're just going to a job site and back.",
+        type: "single",
+        options: [
+            { value: "noCrew", label: "No — drivers go alone or take personal vehicles", icon: "👤" },
+            { value: "smallCrew", label: "Yes, up to 8 people total (driver included)", icon: "👥" },
+            { value: "medCrew", label: "Yes, 9–15 people total (driver included)", icon: "🚐" },
+            { value: "largeCrew", label: "Yes, 16+ people total (driver included)", icon: "🚌" },
+        ],
+    },
+    {
+        id: "state",
+        question: "What state is your business based in?",
+        description: "State regulations vary significantly. Some states have stricter weight thresholds or additional requirements.",
+        type: "single",
+        options: [
+            { value: "AL", label: "Alabama" }, { value: "AK", label: "Alaska" },
+            { value: "AZ", label: "Arizona" }, { value: "AR", label: "Arkansas" },
+            { value: "CA", label: "California" }, { value: "CO", label: "Colorado" },
+            { value: "CT", label: "Connecticut" }, { value: "DE", label: "Delaware" },
+            { value: "FL", label: "Florida" }, { value: "GA", label: "Georgia" },
+            { value: "HI", label: "Hawaii" }, { value: "ID", label: "Idaho" },
+            { value: "IL", label: "Illinois" }, { value: "IN", label: "Indiana" },
+            { value: "IA", label: "Iowa" }, { value: "KS", label: "Kansas" },
+            { value: "KY", label: "Kentucky" }, { value: "LA", label: "Louisiana" },
+            { value: "ME", label: "Maine" }, { value: "MD", label: "Maryland" },
+            { value: "MA", label: "Massachusetts" }, { value: "MI", label: "Michigan" },
+            { value: "MN", label: "Minnesota" }, { value: "MS", label: "Mississippi" },
+            { value: "MO", label: "Missouri" }, { value: "MT", label: "Montana" },
+            { value: "NE", label: "Nebraska" }, { value: "NV", label: "Nevada" },
+            { value: "NH", label: "New Hampshire" }, { value: "NJ", label: "New Jersey" },
+            { value: "NM", label: "New Mexico" }, { value: "NY", label: "New York" },
+            { value: "NC", label: "North Carolina" }, { value: "ND", label: "North Dakota" },
+            { value: "OH", label: "Ohio" }, { value: "OK", label: "Oklahoma" },
+            { value: "OR", label: "Oregon" }, { value: "PA", label: "Pennsylvania" },
+            { value: "RI", label: "Rhode Island" }, { value: "SC", label: "South Carolina" },
+            { value: "SD", label: "South Dakota" }, { value: "TN", label: "Tennessee" },
+            { value: "TX", label: "Texas" }, { value: "UT", label: "Utah" },
+            { value: "VT", label: "Vermont" }, { value: "VA", label: "Virginia" },
+            { value: "WA", label: "Washington" }, { value: "WV", label: "West Virginia" },
+            { value: "WI", label: "Wisconsin" }, { value: "WY", label: "Wyoming" },
+            { value: "DC", label: "Washington D.C." },
         ],
     },
     {
         id: "operations",
-        question: "What type of operations do you run?",
-        description: "This affects which federal and state regulations apply",
+        question: "Do your vehicles cross state lines?",
+        description: "If any of your vehicles ever cross into another state — even occasionally — that counts as interstate commerce and triggers federal DOT regulations.",
         type: "single",
         options: [
-            { value: "interstate", label: "Interstate (crosses state lines)", icon: "🗺️" },
-            { value: "intrastate", label: "Intrastate only (one state)", icon: "📍" },
-            { value: "both", label: "Both interstate and intrastate", icon: "🔄" },
+            { value: "interstate", label: "Yes, we cross state lines", icon: "🗺️" },
+            { value: "intrastate", label: "No — we stay within one state", icon: "📍" },
+            { value: "both", label: "Sometimes — mostly one state but occasionally cross", icon: "🔄" },
         ],
     },
     {
         id: "fleetSize",
         question: "How many commercial vehicles do you operate?",
-        description: "Include all vehicles over 10,001 lbs GVWR",
+        description: "Count all vehicles used for business that are over 10,001 lbs (by themselves or with a trailer). Include vans, trucks, and any vehicle with a USDOT number.",
         type: "single",
         options: [
             { value: "1-5", label: "1–5 vehicles", icon: "1️⃣" },
@@ -95,18 +154,81 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     },
     {
         id: "hazmat",
-        question: "Which of these apply to your operations?",
-        description: "Select all that apply to determine additional requirements",
+        question: "Do any of these apply to your operations?",
+        description: "Select all that apply — these trigger additional compliance requirements",
         type: "multi",
         options: [
-            { value: "hazmat", label: "Transport hazardous materials", icon: "☢️" },
-            { value: "passengers", label: "Transport passengers (9+)", icon: "🚌" },
-            { value: "cdlDrivers", label: "Drivers have CDLs", icon: "🪪" },
-            { value: "crossBorder", label: "Cross international borders", icon: "🌎" },
+            { value: "hazmat", label: "Transport hazardous materials (chemicals, propane, etc.)", icon: "☢️" },
+            { value: "cdlDrivers", label: "Some drivers have CDLs (Commercial Driver's Licenses)", icon: "🪪" },
+            { value: "crossBorder", label: "Cross international borders (Canada/Mexico)", icon: "🌎" },
             { value: "none", label: "None of the above", icon: "✅" },
         ],
     },
 ];
+
+// ─── State-Specific Regulation Data ──────────────────────────────
+
+export interface StateRegInfo {
+    state: string;
+    requiresIntrastateDOT: boolean;
+    weightThreshold: number; // lbs for intrastate DOT
+    passengerNotes: string;
+    specialNotes: string[];
+}
+
+export const stateRegulations: Record<string, StateRegInfo> = {
+    AL: { state: "Alabama", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal 16+ passenger CDL rule", specialNotes: [] },
+    AK: { state: "Alaska", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal 16+ passenger CDL rule", specialNotes: ["Seasonal weight restrictions on many roads"] },
+    AZ: { state: "Arizona", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["State requires own ADOT number for intrastate"] },
+    AR: { state: "Arkansas", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    CA: { state: "California", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "CA requires BIT inspections for ALL fleets", specialNotes: ["Must register with CA MCP (Motor Carrier Permit)", "BIT (Basic Inspection of Terminal) program applies to all intrastate carriers", "CARB compliance for diesel vehicles", "Stricter emissions and idling rules"] },
+    CO: { state: "Colorado", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Intrastate USDOT number required", "CO PUC authority may be needed"] },
+    CT: { state: "Connecticut", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    DE: { state: "Delaware", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    FL: { state: "Florida", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Intrastate commercial vehicles must comply with FHP regulations"] },
+    GA: { state: "Georgia", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["GA PSC registration may be required for for-hire carriers"] },
+    HI: { state: "Hawaii", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["No interstate commerce (islands) — state rules dominate"] },
+    ID: { state: "Idaho", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    IL: { state: "Illinois", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["State requires USDOT for intrastate vehicles over 10,001 lbs"] },
+    IN: { state: "Indiana", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Must comply with Indiana Motor Carrier regulations"] },
+    IA: { state: "Iowa", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    KS: { state: "Kansas", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "KHP enforces passenger transport rules strictly. If a crew vehicle is designed for 16+ passengers (including driver), a CDL with P endorsement is required — even for transporting your own employees.", specialNotes: ["Kansas Highway Patrol actively enforces DOT rules on service vehicles", "Crew transport in passenger-capacity vehicles requires proper licensing", "KCC authority may be needed for for-hire operations"] },
+    KY: { state: "Kentucky", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    LA: { state: "Louisiana", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    ME: { state: "Maine", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["State requires intrastate USDOT"] },
+    MD: { state: "Maryland", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    MA: { state: "Massachusetts", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    MI: { state: "Michigan", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Michigan has unique axle weight rules"] },
+    MN: { state: "Minnesota", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["MN requires intrastate USDOT for vehicles over 10,001 lbs"] },
+    MS: { state: "Mississippi", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    MO: { state: "Missouri", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    MT: { state: "Montana", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    NE: { state: "Nebraska", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    NV: { state: "Nevada", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["NV requires intrastate USDOT"] },
+    NH: { state: "New Hampshire", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    NJ: { state: "New Jersey", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    NM: { state: "New Mexico", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["NM requires USDOT for intrastate carriers"] },
+    NY: { state: "New York", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["NY requires USDOT for intrastate carriers", "NYC has additional commercial vehicle restrictions"] },
+    NC: { state: "North Carolina", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    ND: { state: "North Dakota", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    OH: { state: "Ohio", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["OH PUCO registration may be required"] },
+    OK: { state: "Oklahoma", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    OR: { state: "Oregon", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Oregon requires weight-mile tax for vehicles over 26,001 lbs", "Must register with ODOT"] },
+    PA: { state: "Pennsylvania", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["PA requires intrastate USDOT"] },
+    RI: { state: "Rhode Island", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    SC: { state: "South Carolina", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["SC requires intrastate USDOT"] },
+    SD: { state: "South Dakota", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    TN: { state: "Tennessee", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    TX: { state: "Texas", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["TX requires USDOT and TxDMV registration for intrastate hauling", "Texas has its own drug testing random rate requirements"] },
+    UT: { state: "Utah", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["UT requires intrastate USDOT"] },
+    VT: { state: "Vermont", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    VA: { state: "Virginia", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    WA: { state: "Washington", requiresIntrastateDOT: true, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["WUTC registration may be required", "WA has strict logging truck regulations"] },
+    WV: { state: "West Virginia", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    WI: { state: "Wisconsin", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    WY: { state: "Wyoming", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: [] },
+    DC: { state: "Washington D.C.", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Strict commercial vehicle restrictions in DC"] },
+};
 
 // ─── Form Definitions ────────────────────────────────────────────
 
@@ -649,15 +771,110 @@ export const dotForms: DOTForm[] = [
 
 // ─── Recommendation Engine ──────────────────────────────────────
 
-export function getRecommendedForms(answers: Record<string, string | string[]>): DOTForm[] {
-    const recommended: Set<string> = new Set();
+export interface ComplianceResult {
+    forms: DOTForm[];
+    alerts: ComplianceAlert[];
+    stateInfo: StateRegInfo | null;
+}
 
-    // Everyone needs these
-    recommended.add("mcs150");
-    recommended.add("driverApp");
-    recommended.add("annualCertViolations");
-    recommended.add("dvir");
-    recommended.add("vehicleMaintenance");
+export interface ComplianceAlert {
+    type: "warning" | "info" | "danger";
+    title: string;
+    description: string;
+}
+
+export function getRecommendedForms(answers: Record<string, string | string[]>): ComplianceResult {
+    const recommended: Set<string> = new Set();
+    const alerts: ComplianceAlert[] = [];
+    const stateInfo = stateRegulations[answers.state as string] || null;
+
+    // Determine effective weight class (account for trailers)
+    let effectiveWeight = answers.vehicleWeight as string;
+    const towsTrailer = answers.towsTrailer as string;
+
+    // If they tow a trailer, the combined weight may push them into a higher class
+    if (towsTrailer === "heavyTrailer") {
+        effectiveWeight = "over26k";
+        alerts.push({
+            type: "warning",
+            title: "Combined Weight Over 26,000 lbs",
+            description: "Your vehicle + trailer combined weight exceeds 26,000 lbs. Your drivers will need a CDL (Commercial Driver's License). The GCWR (Gross Combined Weight Rating = vehicle + trailer) determines your CDL class, not just the truck alone.",
+        });
+    } else if (towsTrailer === "medTrailer" && effectiveWeight === "under10k") {
+        effectiveWeight = "10k-26k";
+        alerts.push({
+            type: "warning",
+            title: "Trailer Pushes You Over the DOT Threshold",
+            description: "Your vehicle alone is under 10,001 lbs, but when you add the trailer, the combined weight (called GCWR — Gross Combined Weight Rating) puts you over 10,001 lbs. This means DOT regulations apply to you. You'll need a USDOT number, medical cards for drivers, vehicle inspections, and more.",
+        });
+    } else if (towsTrailer === "unsureTrailer") {
+        alerts.push({
+            type: "info",
+            title: "Check Your Combined Weight",
+            description: "Add your vehicle's GVWR (from the door sticker) + your trailer's GVWR (from the trailer's VIN plate). If the total exceeds 10,001 lbs, DOT regulations apply. If over 26,001 lbs and the trailer is over 10,000 lbs, a CDL is required.",
+        });
+    }
+
+    if (answers.vehicleWeight === "unsure") {
+        alerts.push({
+            type: "info",
+            title: "How to Find Your Vehicle's Weight Rating",
+            description: "Open the driver's side door and look for a sticker or plate. It lists the GVWR (Gross Vehicle Weight Rating). Common examples: Ford F-150 = ~6,500 lbs, Ford F-350 = ~10,000-14,000 lbs, Ford E-350 Van = ~10,200 lbs. If your GVWR is 10,001+ lbs, DOT rules apply.",
+        });
+    }
+
+    // Crew transport alerts
+    const crewTransport = answers.crewTransport as string;
+    if (crewTransport === "largeCrew") {
+        alerts.push({
+            type: "danger",
+            title: "CDL with Passenger Endorsement Required",
+            description: "Federal law requires a CDL with a Passenger (P) endorsement for any vehicle designed to carry 16+ people (including the driver). This applies to transporting your own employees to job sites — not just paid passenger services. The driver must also pass a skills test in a passenger vehicle and complete FMCSA-approved training.",
+        });
+        recommended.add("roadTestCert");
+        recommended.add("drugAlcoholPolicy");
+    } else if (crewTransport === "medCrew") {
+        alerts.push({
+            type: "warning",
+            title: "Watch Out: 9–15 Passenger Transport Rules",
+            description: "Vehicles designed to carry 9-15 passengers (including the driver) have special federal and state requirements. If used for compensation (even indirectly — like you're paying the crew leader to drive), a CDL may be required. Even without a CDL, these vehicles must comply with FMCSA safety rules, and drivers need DOT medical cards.",
+        });
+    }
+
+    // State-specific alerts
+    if (stateInfo) {
+        if (stateInfo.requiresIntrastateDOT && (answers.operations === "intrastate")) {
+            alerts.push({
+                type: "info",
+                title: `${stateInfo.state} Requires USDOT for Intrastate Carriers`,
+                description: `Even though you only operate within ${stateInfo.state}, your state requires a USDOT number for intrastate commercial vehicles. You must register with FMCSA and display your USDOT number on all qualifying vehicles.`,
+            });
+        }
+        if (stateInfo.passengerNotes !== "Follows federal rules") {
+            alerts.push({
+                type: "warning",
+                title: `${stateInfo.state} — Special Passenger Transport Rules`,
+                description: stateInfo.passengerNotes,
+            });
+        }
+        stateInfo.specialNotes.forEach(note => {
+            alerts.push({
+                type: "info",
+                title: `${stateInfo.state} Regulation`,
+                description: note,
+            });
+        });
+    }
+
+    // Everyone with qualifying vehicles needs these
+    if (effectiveWeight !== "under10k" || towsTrailer === "medTrailer" || towsTrailer === "heavyTrailer") {
+        recommended.add("mcs150");
+        recommended.add("driverApp");
+        recommended.add("annualCertViolations");
+        recommended.add("dvir");
+        recommended.add("vehicleMaintenance");
+        recommended.add("accidentRegister");
+    }
 
     // Interstate operations need BOC-3
     if (answers.operations === "interstate" || answers.operations === "both") {
@@ -666,18 +883,26 @@ export function getRecommendedForms(answers: Record<string, string | string[]>):
 
     // CDL drivers need road test cert and MVR review
     const hazmatAnswers = answers.hazmat as string[] | undefined;
-    if (hazmatAnswers?.includes("cdlDrivers") || answers.vehicleWeight === "over26k" || answers.vehicleWeight === "combination") {
+    if (hazmatAnswers?.includes("cdlDrivers") || effectiveWeight === "over26k") {
         recommended.add("roadTestCert");
         recommended.add("annualMVRReview");
-    }
-
-    // Drug & Alcohol policy always needed for CDL drivers
-    if (hazmatAnswers?.includes("cdlDrivers") || answers.vehicleWeight === "over26k" || answers.vehicleWeight === "combination") {
         recommended.add("drugAlcoholPolicy");
     }
 
-    // Accident register is always recommended
-    recommended.add("accidentRegister");
+    // If truly under threshold and no trailers, give them a clean bill
+    if (effectiveWeight === "under10k" && towsTrailer !== "medTrailer" && towsTrailer !== "heavyTrailer" && towsTrailer !== "unsureTrailer") {
+        if (crewTransport !== "largeCrew" && crewTransport !== "medCrew") {
+            alerts.push({
+                type: "info",
+                title: "You May Not Need Federal DOT Compliance",
+                description: "Based on your answers, your vehicles are under 10,001 lbs and you don't tow heavy trailers or carry large crews. Federal DOT regulations likely don't apply to you. However, check your state's requirements — some states have additional rules. If your situation changes (heavier vehicle, new trailer, etc.), re-take this assessment.",
+            });
+        }
+    }
 
-    return dotForms.filter(f => recommended.has(f.id));
+    return {
+        forms: dotForms.filter(f => recommended.has(f.id)),
+        alerts,
+        stateInfo,
+    };
 }
