@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import styles from "./page.module.css";
 import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
+import { useDemoMode } from "../../components/DemoModeContext";
 
 // Document types and their categories
 const documentCategories = [
@@ -135,6 +136,7 @@ function getCategoryLabel(cat: string) {
 }
 
 export default function DocumentsPage() {
+    const { isDemoMode } = useDemoMode();
     const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([]);
 
     useEffect(() => {
@@ -309,115 +311,117 @@ export default function DocumentsPage() {
                 </section>
             )}
 
-            {/* Stats */}
-            <div className={styles.statsRow}>
-                {documentCategories.map((cat) => (
-                    <button
-                        key={cat.id}
-                        className={`${styles.categoryCard} ${cat.id === "all" ? styles.active : ""}`}
-                    >
-                        <FolderOpen size={20} />
-                        <span className={styles.categoryName}>{cat.name}</span>
-                        <span className={styles.categoryCount}>{cat.count}</span>
-                    </button>
-                ))}
-            </div>
-
-            {/* Toolbar */}
-            <div className={styles.toolbar}>
-                <div className={styles.searchBox}>
-                    <Search size={18} className={styles.searchIcon} />
-                    <input
-                        type="text"
-                        placeholder="Search documents..."
-                        className={styles.searchInput}
-                    />
+            {isDemoMode && <>
+                {/* Stats */}
+                <div className={styles.statsRow}>
+                    {documentCategories.map((cat) => (
+                        <button
+                            key={cat.id}
+                            className={`${styles.categoryCard} ${cat.id === "all" ? styles.active : ""}`}
+                        >
+                            <FolderOpen size={20} />
+                            <span className={styles.categoryName}>{cat.name}</span>
+                            <span className={styles.categoryCount}>{cat.count}</span>
+                        </button>
+                    ))}
                 </div>
-                <button className={styles.filterButton}>
-                    <Filter size={18} />
-                    Filter
-                </button>
-            </div>
 
-            {/* Documents Table */}
-            <div className={styles.tableContainer}>
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Document</th>
-                            <th>Type</th>
-                            <th>Associated With</th>
-                            <th>Uploaded</th>
-                            <th>Expires</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {documents.map((doc) => {
-                            const status = getStatusBadge(doc.status);
-                            const StatusIcon = status.icon;
+                {/* Toolbar */}
+                <div className={styles.toolbar}>
+                    <div className={styles.searchBox}>
+                        <Search size={18} className={styles.searchIcon} />
+                        <input
+                            type="text"
+                            placeholder="Search documents..."
+                            className={styles.searchInput}
+                        />
+                    </div>
+                    <button className={styles.filterButton}>
+                        <Filter size={18} />
+                        Filter
+                    </button>
+                </div>
 
-                            return (
-                                <tr key={doc.id}>
-                                    <td>
-                                        <div className={styles.docCell}>
-                                            <div className={styles.docIcon}>
-                                                <FileText size={20} />
+                {/* Documents Table */}
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Type</th>
+                                <th>Associated With</th>
+                                <th>Uploaded</th>
+                                <th>Expires</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {documents.map((doc) => {
+                                const status = getStatusBadge(doc.status);
+                                const StatusIcon = status.icon;
+
+                                return (
+                                    <tr key={doc.id}>
+                                        <td>
+                                            <div className={styles.docCell}>
+                                                <div className={styles.docIcon}>
+                                                    <FileText size={20} />
+                                                </div>
+                                                <div className={styles.docInfo}>
+                                                    <span className={styles.docName}>{doc.name}</span>
+                                                    <span className={styles.docSize}>{doc.fileSize}</span>
+                                                </div>
                                             </div>
-                                            <div className={styles.docInfo}>
-                                                <span className={styles.docName}>{doc.name}</span>
-                                                <span className={styles.docSize}>{doc.fileSize}</span>
+                                        </td>
+                                        <td>
+                                            <span className={styles.docType}>{doc.type}</span>
+                                        </td>
+                                        <td>
+                                            <span className={styles.docEntity}>{doc.entity}</span>
+                                        </td>
+                                        <td>
+                                            <span className={styles.docDate}>{doc.uploadDate}</span>
+                                        </td>
+                                        <td>
+                                            <span className={styles.docDate}>
+                                                {doc.expirationDate || "—"}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span className={`${styles.statusBadge} ${styles[status.class]}`}>
+                                                <StatusIcon size={14} />
+                                                {status.label}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className={styles.actions}>
+                                                <button className={styles.actionBtn} title="Download">
+                                                    <Download size={16} />
+                                                </button>
+                                                <button className={styles.actionBtn} title="More">
+                                                    <MoreVertical size={16} />
+                                                </button>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={styles.docType}>{doc.type}</span>
-                                    </td>
-                                    <td>
-                                        <span className={styles.docEntity}>{doc.entity}</span>
-                                    </td>
-                                    <td>
-                                        <span className={styles.docDate}>{doc.uploadDate}</span>
-                                    </td>
-                                    <td>
-                                        <span className={styles.docDate}>
-                                            {doc.expirationDate || "—"}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${styles[status.class]}`}>
-                                            <StatusIcon size={14} />
-                                            {status.label}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className={styles.actions}>
-                                            <button className={styles.actionBtn} title="Download">
-                                                <Download size={16} />
-                                            </button>
-                                            <button className={styles.actionBtn} title="More">
-                                                <MoreVertical size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
 
-            {/* Quick Upload Box */}
-            <div className={styles.uploadBox}>
-                <div className={styles.uploadContent}>
-                    <Plus size={24} />
-                    <div>
-                        <h3>Quick Upload</h3>
-                        <p>Drag and drop files here or click to browse</p>
+                {/* Quick Upload Box */}
+                <div className={styles.uploadBox}>
+                    <div className={styles.uploadContent}>
+                        <Plus size={24} />
+                        <div>
+                            <h3>Quick Upload</h3>
+                            <p>Drag and drop files here or click to browse</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>}
         </div>
     );
 }

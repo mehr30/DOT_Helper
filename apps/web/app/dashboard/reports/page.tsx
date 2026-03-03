@@ -1,6 +1,10 @@
+"use client";
+
 import { FileText, BarChart3, PieChart, TrendingUp, Download } from "lucide-react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 const reportTypes = [
     { name: "Compliance Summary", description: "Overall compliance status across all categories", icon: PieChart },
@@ -10,6 +14,25 @@ const reportTypes = [
 ];
 
 export default function ReportsPage() {
+    const { isDemoMode } = useDemoMode();
+
+    if (!isDemoMode) {
+        return (
+            <div style={{ padding: "2rem" }}>
+                <header style={{ marginBottom: "1rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 700 }}>Reports</h1>
+                    <p style={{ color: "#64748b" }}>Generate and download compliance reports for your fleet</p>
+                </header>
+                <EmptyState
+                    icon="📊"
+                    title="No report data yet"
+                    description="Add drivers, vehicles, and compliance data to generate reports. Reports will include compliance summaries, DQ file status, vehicle maintenance, and CSA scores."
+                    primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}
+                />
+            </div>
+        );
+    }
+
     return (
         <div style={{ padding: "2rem" }}>
             <header style={{ marginBottom: "2rem" }}>

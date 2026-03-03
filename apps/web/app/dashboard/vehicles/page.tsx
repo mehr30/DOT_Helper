@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
     Plus,
@@ -11,6 +13,8 @@ import {
     Wrench
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 // Mock data
 const vehicles = [
@@ -117,9 +121,33 @@ function getInspectionStatus(daysUntil: number) {
 }
 
 export default function VehiclesPage() {
-    const tractors = vehicles.filter(v => v.vehicleType === "tractor");
-    const trailers = vehicles.filter(v => v.vehicleType === "trailer");
-    const inMaintenance = vehicles.filter(v => v.status === "maintenance").length;
+    const { isDemoMode } = useDemoMode();
+    const tractors = isDemoMode ? vehicles.filter(v => v.vehicleType === "tractor") : [];
+    const trailers = isDemoMode ? vehicles.filter(v => v.vehicleType === "trailer") : [];
+    const inMaintenance = isDemoMode ? vehicles.filter(v => v.status === "maintenance").length : 0;
+
+    if (!isDemoMode) {
+        return (
+            <div className={styles.page}>
+                <header className={styles.header}>
+                    <div className={styles.headerContent}>
+                        <h1 className={styles.title}>Vehicle Management</h1>
+                        <p className={styles.subtitle}>Track vehicle inspections, maintenance, and compliance</p>
+                    </div>
+                    <Link href="/dashboard/vehicles/new" className="btn btn-primary">
+                        <Plus size={18} /> Add Vehicle
+                    </Link>
+                </header>
+                <EmptyState
+                    icon="🚛"
+                    title="No vehicles added yet"
+                    description="Add your vehicles and trailers to track annual inspections, preventive maintenance (PM) schedules, and compliance status."
+                    primaryAction={{ label: "Add Your First Vehicle", href: "/dashboard/vehicles/new" }}
+                    secondaryAction={{ label: "Run Compliance Setup", href: "/dashboard/documents/wizard" }}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className={styles.page}>
@@ -187,7 +215,7 @@ export default function VehiclesPage() {
                             <th>Vehicle Info</th>
                             <th>VIN</th>
                             <th>Annual Inspection</th>
-                            <th>Next PM Due</th>
+                            <th>Next PM Due <span title="Preventive Maintenance — scheduled oil changes, brake checks, and other routine service" style={{ display: "inline-block", width: 14, height: 14, borderRadius: "50%", background: "#f1f5f9", fontSize: "0.6rem", lineHeight: "14px", textAlign: "center" as const, color: "#64748b", cursor: "help", marginLeft: "0.25rem" }}>?</span></th>
                             <th>Status</th>
                             <th></th>
                         </tr>
@@ -253,7 +281,7 @@ export default function VehiclesPage() {
                                     </td>
                                     <td>
                                         <span className={`badge ${vehicle.status === "active" ? "badge-success" :
-                                                vehicle.status === "maintenance" ? "badge-warning" : "badge-neutral"
+                                            vehicle.status === "maintenance" ? "badge-warning" : "badge-neutral"
                                             }`}>
                                             {vehicle.status === "active" && <CheckCircle size={12} />}
                                             {vehicle.status === "maintenance" && <Wrench size={12} />}

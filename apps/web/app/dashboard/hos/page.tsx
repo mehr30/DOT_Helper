@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
     Clock,
@@ -13,6 +15,8 @@ import {
     Search
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 // Mock HOS data
 const driversHOS = [
@@ -95,9 +99,30 @@ function getTimeClass(timeStr: string): string {
 }
 
 export default function HOSPage() {
-    const drivingNow = driversHOS.filter(d => d.status === "driving").length;
-    const onDuty = driversHOS.filter(d => d.status === "on_duty").length;
-    const violations = driversHOS.reduce((sum, d) => sum + d.violations, 0);
+    const { isDemoMode } = useDemoMode();
+    const drivingNow = isDemoMode ? driversHOS.filter(d => d.status === "driving").length : 0;
+    const onDuty = isDemoMode ? driversHOS.filter(d => d.status === "on_duty").length : 0;
+    const violations = isDemoMode ? driversHOS.reduce((sum, d) => sum + d.violations, 0) : 0;
+
+    if (!isDemoMode) {
+        return (
+            <div className={styles.page}>
+                <header className={styles.header}>
+                    <div className={styles.headerContent}>
+                        <h1 className={styles.title}>Hours of Service</h1>
+                        <p className={styles.subtitle}>Track driver duty status and HOS compliance</p>
+                    </div>
+                </header>
+                <EmptyState
+                    icon="⏱️"
+                    title="No HOS data yet"
+                    description="Hours of Service (HOS) tracking shows how many hours your drivers have been driving, on duty, and resting. Add drivers and connect an ELD provider in Settings to see real-time data."
+                    primaryAction={{ label: "Add Drivers", href: "/dashboard/drivers" }}
+                    secondaryAction={{ label: "Connect ELD", href: "/dashboard/settings" }}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className={styles.page}>

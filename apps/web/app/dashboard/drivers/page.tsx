@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
     Plus,
@@ -10,6 +12,8 @@ import {
     FileText
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 // Mock data - would come from database in production
 const drivers = [
@@ -112,8 +116,32 @@ function getDaysUntil(dateStr: string) {
 }
 
 export default function DriversPage() {
-    const activeDrivers = drivers.filter(d => d.status === "active").length;
-    const needsAttention = drivers.filter(d => d.complianceScore < 90).length;
+    const { isDemoMode } = useDemoMode();
+    const activeDrivers = isDemoMode ? drivers.filter(d => d.status === "active").length : 0;
+    const needsAttention = isDemoMode ? drivers.filter(d => d.complianceScore < 90).length : 0;
+
+    if (!isDemoMode) {
+        return (
+            <div className={styles.page}>
+                <header className={styles.header}>
+                    <div className={styles.headerContent}>
+                        <h1 className={styles.title}>Driver Management</h1>
+                        <p className={styles.subtitle}>Manage driver qualification files and compliance status</p>
+                    </div>
+                    <Link href="/dashboard/drivers/new" className="btn btn-primary">
+                        <Plus size={18} /> Add Driver
+                    </Link>
+                </header>
+                <EmptyState
+                    icon="👤"
+                    title="No drivers added yet"
+                    description="Add your drivers to track their CDL expirations, medical cards, qualification files, and compliance status."
+                    primaryAction={{ label: "Add Your First Driver", href: "/dashboard/drivers/new" }}
+                    secondaryAction={{ label: "Run Compliance Setup", href: "/dashboard/documents/wizard" }}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className={styles.page}>

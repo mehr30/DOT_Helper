@@ -18,9 +18,12 @@ import {
     ChevronDown,
     Building2,
     Check,
+    Eye,
+    Zap,
 } from "lucide-react";
 import { useState } from "react";
 import styles from "./Sidebar.module.css";
+import { useDemoMode } from "./DemoModeContext";
 
 const organizations = [
     { id: "org1", name: "Transport Co.", initials: "TC", usdot: "1234567", location: "Kansas City, KS" },
@@ -51,6 +54,7 @@ export default function Sidebar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const [activeOrg, setActiveOrg] = useState(organizations[0]!);
+    const { isDemoMode, toggleDemoMode } = useDemoMode();
 
     return (
         <>
@@ -112,45 +116,76 @@ export default function Sidebar() {
 
                 {/* Bottom section */}
                 <div className={styles.bottomSection}>
-                    <div className={styles.companyInfo}>
+                    {/* Demo/Live Mode Toggle */}
+                    <div className={styles.modeToggle}>
                         <button
-                            className={styles.orgSwitcher}
-                            onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                            className={`${styles.modeButton} ${isDemoMode ? styles.modeActive : ""}`}
+                            onClick={() => { if (!isDemoMode) toggleDemoMode(); }}
                         >
-                            <div className={styles.companyAvatar}>{activeOrg.initials}</div>
-                            <div className={styles.companyDetails}>
-                                <span className={styles.companyName}>{activeOrg.name}</span>
-                                <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
-                            </div>
-                            <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
+                            <Eye size={14} />
+                            Demo
                         </button>
-
-                        {orgDropdownOpen && (
-                            <div className={styles.orgDropdown}>
-                                <div className={styles.orgDropdownHeader}>
-                                    <Building2 size={14} />
-                                    <span>Switch Business Unit</span>
-                                </div>
-                                {organizations.map(org => (
-                                    <button
-                                        key={org.id}
-                                        className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
-                                        onClick={() => {
-                                            setActiveOrg(org);
-                                            setOrgDropdownOpen(false);
-                                        }}
-                                    >
-                                        <div className={styles.orgOptionAvatar}>{org.initials}</div>
-                                        <div className={styles.orgOptionDetails}>
-                                            <span className={styles.orgOptionName}>{org.name}</span>
-                                            <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
-                                        </div>
-                                        {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        <button
+                            className={`${styles.modeButton} ${!isDemoMode ? styles.modeActive : ""}`}
+                            onClick={() => { if (isDemoMode) toggleDemoMode(); }}
+                        >
+                            <Zap size={14} />
+                            Live
+                        </button>
                     </div>
+
+                    {/* Org switcher - demo shows mock orgs, live shows placeholder */}
+                    {isDemoMode ? (
+                        <div className={styles.companyInfo}>
+                            <button
+                                className={styles.orgSwitcher}
+                                onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                            >
+                                <div className={styles.companyAvatar}>{activeOrg.initials}</div>
+                                <div className={styles.companyDetails}>
+                                    <span className={styles.companyName}>{activeOrg.name}</span>
+                                    <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
+                                </div>
+                                <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
+                            </button>
+
+                            {orgDropdownOpen && (
+                                <div className={styles.orgDropdown}>
+                                    <div className={styles.orgDropdownHeader}>
+                                        <Building2 size={14} />
+                                        <span>Switch Business Unit</span>
+                                    </div>
+                                    {organizations.map(org => (
+                                        <button
+                                            key={org.id}
+                                            className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
+                                            onClick={() => {
+                                                setActiveOrg(org);
+                                                setOrgDropdownOpen(false);
+                                            }}
+                                        >
+                                            <div className={styles.orgOptionAvatar}>{org.initials}</div>
+                                            <div className={styles.orgOptionDetails}>
+                                                <span className={styles.orgOptionName}>{org.name}</span>
+                                                <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
+                                            </div>
+                                            {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className={styles.companyInfo}>
+                            <Link href="/dashboard/settings" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
+                                <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
+                                <div className={styles.companyDetails}>
+                                    <span className={styles.companyName}>Set Up Your Company</span>
+                                    <span className={styles.usdot}>Add USDOT &amp; details</span>
+                                </div>
+                            </Link>
+                        </div>
+                    )}
 
                     <div className={styles.bottomLinks}>
                         <Link href="/dashboard/alerts" className={styles.bottomLink}>

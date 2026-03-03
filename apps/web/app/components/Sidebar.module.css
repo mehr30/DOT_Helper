@@ -144,6 +144,42 @@
 .bottomSection {
     padding: var(--space-4);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.modeToggle {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+}
+
+.modeButton {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modeButton:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modeButton.modeActive {
+    background: rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
 }
 
 .companyInfo {

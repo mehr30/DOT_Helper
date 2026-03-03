@@ -17,6 +17,8 @@ import {
     Eye
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 type AlertSeverity = "critical" | "urgent" | "warning" | "info";
 type AlertType = "expiration" | "missing" | "compliance" | "violation" | "system";
@@ -208,8 +210,28 @@ function getEntityIcon(entityType: string) {
 }
 
 export default function AlertsPage() {
-    const [alerts, setAlerts] = useState<Alert[]>(mockAlerts);
+    const { isDemoMode } = useDemoMode();
+    const [alerts, setAlerts] = useState<Alert[]>(isDemoMode ? mockAlerts : []);
     const [activeFilter, setActiveFilter] = useState("all");
+
+    if (!isDemoMode) {
+        return (
+            <div className={styles.alerts}>
+                <div className={styles.header}>
+                    <div className={styles.headerLeft}>
+                        <h1 className={styles.title}>Alerts & Notifications</h1>
+                        <p className={styles.subtitle}>Monitor compliance deadlines, expirations, and action items</p>
+                    </div>
+                </div>
+                <EmptyState
+                    icon="🔔"
+                    title="No alerts yet"
+                    description="Once you add drivers, vehicles, and set up your compliance profile, alerts for upcoming deadlines and expirations will appear here automatically."
+                    primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}
+                />
+            </div>
+        );
+    }
 
     const filteredAlerts = alerts.filter((alert) => {
         if (activeFilter === "all") return !alert.dismissed;

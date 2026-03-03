@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { useDemoMode } from "../components/DemoModeContext";
 
 function computeDaysLeft(dateStr: string): number {
     const target = new Date(dateStr);
@@ -135,6 +136,129 @@ const quickActions = [
 ];
 
 export default function DashboardPage() {
+    const { isDemoMode } = useDemoMode();
+
+    if (!isDemoMode) {
+        return (
+            <div className={styles.dashboard}>
+                <header className={styles.header}>
+                    <div>
+                        <h1 className={styles.title}>Compliance Dashboard</h1>
+                        <p className={styles.subtitle}>
+                            Welcome! Let&apos;s get your DOT compliance set up.
+                        </p>
+                    </div>
+                    <div className={styles.dateDisplay}>
+                        <Calendar size={18} />
+                        <span>{new Date().toLocaleDateString("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                        })}</span>
+                    </div>
+                </header>
+
+                {/* Getting Started */}
+                <section style={{
+                    maxWidth: 720,
+                    margin: "2rem auto",
+                    textAlign: "center" as const,
+                }}>
+                    <div style={{
+                        fontSize: "3rem",
+                        marginBottom: "1rem",
+                    }}>🚀</div>
+                    <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#0f172a", marginBottom: "0.75rem" }}>
+                        Get started in 3 steps
+                    </h2>
+                    <p style={{ color: "#64748b", fontSize: "0.95rem", lineHeight: 1.6, marginBottom: "2rem" }}>
+                        Set up your DOT compliance profile, add your drivers and vehicles,
+                        and we&apos;ll handle the rest.
+                    </p>
+
+                    <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                        gap: "1rem",
+                    }}>
+                        <Link href="/dashboard/documents/wizard" style={{
+                            display: "flex", flexDirection: "column" as const, alignItems: "center",
+                            gap: "0.75rem", padding: "1.5rem", background: "white",
+                            borderRadius: "14px", border: "2px solid #3b82f6",
+                            textDecoration: "none", transition: "box-shadow 0.2s",
+                        }}>
+                            <div style={{
+                                width: 56, height: 56, borderRadius: "14px",
+                                background: "#eff6ff", display: "flex",
+                                alignItems: "center", justifyContent: "center",
+                                color: "#3b82f6",
+                            }}>
+                                <ClipboardList size={24} />
+                            </div>
+                            <span style={{ fontWeight: 600, color: "#0f172a" }}>1. Compliance Setup</span>
+                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
+                                Answer questions about your business to find out what you need
+                            </span>
+                        </Link>
+
+                        <Link href="/dashboard/drivers" style={{
+                            display: "flex", flexDirection: "column" as const, alignItems: "center",
+                            gap: "0.75rem", padding: "1.5rem", background: "white",
+                            borderRadius: "14px", border: "1px solid #e2e8f0",
+                            textDecoration: "none",
+                        }}>
+                            <div style={{
+                                width: 56, height: 56, borderRadius: "14px",
+                                background: "#f1f5f9", display: "flex",
+                                alignItems: "center", justifyContent: "center",
+                                color: "#475569",
+                            }}>
+                                <Users size={24} />
+                            </div>
+                            <span style={{ fontWeight: 600, color: "#0f172a" }}>2. Add Drivers</span>
+                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
+                                Add your drivers and their qualification files
+                            </span>
+                        </Link>
+
+                        <Link href="/dashboard/vehicles" style={{
+                            display: "flex", flexDirection: "column" as const, alignItems: "center",
+                            gap: "0.75rem", padding: "1.5rem", background: "white",
+                            borderRadius: "14px", border: "1px solid #e2e8f0",
+                            textDecoration: "none",
+                        }}>
+                            <div style={{
+                                width: 56, height: 56, borderRadius: "14px",
+                                background: "#f1f5f9", display: "flex",
+                                alignItems: "center", justifyContent: "center",
+                                color: "#475569",
+                            }}>
+                                <Truck size={24} />
+                            </div>
+                            <span style={{ fontWeight: 600, color: "#0f172a" }}>3. Add Vehicles</span>
+                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
+                                Register your fleet vehicles with GVWR and details
+                            </span>
+                        </Link>
+                    </div>
+
+                    <p style={{
+                        marginTop: "2rem",
+                        padding: "1rem 1.5rem",
+                        background: "#f8fafc",
+                        borderRadius: "10px",
+                        border: "1px solid #e2e8f0",
+                        fontSize: "0.825rem",
+                        color: "#64748b",
+                    }}>
+                        💡 <strong>Tip:</strong> Switch to <strong>Demo</strong> mode in the sidebar to see how the dashboard looks with sample data.
+                    </p>
+                </section>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.dashboard}>
             {/* Header */}

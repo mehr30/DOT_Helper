@@ -20,6 +20,8 @@ import {
     Activity
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useDemoMode } from "../../components/DemoModeContext";
+import EmptyState from "../../components/EmptyState";
 
 // Category scores
 const categoryScores = [
@@ -157,10 +159,28 @@ function getCategoryProgress(items: { status: string }[]) {
 }
 
 export default function CompliancePage() {
+    const { isDemoMode } = useDemoMode();
     const [selectedState, setSelectedState] = useState("Texas");
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
         new Set(["dqf", "vehicle"])
     );
+
+    if (!isDemoMode) {
+        return (
+            <div style={{ padding: "2rem" }}>
+                <header style={{ marginBottom: "1rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 700 }}>Compliance Overview</h1>
+                    <p style={{ color: "#64748b" }}>Track your DOT compliance status across all categories</p>
+                </header>
+                <EmptyState
+                    icon="🛡️"
+                    title="No compliance data yet"
+                    description="Run the Compliance Setup to discover which regulations apply to your business. Once set up, your compliance checklist and scores will appear here."
+                    primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}
+                />
+            </div>
+        );
+    }
 
     const toggleCategory = (id: string) => {
         setExpandedCategories(prev => {
@@ -217,7 +237,7 @@ export default function CompliancePage() {
                                 <div className={styles.scoreName}>{cat.name}</div>
                                 <div className={`${styles.scoreStatus} ${styles[cat.status]}`}>
                                     {cat.status === "compliant" ? "Compliant" :
-                                     cat.status === "attention" ? "Needs Attention" : "Critical"}
+                                        cat.status === "attention" ? "Needs Attention" : "Critical"}
                                 </div>
                             </div>
                         </div>
@@ -278,8 +298,8 @@ export default function CompliancePage() {
                                             </div>
                                             <span className={`${styles.itemBadge} ${styles[item.status]}`}>
                                                 {item.status === "compliant" ? "Compliant" :
-                                                 item.status === "actionNeeded" ? "Action Needed" :
-                                                 item.status === "expired" ? "Expired" : "Pending"}
+                                                    item.status === "actionNeeded" ? "Action Needed" :
+                                                        item.status === "expired" ? "Expired" : "Pending"}
                                             </span>
                                             {item.dueDate && (
                                                 <span className={styles.itemDueDate}>{item.dueDate}</span>
