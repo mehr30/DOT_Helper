@@ -171,53 +171,46 @@ const testimonials = [
 const pricingPlans = [
   {
     name: "Starter",
-    description: "Perfect for owner-operators and small fleets",
+    description: "For owner-operators and small fleets (1–3 vehicles)",
     price: "49",
     period: "month",
     features: [
-      "Up to 5 drivers",
-      "Up to 10 vehicles",
-      "Driver qualification file tracking",
-      "Document storage (5GB)",
-      "Expiration alerts",
-      "Email support"
+      "1 to 3 vehicles / drivers",
+      "Core DQ file management",
+      "Compliance calendar",
+      "Automated deadline alerts",
+      "Document storage",
+      "Plain-language requirement explanations",
     ],
     cta: "Start Free Trial",
     popular: false
   },
   {
-    name: "Professional",
-    description: "For growing fleets that need more power",
+    name: "Growth",
+    description: "For growing fleets that need more power (4–15 vehicles)",
     price: "99",
     period: "month",
     features: [
-      "Up to 25 drivers",
-      "Up to 50 vehicles",
+      "4 to 15 vehicles / drivers",
       "Everything in Starter",
-      "Mobile DVIR app access",
-      "Clearinghouse integration",
-      "HOS monitoring",
-      "Document storage (25GB)",
-      "Priority support"
+      "Audit readiness scoring",
+      "Violation history tracking",
+      "Employee document e-signing",
     ],
     cta: "Start Free Trial",
     popular: true
   },
   {
-    name: "Enterprise",
-    description: "For larger fleets with advanced needs",
+    name: "Fleet",
+    description: "For established fleets with advanced needs (16+ vehicles)",
     price: "199",
     period: "month",
     features: [
-      "Unlimited drivers",
-      "Unlimited vehicles",
-      "Everything in Professional",
-      "ELD integration",
-      "Custom reports",
-      "API access",
-      "Unlimited storage",
-      "Dedicated account manager",
-      "Phone support"
+      "16+ vehicles / drivers",
+      "Everything in Growth",
+      "Priority compliance support",
+      "Multi-location management",
+      "Custom onboarding",
     ],
     cta: "Contact Sales",
     popular: false

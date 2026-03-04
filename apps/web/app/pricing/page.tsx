@@ -18,62 +18,48 @@ const pricingPlans = [
     {
         key: "starter",
         name: "Starter",
-        description: "Perfect for owner-operators and small fleets getting started with DOT compliance",
+        description: "For owner-operators and small fleets getting started with DOT compliance",
         monthlyPrice: 49,
-        yearlyPrice: 39,
+        yearlyPrice: 41, // 2 months free → $490/yr ÷ 12 ≈ $41/mo
         features: [
-            "Up to 5 drivers",
-            "Up to 10 vehicles",
-            "DVIR digital forms",
-            "Document storage (5 GB)",
-            "Expiration alerts (email)",
-            "Basic compliance checklist",
-            "Mobile app access",
-            "Email support",
+            "1 to 3 vehicles / drivers",
+            "Core DQ file management",
+            "Compliance calendar",
+            "Automated deadline alerts",
+            "Document storage",
+            "Plain-language requirement explanations",
         ],
         cta: "Start Free Trial",
         popular: false,
     },
     {
-        key: "professional",
-        name: "Professional",
-        description: "For growing fleets that need full FMCSA compliance management and automation",
+        key: "growth",
+        name: "Growth",
+        description: "For growing fleets that need audit readiness and automation",
         monthlyPrice: 99,
-        yearlyPrice: 79,
+        yearlyPrice: 83, // 2 months free → $990/yr ÷ 12 ≈ $83/mo
         features: [
-            "Up to 25 drivers",
-            "Up to 50 vehicles",
+            "4 to 15 vehicles / drivers",
             "Everything in Starter",
-            "HOS log management",
-            "Drug & alcohol tracking",
-            "Driver qualification files",
-            "Compliance scoring & reports",
-            "State-specific checklists",
-            "SMS & email alerts",
-            "Document storage (25 GB)",
-            "Priority support",
+            "Audit readiness scoring",
+            "Violation history tracking",
+            "Employee document e-signing",
         ],
         cta: "Start Free Trial",
         popular: true,
     },
     {
-        key: "enterprise",
-        name: "Enterprise",
-        description: "For large fleets needing custom solutions, integrations, and a dedicated account team",
+        key: "fleet",
+        name: "Fleet",
+        description: "For established fleets with multi-location needs and priority support",
         monthlyPrice: 199,
-        yearlyPrice: 159,
+        yearlyPrice: 166, // 2 months free → $1990/yr ÷ 12 ≈ $166/mo
         features: [
-            "Unlimited drivers",
-            "Unlimited vehicles",
-            "Everything in Professional",
-            "ELD integration",
-            "Custom compliance reports",
-            "API access",
-            "Unlimited document storage",
-            "Audit preparation toolkit",
-            "Dedicated account manager",
-            "Phone + chat support",
-            "Custom training & onboarding",
+            "16+ vehicles / drivers",
+            "Everything in Growth",
+            "Priority compliance support",
+            "Multi-location management",
+            "Custom onboarding",
         ],
         cta: "Contact Sales",
         popular: false,
@@ -83,27 +69,27 @@ const pricingPlans = [
 const faqs = [
     {
         question: "Is there a free trial?",
-        answer: "Yes! All plans include a 14-day free trial with full access to all features. No credit card required to start. You can cancel anytime during the trial and you won't be charged.",
+        answer: "Yes! All plans include a 14-day free trial with full access to every feature. No credit card required. You can cancel anytime during the trial and you won't be charged.",
+    },
+    {
+        question: "How does annual billing work?",
+        answer: "Annual billing gives you 2 months free — that's a ~17% discount. You pay upfront for 10 months instead of 12, and your plan auto-renews annually. You can switch back to monthly at any time.",
     },
     {
         question: "Can I change plans later?",
-        answer: "Absolutely. You can upgrade or downgrade your plan at any time from your account settings. Changes take effect immediately, and we'll prorate any billing differences.",
+        answer: "Absolutely. Upgrade or downgrade anytime from your account settings. Changes take effect immediately and we prorate billing differences.",
     },
     {
-        question: "What happens if I exceed my driver or vehicle limit?",
-        answer: "We'll notify you when you're approaching your limit. You can upgrade to a higher plan at any time, or contact us for a custom plan that fits your exact needs.",
+        question: "Is this really worth $49/month?",
+        answer: "One FMCSA violation carries a minimum $11,000 fine. Our Starter plan costs $588/year — that's a 19:1 return on investment just from avoiding a single violation. Most customers tell us it pays for itself in the first month.",
     },
     {
         question: "Is my data secure?",
-        answer: "Yes. We use bank-level AES-256 encryption for all data at rest and TLS 1.3 for data in transit. Our infrastructure is SOC 2 Type II certified, and we perform daily encrypted backups stored in geographically separate US data centers.",
-    },
-    {
-        question: "Do you integrate with ELDs?",
-        answer: "Our Professional plan integrates with most major ELD providers including KeepTruckin, Samsara, and Omnitracs. Enterprise customers can also request custom integrations with any ELD or TMS platform.",
+        answer: "Yes. We use AES-256 encryption for all data at rest and TLS 1.3 in transit. Our infrastructure runs on secure US data centers with daily encrypted backups.",
     },
     {
         question: "Will this actually help me pass a DOT audit?",
-        answer: "Our platform is designed specifically to keep you audit-ready at all times. We track every FMCSA requirement, alert you before deadlines, and maintain organized digital records that are easily accessible if an auditor requests them. Many customers report passing their audits with zero findings.",
+        answer: "That's exactly what we built it for. We track every FMCSA requirement, alert you before deadlines, and keep organized digital records ready for auditors. Many customers report passing audits with zero findings.",
     },
 ];
 
@@ -113,7 +99,7 @@ export default function PricingPage() {
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
     const handleCheckout = async (planKey: string) => {
-        if (planKey === "enterprise") {
+        if (planKey === "fleet") {
             window.location.href = "mailto:sales@dothelper.com?subject=Enterprise Plan Inquiry";
             return;
         }
@@ -180,7 +166,7 @@ export default function PricingPage() {
                     >
                         Yearly
                     </button>
-                    <span className={styles.saveBadge}>Save 20%</span>
+                    <span className={styles.saveBadge}>2 Months Free</span>
                 </div>
             </div>
 
@@ -250,9 +236,9 @@ export default function PricingPage() {
 
             {/* CTA */}
             <div className={styles.ctaSection}>
-                <h2 className={styles.ctaTitle}>Ready to Simplify DOT Compliance?</h2>
+                <h2 className={styles.ctaTitle}>One FMCSA Violation = $11,000+ in Fines</h2>
                 <p className={styles.ctaSubtitle}>
-                    Join thousands of fleet operators who trust DOT Helper to keep them compliant and audit-ready.
+                    Our Starter plan costs $588/year — that&apos;s a 19:1 ROI on avoiding just one violation. Start your free trial and protect your business today.
                 </p>
                 <Link href="/register" className={styles.ctaBtn}>
                     Start Your Free Trial
