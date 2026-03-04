@@ -11,6 +11,8 @@ const publicPaths = [
     "/pricing",
     "/blog",
     "/forgot-password",
+    "/reset-password",
+    "/features",
     "/checkout",
     "/api/auth",
 ];
