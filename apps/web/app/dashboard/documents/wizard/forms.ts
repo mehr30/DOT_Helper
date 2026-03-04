@@ -90,7 +90,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
         type: "single",
         options: [
             { value: "noCrew", label: "No — drivers go alone or take personal vehicles", icon: "👤" },
-            { value: "smallCrew", label: "Yes, up to 8 people total (driver included)", icon: "👥" },
+            { value: "smallCrew", label: "Yes, but 8 or fewer people total (driver included)", icon: "👥" },
             { value: "medCrew", label: "Yes, 9–15 people total (driver included)", icon: "🚐" },
             { value: "largeCrew", label: "Yes, 16+ people total (driver included)", icon: "🚌" },
         ],
@@ -850,20 +850,29 @@ export function getRecommendedForms(answers: Record<string, string | string[]>):
                 description: `Even though you only operate within ${stateInfo.state}, your state requires a USDOT number for intrastate commercial vehicles. You must register with FMCSA and display your USDOT number on all qualifying vehicles.`,
             });
         }
-        if (stateInfo.passengerNotes !== "Follows federal rules") {
+        if (stateInfo.passengerNotes !== "Follows federal rules" && (crewTransport === "medCrew" || crewTransport === "largeCrew")) {
             alerts.push({
                 type: "warning",
                 title: `${stateInfo.state} — Special Passenger Transport Rules`,
                 description: stateInfo.passengerNotes,
             });
         }
-        stateInfo.specialNotes.forEach(note => {
-            alerts.push({
-                type: "info",
-                title: `${stateInfo.state} Regulation`,
-                description: note,
+        stateInfo.specialNotes
+            .filter(note => {
+                // Only show passenger-related notes if user transports 9+ people
+                const isPassengerNote = /passenger|crew transport/i.test(note);
+                if (isPassengerNote && crewTransport !== "medCrew" && crewTransport !== "largeCrew") {
+                    return false;
+                }
+                return true;
+            })
+            .forEach(note => {
+                alerts.push({
+                    type: "info",
+                    title: `${stateInfo.state} Regulation`,
+                    description: note,
+                });
             });
-        });
     }
 
     // Everyone with qualifying vehicles needs these
