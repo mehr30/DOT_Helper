@@ -129,11 +129,18 @@ const recentAlerts = [
 ];
 
 const quickActions = [
-    { label: "Add Driver", href: "/dashboard/drivers", icon: Users },
-    { label: "Add Vehicle", href: "/dashboard/vehicles", icon: Truck },
+    { label: "Add Driver", href: "/dashboard/drivers/new", icon: Users },
+    { label: "Add Vehicle", href: "/dashboard/vehicles/new", icon: Truck },
     { label: "Compliance Setup", href: "/dashboard/documents/wizard", icon: ClipboardList },
     { label: "Compliance", href: "/dashboard/compliance", icon: Shield },
 ];
+
+const statLinks: Record<string, string> = {
+    "Active Drivers": "/dashboard/drivers",
+    "Vehicles": "/dashboard/vehicles",
+    "Pending Actions": "/dashboard/alerts",
+    "Clearinghouse": "/dashboard/compliance",
+};
 
 export default function DashboardPage() {
     const { isDemoMode } = useDemoMode();
@@ -182,11 +189,13 @@ export default function DashboardPage() {
                         gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                         gap: "1rem",
                     }}>
-                        <Link href="/dashboard/documents/wizard" style={{
+                        <Link href="/dashboard/documents/wizard" className="dashCard" style={{
                             display: "flex", flexDirection: "column" as const, alignItems: "center",
                             gap: "0.75rem", padding: "1.5rem", background: "white",
                             borderRadius: "14px", border: "2px solid #3b82f6",
-                            textDecoration: "none", transition: "box-shadow 0.2s",
+                            textDecoration: "none", transition: "all 0.2s ease",
+                            cursor: "pointer", position: "relative" as const,
+                            boxShadow: "0 2px 8px rgba(59,130,246,0.1)",
                         }}>
                             <div style={{
                                 width: 56, height: 56, borderRadius: "14px",
@@ -200,13 +209,21 @@ export default function DashboardPage() {
                             <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
                                 Answer questions about your business to find out what you need
                             </span>
+                            <span style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                fontSize: "0.8rem", fontWeight: 600, color: "#3b82f6",
+                                marginTop: "0.25rem",
+                            }}>
+                                Click to get started <ArrowRight size={14} />
+                            </span>
                         </Link>
 
-                        <Link href="/dashboard/drivers" style={{
+                        <Link href="/dashboard/drivers" className="dashCard" style={{
                             display: "flex", flexDirection: "column" as const, alignItems: "center",
                             gap: "0.75rem", padding: "1.5rem", background: "white",
                             borderRadius: "14px", border: "1px solid #e2e8f0",
-                            textDecoration: "none",
+                            textDecoration: "none", transition: "all 0.2s ease",
+                            cursor: "pointer",
                         }}>
                             <div style={{
                                 width: 56, height: 56, borderRadius: "14px",
@@ -220,13 +237,21 @@ export default function DashboardPage() {
                             <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
                                 Add your drivers and their qualification files
                             </span>
+                            <span style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                fontSize: "0.8rem", fontWeight: 600, color: "#64748b",
+                                marginTop: "0.25rem",
+                            }}>
+                                Add drivers <ArrowRight size={14} />
+                            </span>
                         </Link>
 
-                        <Link href="/dashboard/vehicles" style={{
+                        <Link href="/dashboard/vehicles" className="dashCard" style={{
                             display: "flex", flexDirection: "column" as const, alignItems: "center",
                             gap: "0.75rem", padding: "1.5rem", background: "white",
                             borderRadius: "14px", border: "1px solid #e2e8f0",
-                            textDecoration: "none",
+                            textDecoration: "none", transition: "all 0.2s ease",
+                            cursor: "pointer",
                         }}>
                             <div style={{
                                 width: 56, height: 56, borderRadius: "14px",
@@ -239,6 +264,13 @@ export default function DashboardPage() {
                             <span style={{ fontWeight: 600, color: "#0f172a" }}>3. Add Vehicles</span>
                             <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
                                 Register your fleet vehicles with GVWR and details
+                            </span>
+                            <span style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                fontSize: "0.8rem", fontWeight: 600, color: "#64748b",
+                                marginTop: "0.25rem",
+                            }}>
+                                Add vehicles <ArrowRight size={14} />
                             </span>
                         </Link>
                     </div>
@@ -331,8 +363,9 @@ export default function DashboardPage() {
             <section className={styles.statsGrid}>
                 {stats.map((stat) => {
                     const Icon = stat.icon;
+                    const href = statLinks[stat.label] || "/dashboard";
                     return (
-                        <div key={stat.label} className={`${styles.statCard} ${styles[stat.color]}`}>
+                        <Link key={stat.label} href={href} className={`${styles.statCard} ${styles[stat.color]}`} style={{ textDecoration: "none", cursor: "pointer", transition: "all 0.2s ease" }}>
                             <div className={styles.statIcon}>
                                 <Icon size={24} />
                             </div>
@@ -341,7 +374,8 @@ export default function DashboardPage() {
                                 <span className={styles.statLabel}>{stat.label}</span>
                                 <span className={styles.statChange}>{stat.change}</span>
                             </div>
-                        </div>
+                            <ArrowRight size={16} style={{ position: "absolute", top: 12, right: 12, color: "#94a3b8", opacity: 0.5 }} />
+                        </Link>
                     );
                 })}
             </section>

@@ -202,11 +202,14 @@
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-fast);
+    position: relative;
+    cursor: pointer;
 }
 
 .statCard:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-md);
+    border-color: var(--primary-color, #3b82f6);
 }
 
 .statIcon {
