@@ -159,7 +159,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
         type: "multi",
         options: [
             { value: "hazmat", label: "Transport hazardous materials (chemicals, propane, etc.)", icon: "☢️" },
-            { value: "cdlDrivers", label: "Some drivers have CDLs (Commercial Driver's Licenses)", icon: "🪪" },
+            { value: "cdlDrivers", label: "Any driver has a CDL — even just one (triggers drug testing and other requirements)", icon: "🪪" },
             { value: "crossBorder", label: "Cross international borders (Canada/Mexico)", icon: "🌎" },
             { value: "none", label: "None of the above", icon: "✅" },
         ],
