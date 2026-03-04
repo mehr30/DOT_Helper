@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import styles from "./Sidebar.module.css";
 import { useDemoMode } from "./DemoModeContext";
+import { useCompanyProfile } from "./CompanyProfileContext";
 
 const organizations = [
     { id: "org1", name: "Transport Co.", initials: "TC", usdot: "1234567", location: "Kansas City, KS" },
@@ -55,6 +56,15 @@ export default function Sidebar() {
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const [activeOrg, setActiveOrg] = useState(organizations[0]!);
     const { isDemoMode, toggleDemoMode } = useDemoMode();
+    const { needsHOS } = useCompanyProfile();
+
+    // Filter navigation: only show HOS if fleet needs it or in demo mode
+    const visibleNavigation = navigation.filter(item => {
+        if (item.href === "/dashboard/hos") {
+            return isDemoMode || needsHOS;
+        }
+        return true;
+    });
 
     return (
         <>
@@ -90,7 +100,7 @@ export default function Sidebar() {
                 {/* Navigation */}
                 <nav className={styles.nav}>
                     <ul className={styles.navList}>
-                        {navigation.map((item) => {
+                        {visibleNavigation.map((item) => {
                             const isActive = pathname === item.href ||
                                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
                             const Icon = item.icon;

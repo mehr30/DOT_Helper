@@ -28,6 +28,7 @@ import {
     ComplianceAlert,
 } from "./forms";
 import { saveDocument, getDocumentByFormId, SavedDocument } from "../savedDocuments";
+import { useCompanyProfile } from "../../../components/CompanyProfileContext";
 
 type WizardStep = "assessment" | "results" | "fillForm";
 
@@ -43,6 +44,8 @@ function WizardContent() {
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
     const [saveNotice, setSaveNotice] = useState(false);
+    const [addressPickerOpen, setAddressPickerOpen] = useState<string | null>(null);
+    const { profile, addAddress } = useCompanyProfile();
 
     // Handle ?form= query parameter to jump directly to a form
     useEffect(() => {
@@ -111,8 +114,32 @@ function WizardContent() {
     const startForm = (form: DOTForm) => {
         // Load any existing saved data
         const existingDoc = getDocumentByFormId(form.id);
+        const initialData: Record<string, string | boolean> = existingDoc ? existingDoc.data : {};
+
+        // Auto-fill company fields from saved profile (only if not already filled)
+        const autoFillMap: Record<string, string> = {
+            usdotNumber: profile.usdotNumber,
+            carrierName: profile.companyName,
+            companyName: profile.companyName,
+            phone: profile.phone,
+            email: profile.email,
+        };
+        for (const [fieldId, value] of Object.entries(autoFillMap)) {
+            if (value && !initialData[fieldId]) {
+                initialData[fieldId] = value;
+            }
+        }
+        // Auto-fill address from first saved address if available
+        if (profile.addresses.length > 0 && !initialData["street"]) {
+            const addr = profile.addresses[0]!;
+            if (!initialData["street"]) initialData["street"] = addr.street;
+            if (!initialData["city"]) initialData["city"] = addr.city;
+            if (!initialData["state"]) initialData["state"] = addr.state;
+            if (!initialData["zip"]) initialData["zip"] = addr.zip;
+        }
+
         setActiveForm(form);
-        setFormData(existingDoc ? existingDoc.data : {});
+        setFormData(initialData);
         setExpandedSections(new Set([form.sections[0]?.id || ""]));
         setStep("fillForm");
     };
@@ -160,6 +187,20 @@ function WizardContent() {
             setSavedForms(prev => new Set(prev).add(activeForm.id));
             setSaveNotice(true);
             setTimeout(() => setSaveNotice(false), 4000);
+
+            // Save new address to profile if address fields were filled
+            const street = formData["street"] as string;
+            const city = formData["city"] as string;
+            const state = formData["state"] as string;
+            const zip = formData["zip"] as string;
+            if (street && city && state) {
+                const alreadySaved = profile.addresses.some(
+                    a => a.street === street && a.city === city && a.state === state
+                );
+                if (!alreadySaved) {
+                    addAddress({ label: `${city}, ${state}`, street, city, state, zip: zip || "" });
+                }
+            }
         }
     };
 
@@ -195,6 +236,7 @@ function WizardContent() {
 
     const renderField = (field: FormField) => {
         const value = formData[field.id];
+        const isAddressField = ["street", "businessAddress"].includes(field.id);
 
         return (
             <div
@@ -206,6 +248,64 @@ function WizardContent() {
                     {field.required && <span className={styles.requiredStar}>*</span>}
                 </label>
 
+                {/* Address picker for street/address fields */}
+                {isAddressField && profile.addresses.length > 0 && (
+                    <div style={{ position: "relative", marginBottom: "0.4rem" }}>
+                        <button
+                            type="button"
+                            onClick={() => setAddressPickerOpen(addressPickerOpen === field.id ? null : field.id)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                padding: "0.3rem 0.6rem", fontSize: "0.7rem", fontWeight: 500,
+                                border: "1px solid #e2e8f0", borderRadius: "6px",
+                                background: "#f8fafc", color: "#3b82f6", cursor: "pointer",
+                            }}
+                        >
+                            📋 Use saved address ({profile.addresses.length})
+                        </button>
+                        {addressPickerOpen === field.id && (
+                            <div style={{
+                                position: "absolute", top: "100%", left: 0, zIndex: 20,
+                                background: "white", border: "1px solid #e2e8f0",
+                                borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                minWidth: 280, marginTop: "0.25rem", overflow: "hidden",
+                            }}>
+                                <div style={{ padding: "0.5rem 0.75rem", borderBottom: "1px solid #f1f5f9", fontSize: "0.7rem", fontWeight: 600, color: "#64748b" }}>
+                                    Select an address
+                                </div>
+                                {profile.addresses.map(addr => (
+                                    <button
+                                        key={addr.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                [field.id]: addr.street,
+                                                city: addr.city,
+                                                state: addr.state,
+                                                zip: addr.zip,
+                                            }));
+                                            setAddressPickerOpen(null);
+                                        }}
+                                        style={{
+                                            display: "block", width: "100%", textAlign: "left" as const,
+                                            padding: "0.5rem 0.75rem", border: "none", background: "none",
+                                            cursor: "pointer", fontSize: "0.8rem", lineHeight: 1.4,
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: 500, color: "#0f172a" }}>{addr.label}</div>
+                                        <div style={{ color: "#64748b", fontSize: "0.7rem" }}>
+                                            {addr.street}, {addr.city}, {addr.state} {addr.zip}
+                                        </div>
+                                    </button>
+                                ))}
+                                <div style={{ padding: "0.4rem 0.75rem", borderTop: "1px solid #f1f5f9", fontSize: "0.65rem", color: "#94a3b8" }}>
+                                    Or type a new address below
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
                 {field.type === "checkbox" ? (
                     <label className={styles.checkboxLabel}>
                         <input
