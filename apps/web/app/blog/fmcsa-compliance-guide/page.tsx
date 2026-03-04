@@ -42,85 +42,102 @@ export default function FmcsaComplianceGuidePost() {
 
                 <div className={styles.articleContent}>
                     <p>
-                        The <strong>Federal Motor Carrier Safety Administration (FMCSA)</strong> regulates all commercial motor vehicles (CMVs) operating in interstate commerce. For small fleet owners, understanding these regulations isn&apos;t just about avoiding fines — it&apos;s about protecting your drivers, your business, and the public.
+                        If you operate commercial trucks, vans, or equipment vehicles, there&apos;s a federal agency keeping an eye on you: the <strong>FMCSA</strong> (Federal Motor Carrier Safety Administration). They&apos;re the ones who set the rules for who can drive commercially, how long they can drive, how vehicles must be maintained, and a lot more.
                     </p>
                     <p>
-                        This guide breaks down the key <strong>FMCSA compliance requirements</strong> that every small fleet owner must know in 2026.
+                        Understanding FMCSA compliance isn&apos;t just about avoiding fines (though those can be brutal — up to <strong>$16,864 per violation</strong>). It&apos;s about protecting your drivers, your business, and keeping your authority to operate.
+                    </p>
+                    <p>
+                        This guide breaks down what you actually need to know as a small fleet owner in 2026.
                     </p>
 
-                    <h2>What Is FMCSA and Why Does It Matter?</h2>
-                    <p>
-                        FMCSA is the federal agency within the DOT responsible for regulating and overseeing the safety of commercial motor vehicles. They issue regulations (Title 49 CFR Parts 300-399), conduct compliance reviews, manage the CSA program, and can shut down unsafe carriers.
-                    </p>
-                    <p>
-                        If you operate vehicles over 10,001 lbs GVWR, transport 9+ passengers for hire, or haul hazardous materials — you fall under FMCSA jurisdiction.
-                    </p>
-
-                    <h2>Getting Started: Operating Authority</h2>
-                    <p>Before you can legally haul freight, you need:</p>
+                    <h2>Do FMCSA Rules Apply to Me?</h2>
+                    <p>You fall under FMCSA rules if you do any of the following:</p>
                     <ul>
-                        <li><strong>USDOT Number</strong> — Your unique identifier. Apply at <em>fmcsa.dot.gov</em>. Free to obtain.</li>
-                        <li><strong>Motor Carrier (MC) Authority</strong> — Required for for-hire carriers. Costs $300 to apply. Takes 20-25 business days to process.</li>
-                        <li><strong>Insurance Filing</strong> — File your BMC-91 (financial responsibility) through your insurance provider. Must be on file with FMCSA before authority activates.</li>
-                        <li><strong>BOC-3</strong> — Designate process agents in every state. Filed through a BOC-3 service provider.</li>
-                        <li><strong>UCR Registration</strong> — Annual registration. Fee depends on fleet size (starts at around $176 for 0-2 power units).</li>
+                        <li>Operate vehicles with a gross vehicle weight rating (GVWR) over <strong>10,001 lbs</strong> — that&apos;s the total weight the vehicle is rated for, not what it currently weighs. Check the sticker on the driver&apos;s side door.</li>
+                        <li>Transport <strong>9 or more passengers</strong> for compensation (like a shuttle service)</li>
+                        <li>Transport <strong>hazardous materials</strong> in quantities that require placards</li>
+                    </ul>
+                    <p>
+                        If any of those apply, you need a USDOT number and must comply with FMCSA safety regulations. Period.
+                    </p>
+
+                    <h2>Getting Set Up: The Basics</h2>
+                    <p>Before you can legally operate, you need a few things in place:</p>
+                    <ul>
+                        <li><strong>USDOT Number</strong> — Your company&apos;s unique identifier. Apply free at fmcsa.dot.gov. This is step one — nothing else happens without it.</li>
+                        <li><strong>Operating Authority (MC Number)</strong> — If you haul freight for other companies across state lines, you need this. Costs $300 and takes 20-25 business days. If you only haul your own stuff, you may not need it.</li>
+                        <li><strong>Insurance</strong> — Minimum $750,000 liability for general freight. Your insurance company files the proof directly with FMCSA. Without this, your authority won&apos;t activate.</li>
+                        <li><strong>BOC-3</strong> — A legal requirement to have a designated agent in every state. A BOC-3 service handles it for you for a small fee.</li>
+                        <li><strong>UCR Registration</strong> — Annual registration fee based on fleet size. Starts around $176 for small fleets (0-2 trucks).</li>
                     </ul>
 
-                    <h2>Understanding CSA Scores</h2>
+                    <h2>CSA Scores: Your Safety Report Card</h2>
                     <p>
-                        The <strong>Compliance, Safety, Accountability (CSA)</strong> program is FMCSA&apos;s safety measurement system. It evaluates carriers across <strong>7 BASICs</strong> (Behavior Analysis and Safety Improvement Categories):
+                        Think of your <strong>CSA score</strong> as your trucking company&apos;s credit score — except instead of banks, it&apos;s shippers, brokers, and insurance companies checking it. CSA stands for Compliance, Safety, Accountability. FMCSA tracks your performance across seven categories:
                     </p>
                     <ul>
                         <li><strong>Unsafe Driving</strong> — Speeding, reckless driving, lane violations</li>
-                        <li><strong>Crash Indicator</strong> — Crash history and patterns</li>
-                        <li><strong>HOS Compliance</strong> — Driving time violations, log falsification</li>
-                        <li><strong>Vehicle Maintenance</strong> — Brake, tire, and lighting violations</li>
-                        <li><strong>Controlled Substances/Alcohol</strong> — Positive tests, refusals</li>
-                        <li><strong>Hazardous Materials</strong> — Hazmat handling and documentation</li>
-                        <li><strong>Driver Fitness</strong> — CDL, medical card, and qualification violations</li>
+                        <li><strong>Crash Indicator</strong> — Your crash history</li>
+                        <li><strong>Hours of Service</strong> — Are your drivers driving too long?</li>
+                        <li><strong>Vehicle Maintenance</strong> — Brake, tire, and light problems found during inspections</li>
+                        <li><strong>Drug &amp; Alcohol</strong> — Positive tests or refusals</li>
+                        <li><strong>Hazardous Materials</strong> — Hazmat handling violations (if applicable)</li>
+                        <li><strong>Driver Fitness</strong> — CDL, medical card, and qualification issues</li>
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>📊 Why CSA Scores Matter</h4>
-                        <p>High CSA scores can trigger interventions ranging from warning letters to full compliance reviews. Many shippers and brokers also check CSA scores before awarding freight — poor scores directly impact your revenue.</p>
+                        <h4>📊 Why This Matters to Your Bottom Line</h4>
+                        <p>Bad CSA scores don&apos;t just trigger government attention — many shippers and brokers check your scores before giving you loads. Poor scores can directly cost you revenue. Insurance companies also use them to set your rates. Better scores = lower premiums.</p>
                     </div>
 
-                    <h2>Key Regulatory Areas for Small Fleets</h2>
+                    <h2>The Big Five: What You&apos;re Responsible For</h2>
 
-                    <h3>Driver Qualification (Part 391)</h3>
-                    <p>You must maintain a complete qualification file for every driver. This includes employment applications, CDL verification, medical certificates, MVRs, road test certificates, and Clearinghouse queries. Files must be maintained for 3 years after employment ends.</p>
+                    <h3>1. Driver Files</h3>
+                    <p>
+                        For every driver, you need a complete qualification file: application with full work history, CDL copy, medical card, annual driving record, road test, background checks from previous employers, and drug/alcohol database queries. It sounds like a lot, but it&apos;s mostly a one-time setup with annual updates. The <Link href="/blog/driver-qualification-file-requirements">full breakdown is here</Link>.
+                    </p>
 
-                    <h3>Hours of Service (Part 395)</h3>
-                    <p>All CMV drivers must comply with federal HOS rules and record their duty status on an ELD. As a carrier, you&apos;re responsible for monitoring compliance, reviewing logs daily, and taking corrective action when violations occur.</p>
+                    <h3>2. Hours of Service</h3>
+                    <p>
+                        Your drivers can only drive so many hours before they have to rest. Federal rules cap driving at 11 hours and the total work day at 14 hours. As the carrier, you&apos;re responsible for making sure your drivers follow these rules and that their electronic logs (ELDs) are accurate. <strong>Review logs daily</strong> — not weekly, not &quot;when you get around to it.&quot;
+                    </p>
 
-                    <h3>Vehicle Maintenance (Part 396)</h3>
-                    <p>Carriers must have a systematic maintenance program for each vehicle, including regular preventive maintenance, annual DOT inspections, and prompt repair of defects identified on DVIRs.</p>
+                    <h3>3. Vehicle Maintenance</h3>
+                    <p>
+                        You need a written maintenance plan, annual DOT inspections for every truck and trailer, and daily pre-trip/post-trip inspections by drivers. When something breaks, it has to be documented and fixed before the vehicle goes back out. Keep records for at least a year after a vehicle leaves your fleet.
+                    </p>
 
-                    <h3>Drug &amp; Alcohol Testing (Part 382)</h3>
-                    <p>A comprehensive testing program is required: pre-employment, random, post-accident, reasonable suspicion, return-to-duty, and follow-up testing. You must also register with the FMCSA Clearinghouse and conduct annual queries.</p>
+                    <h3>4. Drug &amp; Alcohol Testing</h3>
+                    <p>
+                        If your drivers need a CDL, you need a drug and alcohol testing program. That means testing before you hire someone, random testing throughout the year, testing after serious accidents, and checking the FMCSA&apos;s drug/alcohol database. Most small fleets partner with a testing consortium to handle the logistics.
+                    </p>
 
-                    <h3>Insurance Requirements (Part 387)</h3>
-                    <p>Minimum liability insurance requirements: $750,000 for general commodities, $1,000,000 for oil (hazmat), $5,000,000 for other hazardous materials. Must be filed with FMCSA and remain active at all times.</p>
+                    <h3>5. Insurance</h3>
+                    <p>
+                        Minimum liability coverage of $750,000 for general freight. Higher if you haul oil ($1M) or other hazardous materials ($5M). Your insurance must be filed with FMCSA and stay active at all times. If your insurance lapses — even for a day — your operating authority may be revoked.
+                    </p>
 
-                    <h2>Common FMCSA Violations and Fines</h2>
-                    <p>Here are the most expensive violations small carriers face:</p>
+                    <h2>What Happens If You Don&apos;t Comply?</h2>
+                    <p>The fines are real, and they add up fast:</p>
                     <ul>
                         <li><strong>Operating without authority</strong> — Up to $16,864 per violation</li>
-                        <li><strong>False log entries</strong> — Up to $16,864 per offense</li>
-                        <li><strong>Using a disqualified driver</strong> — Up to $16,864 per violation</li>
-                        <li><strong>No drug/alcohol testing program</strong> — Up to $16,864</li>
-                        <li><strong>No annual vehicle inspection</strong> — $1,270-$12,695 per vehicle</li>
-                        <li><strong>Recordkeeping violations</strong> — $1,270-$12,695 per violation</li>
+                        <li><strong>Falsifying driver logs</strong> — Up to $16,864 per offense</li>
+                        <li><strong>Using a driver who isn&apos;t qualified</strong> — Up to $16,864</li>
+                        <li><strong>No drug &amp; alcohol testing program</strong> — Up to $16,864</li>
+                        <li><strong>No annual vehicle inspection</strong> — $1,270 to $12,695 per vehicle</li>
+                        <li><strong>Missing paperwork/records</strong> — $1,270 to $12,695 per violation</li>
                     </ul>
+                    <p>And beyond fines: multiple violations can trigger a full compliance review, a poor safety rating, or even an order to shut down your operation.</p>
 
-                    <h2>How DOT Helper Simplifies FMCSA Compliance</h2>
+                    <h2>It&apos;s a Lot. We Know.</h2>
                     <p>
-                        Managing all these requirements across multiple drivers and vehicles is a full-time job. <strong>DOT Helper</strong> was built specifically for small fleet owners who need to stay FMCSA compliant without hiring a dedicated compliance officer. Our platform tracks every requirement, sends automated alerts, and keeps your documentation organized and audit-ready.
+                        Managing all of this across multiple drivers and vehicles while also running your actual business is overwhelming. That&apos;s why we built <strong>DOT Helper</strong> — specifically for small fleet owners who need to stay compliant without hiring a full-time compliance person. We track every requirement, send reminders, and keep your documentation organized so you&apos;re always ready.
                     </p>
 
                     <div className={styles.articleCta}>
                         <h3>Simplify Your FMCSA Compliance Today</h3>
-                        <p>Join thousands of small fleet owners who trust DOT Helper to manage their compliance.</p>
+                        <p>Join small fleet owners who trust DOT Helper to manage their compliance.</p>
                         <Link href="/pricing" className={styles.articleCtaBtn}>
                             Start Your Free Trial <ArrowRight size={16} />
                         </Link>

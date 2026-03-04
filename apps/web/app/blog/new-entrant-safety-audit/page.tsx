@@ -21,28 +21,28 @@ export default function Page() {
             <h2>What the Auditor Reviews</h2>
             <p>The new entrant audit covers the same regulatory areas as a full compliance review, just at a slightly higher level:</p>
             <ul>
-                <li><strong>Operating authority and insurance</strong> — Is your MC number active? Is your BMC-91 on file?</li>
-                <li><strong>Driver qualification files</strong> — CDLs, medical cards, MVRs, applications, Clearinghouse queries</li>
-                <li><strong>Hours of Service records</strong> — ELD compliance, daily log review process</li>
-                <li><strong>Vehicle maintenance</strong> — Annual inspections, DVIRs, PM schedule</li>
-                <li><strong>Drug &amp; alcohol program</strong> — Testing records, Clearinghouse registration, written policy</li>
-                <li><strong>Accident register</strong> — Documentation of any recordable accidents</li>
+                <li><strong>Operating authority and insurance</strong> — Is your USDOT active? Is your insurance filed with the government?</li>
+                <li><strong>Driver qualification files</strong> — CDL copies, medical cards, driving records, applications, drug/alcohol database checks</li>
+                <li><strong>Hours of Service records</strong> — Are your drivers using electronic logs (ELDs)? Are you reviewing them?</li>
+                <li><strong>Vehicle maintenance</strong> — Annual inspections, daily pre-trip reports, maintenance schedule</li>
+                <li><strong>Drug &amp; alcohol program</strong> — Testing records, database registration, written policy</li>
+                <li><strong>Accident register</strong> — A log of any recordable accidents, even if you haven&apos;t had any</li>
             </ul>
 
             <h2>How to Prepare (Starting Today)</h2>
             <p>Honestly? The best preparation is just running a compliant operation from day one. But if your audit is coming up soon, here&apos;s your crash course:</p>
             <ol>
-                <li>Pull every driver qualification file and check it against the Part 391 requirements. <em>Every</em> document.</li>
-                <li>Verify your insurance filing (BMC-91) shows as active on SAFER.</li>
+                <li>Pull every driver&apos;s file and make sure all their documents are there and current. <em>Every</em> single item.</li>
+                <li>Verify your insurance shows as active on the FMCSA&apos;s SAFER website.</li>
                 <li>Review 3 months of ELD data. Fix any unidentified driving events.</li>
                 <li>Confirm all vehicles have current annual inspections.</li>
-                <li>Make sure your drug &amp; alcohol testing program is documented and you&apos;re registered in the Clearinghouse.</li>
+                <li>Make sure your drug &amp; alcohol testing program is documented and you&apos;re registered in the FMCSA&apos;s drug/alcohol database.</li>
                 <li>Set up your accident register — even if you haven&apos;t had any accidents. You still need the register.</li>
             </ol>
 
             <h2>What Happens If You Fail?</h2>
             <p>If the auditor finds deficiencies, you&apos;ll get a letter detailing the violations and a timeframe to correct them. Fail to fix the issues? FMCSA can revoke your operating authority.</p>
-            <p>For most new carriers, the violations are fixable — missing documents, incomplete DQFs, that kind of thing. The carriers who get in real trouble are the ones who ignore the letter or don&apos;t have <em>any</em> compliance systems in place.</p>
+            <p>For most new carriers, the violations are fixable — missing documents, incomplete driver files, that kind of thing. The carriers who get in real trouble are the ones who ignore the letter or don&apos;t have <em>any</em> compliance systems in place.</p>
 
             <h2>A Word of Advice</h2>
             <p>We talk to carriers every week who wish they&apos;d set up their compliance from the start. Retrofitting 6 months of paperwork is painful and expensive. Getting it right from day one? That&apos;s just good business.</p>

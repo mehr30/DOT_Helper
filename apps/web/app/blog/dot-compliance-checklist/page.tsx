@@ -47,86 +47,87 @@ export default function DotComplianceChecklistPost() {
 
                 <div className={styles.articleContent}>
                     <p>
-                        Running a small trucking operation means wearing many hats — and staying compliant with the <strong>Department of Transportation (DOT)</strong> and <strong>Federal Motor Carrier Safety Administration (FMCSA)</strong> is one of the most critical. A single missed requirement can result in fines up to <strong>$16,864 per violation</strong>, out-of-service orders, or even loss of your operating authority.
+                        If you run trucks commercially — whether that&apos;s hauling freight, towing equipment to job sites, or sending service vehicles out — there&apos;s a list of federal requirements you need to meet. Miss one, and you could be looking at fines up to <strong>$16,864 per violation</strong>, vehicles pulled off the road, or worse.
                     </p>
                     <p>
-                        This comprehensive <strong>DOT compliance checklist</strong> covers every requirement your small fleet needs to meet in 2026. Use it as your roadmap to staying audit-ready year-round.
+                        This checklist breaks it all down into plain English. Think of it as your &quot;did I forget anything?&quot; reference.
                     </p>
 
-                    <h2>1. Operating Authority &amp; Company Filings</h2>
-                    <p>Before you put a single truck on the road, your company needs the right federal and state registrations in place:</p>
+                    <h2>1. Get Your Company Registered</h2>
+                    <p>Before a single truck hits the road, you need the right registrations. Here&apos;s the short list:</p>
                     <ul>
-                        <li><strong>USDOT Number</strong> — Required for all commercial motor vehicle operations. Verify it&apos;s active at <em>safer.fmcsa.dot.gov</em>.</li>
-                        <li><strong>MC Number (Operating Authority)</strong> — Required if you haul freight for hire across state lines.</li>
-                        <li><strong>BOC-3 Filing</strong> — Designates process agents in each state you operate. Must be current at all times.</li>
-                        <li><strong>Unified Carrier Registration (UCR)</strong> — Annual registration based on fleet size. Due by December 31 each year.</li>
-                        <li><strong>MCS-150 Biennial Update</strong> — Update your company information with FMCSA every two years, in your assigned month.</li>
-                        <li><strong>Insurance Filing (BMC-91 or BMC-34)</strong> — Minimum $750,000 liability for general freight; $1M or $5M for hazmat.</li>
-                        <li><strong>IFTA License</strong> — Required if you operate in more than one jurisdiction. Quarterly fuel tax returns required.</li>
+                        <li><strong>USDOT Number</strong> — This is basically your company&apos;s ID number for trucking. It&apos;s free to get at <em>fmcsa.dot.gov</em>. Every commercial carrier needs one.</li>
+                        <li><strong>MC Number (Operating Authority)</strong> — If you&apos;re hauling other people&apos;s freight across state lines, you need this on top of your USDOT. It costs $300 and takes about a month to process.</li>
+                        <li><strong>BOC-3 Filing</strong> — This is just paperwork that says you have a legal representative in each state. A BOC-3 service handles it for you — usually around $30-50.</li>
+                        <li><strong>UCR (Unified Carrier Registration)</strong> — An annual registration fee based on your fleet size. Starts around $176 for small fleets. Due by December 31 each year.</li>
+                        <li><strong>MCS-150 Update</strong> — Every two years, you update your company info with the feds. They assign you a month based on your USDOT number. Miss it, and your authority can go inactive.</li>
+                        <li><strong>Insurance</strong> — You need at least $750,000 in liability coverage for general freight. Your insurance company files the proof (called a BMC-91) directly with the government.</li>
+                        <li><strong>IFTA License</strong> — If your trucks cross state lines, you need this for fuel tax reporting. File quarterly returns.</li>
                     </ul>
 
-                    <h2>2. Driver Qualification Files (DQF) — Part 391</h2>
-                    <p>Every driver operating a commercial motor vehicle must have a qualification file with all required documents. Missing even one can trigger a violation during an audit.</p>
+                    <h2>2. Driver Files — The Stuff That Catches People Off Guard</h2>
+                    <p>Every driver who operates one of your commercial vehicles needs a qualification file. This is the #1 thing auditors check, and it&apos;s where most companies fall short. For each driver, you need:</p>
                     <ul>
-                        <li><strong>Employment Application (391.21)</strong> — Must include 10-year employment history and 3-year accident history.</li>
-                        <li><strong>Motor Vehicle Record (MVR)</strong> — Pull annually from each state the driver has held a license in the past 3 years.</li>
-                        <li><strong>Road Test Certificate (391.31)</strong> — Or equivalent: a valid CDL with proper class and endorsements.</li>
-                        <li><strong>Medical Examiner&apos;s Certificate</strong> — Valid for up to 2 years. Must be from a National Registry-listed examiner.</li>
-                        <li><strong>Previous Employer Inquiries (391.23)</strong> — Required for 3 years of employment history. Must include drug/alcohol results from FMCSA Clearinghouse.</li>
-                        <li><strong>Annual Certificate of Violations (391.27)</strong> — Each driver must certify all traffic violations in the past 12 months, annually.</li>
-                        <li><strong>FMCSA Clearinghouse Query</strong> — Full query required at pre-employment; limited query annually for each driver.</li>
+                        <li><strong>Employment application</strong> — Not a one-page form. The DOT version requires 10 years of employment history and 3 years of accident history. Yes, really.</li>
+                        <li><strong>Driving record (MVR)</strong> — Pull this from the DMV every year. If your driver has held licenses in multiple states in the past 3 years, you need MVRs from <em>each</em> state.</li>
+                        <li><strong>Road test certificate</strong> — Or a copy of their valid CDL with the right class and endorsements, which most people use instead.</li>
+                        <li><strong>Medical card</strong> — The DOT physical. Good for up to 2 years. When it expires, the driver can&apos;t legally drive your truck until they get a new one. Set a reminder 90 days out.</li>
+                        <li><strong>Previous employer checks</strong> — You have to contact their last 3 years of employers and ask about safety history and drug/alcohol testing. This includes checking the FMCSA&apos;s drug and alcohol database.</li>
+                        <li><strong>Annual violations certificate</strong> — Once a year, every driver signs a form listing any traffic violations they&apos;ve had in the past 12 months. Even if the list is &quot;none.&quot;</li>
+                        <li><strong>Drug &amp; alcohol database check</strong> — Full query before hiring; annual check for every active driver. This is done through the FMCSA Clearinghouse website.</li>
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>💡 Pro Tip</h4>
-                        <p>Set up automated 90-day, 60-day, and 30-day alerts for CDL and medical card expirations. DOT Helper does this automatically for every driver in your fleet.</p>
+                        <h4>💡 The Most Common Audit Finding</h4>
+                        <p>Missing or expired items in driver files. Set up automated reminders for CDL expirations, medical card renewals, and annual MVR pulls. Most carriers who fail audits aren&apos;t doing anything wrong — they just forgot to renew something.</p>
                     </div>
 
-                    <h2>3. Hours of Service (HOS) — Part 395</h2>
-                    <p>HOS violations are one of the most common findings in DOT audits. Make sure your operation covers:</p>
+                    <h2>3. Hours of Service — How Long Your Drivers Can Drive</h2>
+                    <p>If your vehicles need electronic logging devices (ELDs), here&apos;s what you&apos;re responsible for as the company:</p>
                     <ul>
-                        <li><strong>ELD compliance</strong> — All CMVs must be equipped with a registered Electronic Logging Device.</li>
-                        <li><strong>Daily log review</strong> — Review ELD data within 24 hours. Look for unidentified driving, form & manner errors.</li>
-                        <li><strong>Supporting documents</strong> — Toll receipts, fuel receipts, and delivery receipts must be retained for 6 months.</li>
-                        <li><strong>11-hour driving limit</strong> — Monitor that no driver exceeds 11 hours of driving after 10 consecutive hours off duty.</li>
-                        <li><strong>14-hour duty window</strong> — Drivers cannot drive after the 14th consecutive hour on duty.</li>
-                        <li><strong>30-minute break</strong> — Required after 8 cumulative hours of driving.</li>
-                        <li><strong>60/70-hour limit</strong> — Track 7-day and 8-day cumulative hours. 34-hour restart rules apply.</li>
+                        <li><strong>ELD in every qualifying truck</strong> — It must be a registered, approved device. Not a phone app (unless it&apos;s a certified one).</li>
+                        <li><strong>Review logs daily</strong> — Yes, daily. Look for unidentified driving, missing entries, and anything that doesn&apos;t match up. Don&apos;t wait until the end of the week.</li>
+                        <li><strong>Keep supporting documents</strong> — Toll receipts, fuel receipts, delivery receipts. Hold onto them for 6 months.</li>
+                        <li><strong>Know the limits</strong> — 11 hours of driving max after 10 hours off. Can&apos;t drive past the 14th hour after coming on duty. 30-minute break required after 8 hours of driving. 60 or 70 total hours in a week depending on your schedule.</li>
+                    </ul>
+                    <p>HOS violations are one of the top audit findings. The fix is simple: actually look at the logs every day. Most violations happen because nobody was checking.</p>
+
+                    <h2>4. Vehicle Maintenance — The Paperwork Behind the Wrench</h2>
+                    <ul>
+                        <li><strong>Annual DOT inspection</strong> — Every truck and trailer must pass a thorough inspection once a year by a qualified inspector. Keep the report for 14 months and put the inspection decal on the vehicle.</li>
+                        <li><strong>Pre-trip and post-trip inspections (DVIRs)</strong> — Drivers must do a walkaround before and after each trip, checking tires, brakes, lights, mirrors, etc. If they find something wrong, it has to be documented and fixed before the truck goes out again.</li>
+                        <li><strong>Written maintenance plan</strong> — You need a schedule for oil changes, brake checks, tire rotations, etc. &quot;We fix stuff when it breaks&quot; doesn&apos;t count.</li>
+                        <li><strong>Maintenance records</strong> — Keep records for every vehicle showing what was inspected, what was fixed, and when. Hold onto them for at least 1 year after the vehicle leaves your fleet.</li>
+                        <li><strong>Brakes</strong> — Check brake adjustment at every service. Brakes out of adjustment is the single most common vehicle violation at roadside inspections. If there&apos;s one thing to get right, it&apos;s brakes.</li>
                     </ul>
 
-                    <h2>4. Vehicle Maintenance &amp; Inspections — Part 396</h2>
+                    <h2>5. Drug &amp; Alcohol Testing — Yes, This Applies to You</h2>
+                    <p>If your drivers need a CDL, or if your vehicles are over 26,001 lbs, you need a drug and alcohol testing program. Here&apos;s what that means:</p>
                     <ul>
-                        <li><strong>Annual DOT Inspection</strong> — Every CMV and trailer must pass an annual inspection by a qualified inspector. Keep the report for 14 months.</li>
-                        <li><strong>DVIRs (Pre/Post Trip)</strong> — Drivers must complete a written DVIR before and after each trip. Defects must be documented and repaired before dispatch.</li>
-                        <li><strong>Systematic Maintenance Plan</strong> — You must have a written preventive maintenance program for every vehicle.</li>
-                        <li><strong>Maintenance Records</strong> — Keep records for each vehicle showing all inspections, repairs, and maintenance for 1 year + 6 months after disposal.</li>
-                        <li><strong>Brake Adjustments</strong> — Check brake adjustment at each PM service. Brakes are the #1 out-of-service violation.</li>
+                        <li><strong>Test before hiring</strong> — Every driver must pass a drug test before they start. No exceptions, no &quot;we&apos;ll get to it next week.&quot;</li>
+                        <li><strong>Random testing pool</strong> — You need to randomly test 50% of your drivers for drugs and 10% for alcohol each year. Most small fleets join a consortium (a third-party service) to handle this.</li>
+                        <li><strong>Supervisor training</strong> — At least one person at your company needs 2 hours of training on recognizing signs of drug/alcohol use.</li>
+                        <li><strong>Post-accident testing</strong> — If there&apos;s a serious crash (fatality, injury with a citation, or a towed vehicle with a citation), the driver must be tested.</li>
+                        <li><strong>Register with the FMCSA database</strong> — Sign up at the FMCSA Clearinghouse website. Run queries on drivers, report any violations.</li>
+                        <li><strong>Written policy</strong> — Create a drug &amp; alcohol policy, give it to every driver, and get their signature saying they received it.</li>
                     </ul>
 
-                    <h2>5. Drug &amp; Alcohol Testing — Part 382</h2>
+                    <h2>6. Don&apos;t Forget Your State</h2>
+                    <p>Federal rules are the floor, not the ceiling. Your state might add requirements on top:</p>
                     <ul>
-                        <li><strong>Pre-employment drug testing</strong> — Required before any driver operates a CMV. No exceptions.</li>
-                        <li><strong>Random testing pool</strong> — Must test 50% of drivers for drugs and 10% for alcohol annually.</li>
-                        <li><strong>Reasonable suspicion training</strong> — At least 2 hours for all supervisors who may determine reasonable suspicion.</li>
-                        <li><strong>Post-accident testing</strong> — Required when a driver is involved in a qualifying accident (fatality, citation + injury, citation + tow).</li>
-                        <li><strong>FMCSA Clearinghouse</strong> — Register as an employer, conduct queries, and report violations.</li>
-                        <li><strong>Written policy</strong> — Distribute your company&apos;s drug and alcohol policy to every driver. Get signed acknowledgment.</li>
+                        <li>Some states require a separate state DOT registration</li>
+                        <li>State-specific vehicle inspection programs</li>
+                        <li>Emissions requirements (California, we&apos;re looking at you)</li>
+                        <li>Oversize/overweight permits</li>
+                        <li>State fuel taxes beyond IFTA</li>
                     </ul>
+                    <p>Our <Link href="/dashboard/documents/wizard">Compliance Setup wizard</Link> asks where you operate and flags state-specific requirements automatically.</p>
 
-                    <h2>6. State-Specific Requirements</h2>
-                    <p>Don&apos;t forget that individual states may have additional requirements beyond federal DOT regulations:</p>
-                    <ul>
-                        <li>State DOT registration or intrastate authority</li>
-                        <li>State-specific HOS exemptions (some states have agricultural or short-haul exemptions)</li>
-                        <li>Vehicle emissions and safety inspection requirements</li>
-                        <li>Oversize/overweight permit requirements</li>
-                        <li>State fuel tax reporting (IFTA + state-specific taxes)</li>
-                    </ul>
-
-                    <h2>Stay Audit-Ready with DOT Helper</h2>
+                    <h2>Feeling Overwhelmed? That&apos;s Normal.</h2>
                     <p>
-                        Keeping track of all these requirements manually is overwhelming — especially when you&apos;re also managing drivers, loads, and day-to-day operations. That&apos;s exactly why we built <strong>DOT Helper</strong>: to automate compliance tracking, send timely alerts, and keep all your documents organized in one place.
+                        The first time you see this list, it feels like a lot. That&apos;s because it <em>is</em> a lot. But most of it is just staying organized — knowing what&apos;s due, when it&apos;s due, and where to find the paperwork when someone asks for it.
                     </p>
+                    <p>That&apos;s exactly what DOT Helper does. We track every item on this checklist, send you reminders before things expire, and keep everything in one place so you&apos;re always ready if an auditor comes knocking.</p>
 
                     <div className={styles.articleCta}>
                         <h3>Never Miss a Compliance Deadline Again</h3>
