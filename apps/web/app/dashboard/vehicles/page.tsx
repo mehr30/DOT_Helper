@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
     Plus,
@@ -122,6 +123,19 @@ function getInspectionStatus(daysUntil: number) {
 
 export default function VehiclesPage() {
     const { isDemoMode } = useDemoMode();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [typeFilter, setTypeFilter] = useState("all");
+    const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+    const filteredVehicles = isDemoMode ? vehicles.filter(v => {
+        const matchesSearch = searchTerm === "" ||
+            v.unitNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            `${v.make} ${v.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            v.vin.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = typeFilter === "all" || v.vehicleType === typeFilter;
+        return matchesSearch && matchesType;
+    }) : [];
+
     const tractors = isDemoMode ? vehicles.filter(v => v.vehicleType === "tractor") : [];
     const trailers = isDemoMode ? vehicles.filter(v => v.vehicleType === "trailer") : [];
     const inMaintenance = isDemoMode ? vehicles.filter(v => v.status === "maintenance").length : 0;
@@ -198,12 +212,23 @@ export default function VehiclesPage() {
                         type="text"
                         placeholder="Search vehicles..."
                         className={styles.searchInput}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className={styles.filterButton}>
-                    <Filter size={18} />
-                    Filter
-                </button>
+                <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    style={{
+                        padding: "0.5rem 0.75rem", borderRadius: "8px",
+                        border: "1px solid #e2e8f0", fontSize: "0.85rem",
+                        color: "#334155", cursor: "pointer",
+                    }}
+                >
+                    <option value="all">All Types</option>
+                    <option value="tractor">Tractors</option>
+                    <option value="trailer">Trailers</option>
+                </select>
             </div>
 
             {/* Vehicles Table */}
@@ -221,7 +246,7 @@ export default function VehiclesPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {vehicles.map((vehicle) => {
+                        {filteredVehicles.map((vehicle) => {
                             const inspDays = getDaysUntil(vehicle.annualInspectionDue);
                             const inspStatus = getInspectionStatus(inspDays);
                             const pmDays = getDaysUntil(vehicle.nextPmDue);
@@ -288,10 +313,37 @@ export default function VehiclesPage() {
                                             {vehicle.status}
                                         </span>
                                     </td>
-                                    <td>
-                                        <button className={styles.menuButton}>
+                                    <td style={{ position: "relative" }}>
+                                        <button className={styles.menuButton} onClick={() => setOpenMenu(openMenu === vehicle.id ? null : vehicle.id)}>
                                             <MoreVertical size={18} />
                                         </button>
+                                        {openMenu === vehicle.id && (
+                                            <div style={{
+                                                position: "absolute", right: 0, top: "100%",
+                                                background: "white", borderRadius: "8px",
+                                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                border: "1px solid #e2e8f0", minWidth: 160,
+                                                zIndex: 10, overflow: "hidden",
+                                            }}>
+                                                <Link href={`/dashboard/vehicles/${vehicle.id}`} style={{
+                                                    display: "block", padding: "0.5rem 0.75rem",
+                                                    fontSize: "0.85rem", color: "#334155",
+                                                    textDecoration: "none",
+                                                }} onClick={() => setOpenMenu(null)}>View Details</Link>
+                                                <button style={{
+                                                    display: "block", width: "100%", textAlign: "left" as const,
+                                                    padding: "0.5rem 0.75rem", fontSize: "0.85rem",
+                                                    border: "none", background: "none", color: "#334155",
+                                                    cursor: "pointer",
+                                                }} onClick={() => { setOpenMenu(null); alert("Edit functionality coming in production."); }}>Edit Vehicle</button>
+                                                <button style={{
+                                                    display: "block", width: "100%", textAlign: "left" as const,
+                                                    padding: "0.5rem 0.75rem", fontSize: "0.85rem",
+                                                    border: "none", background: "none", color: "#ef4444",
+                                                    cursor: "pointer",
+                                                }} onClick={() => { setOpenMenu(null); alert("Remove functionality coming in production."); }}>Remove Vehicle</button>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             );

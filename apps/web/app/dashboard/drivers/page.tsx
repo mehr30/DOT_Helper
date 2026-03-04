@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
     Plus,
@@ -117,6 +118,18 @@ function getDaysUntil(dateStr: string) {
 
 export default function DriversPage() {
     const { isDemoMode } = useDemoMode();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+    const filteredDrivers = isDemoMode ? drivers.filter(d => {
+        const matchesSearch = searchTerm === "" ||
+            `${d.firstName} ${d.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            d.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || d.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    }) : [];
+
     const activeDrivers = isDemoMode ? drivers.filter(d => d.status === "active").length : 0;
     const needsAttention = isDemoMode ? drivers.filter(d => d.complianceScore < 90).length : 0;
 
@@ -183,12 +196,23 @@ export default function DriversPage() {
                         type="text"
                         placeholder="Search drivers..."
                         className={styles.searchInput}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className={styles.filterButton}>
-                    <Filter size={18} />
-                    Filter
-                </button>
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                        padding: "0.5rem 0.75rem", borderRadius: "8px",
+                        border: "1px solid #e2e8f0", fontSize: "0.85rem",
+                        color: "#334155", cursor: "pointer",
+                    }}
+                >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
             </div>
 
             {/* Drivers Table */}
@@ -206,7 +230,7 @@ export default function DriversPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {drivers.map((driver) => {
+                        {filteredDrivers.map((driver) => {
                             const compliance = getComplianceStatus(driver.complianceScore);
                             const cdlDays = getDaysUntil(driver.cdlExpiration);
                             const medDays = getDaysUntil(driver.medicalExpiration);
@@ -284,10 +308,37 @@ export default function DriversPage() {
                                             {driver.status}
                                         </span>
                                     </td>
-                                    <td>
-                                        <button className={styles.menuButton}>
+                                    <td style={{ position: "relative" }}>
+                                        <button className={styles.menuButton} onClick={() => setOpenMenu(openMenu === driver.id ? null : driver.id)}>
                                             <MoreVertical size={18} />
                                         </button>
+                                        {openMenu === driver.id && (
+                                            <div style={{
+                                                position: "absolute", right: 0, top: "100%",
+                                                background: "white", borderRadius: "8px",
+                                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                border: "1px solid #e2e8f0", minWidth: 160,
+                                                zIndex: 10, overflow: "hidden",
+                                            }}>
+                                                <Link href={`/dashboard/drivers/${driver.id}`} style={{
+                                                    display: "block", padding: "0.5rem 0.75rem",
+                                                    fontSize: "0.85rem", color: "#334155",
+                                                    textDecoration: "none",
+                                                }} onClick={() => setOpenMenu(null)}>View Profile</Link>
+                                                <button style={{
+                                                    display: "block", width: "100%", textAlign: "left" as const,
+                                                    padding: "0.5rem 0.75rem", fontSize: "0.85rem",
+                                                    border: "none", background: "none", color: "#334155",
+                                                    cursor: "pointer",
+                                                }} onClick={() => { setOpenMenu(null); alert("Edit functionality coming in production."); }}>Edit Driver</button>
+                                                <button style={{
+                                                    display: "block", width: "100%", textAlign: "left" as const,
+                                                    padding: "0.5rem 0.75rem", fontSize: "0.85rem",
+                                                    border: "none", background: "none", color: "#ef4444",
+                                                    cursor: "pointer",
+                                                }} onClick={() => { setOpenMenu(null); alert("Remove functionality coming in production."); }}>Remove Driver</button>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             );

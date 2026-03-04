@@ -72,20 +72,22 @@ export default function ReportsPage() {
                                 <h3 style={{ fontSize: "1.05rem", fontWeight: 600, marginBottom: "0.35rem" }}>{report.name}</h3>
                                 <p style={{ color: "#64748b", fontSize: "0.875rem", lineHeight: 1.5 }}>{report.description}</p>
                             </div>
-                            <button style={{
-                                marginTop: "auto",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.5rem",
-                                padding: "0.6rem 1rem",
-                                borderRadius: "8px",
-                                border: "1px solid #e2e8f0",
-                                background: "#f8fafc",
-                                cursor: "pointer",
-                                fontSize: "0.875rem",
-                                fontWeight: 500,
-                                color: "#334155",
-                            }}>
+                            <button
+                                onClick={() => alert(`Generating "${report.name}" report...\n\nFull PDF report generation will be available in the production release.`)}
+                                style={{
+                                    marginTop: "auto",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
+                                    padding: "0.6rem 1rem",
+                                    borderRadius: "8px",
+                                    border: "1px solid #e2e8f0",
+                                    background: "#f8fafc",
+                                    cursor: "pointer",
+                                    fontSize: "0.875rem",
+                                    fontWeight: 500,
+                                    color: "#334155",
+                                }}>
                                 <Download size={16} />
                                 Generate Report
                             </button>

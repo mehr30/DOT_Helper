@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
     Clock,
@@ -100,6 +101,15 @@ function getTimeClass(timeStr: string): string {
 
 export default function HOSPage() {
     const { isDemoMode } = useDemoMode();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+
+    const filteredDrivers = isDemoMode ? driversHOS.filter(d => {
+        const matchesSearch = searchTerm === "" || d.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || d.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    }) : [];
+
     const drivingNow = isDemoMode ? driversHOS.filter(d => d.status === "driving").length : 0;
     const onDuty = isDemoMode ? driversHOS.filter(d => d.status === "on_duty").length : 0;
     const violations = isDemoMode ? driversHOS.reduce((sum, d) => sum + d.violations, 0) : 0;
@@ -135,14 +145,14 @@ export default function HOSPage() {
                     </p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className="btn btn-secondary">
+                    <button className="btn btn-secondary" onClick={() => alert("Log viewer will display detailed ELD logs in the production release.")}>
                         <Calendar size={18} />
                         View Logs
                     </button>
-                    <button className="btn btn-primary">
+                    <Link href="/dashboard/reports" className="btn btn-primary">
                         <TrendingUp size={18} />
                         Run Report
-                    </button>
+                    </Link>
                 </div>
             </header>
 
@@ -188,12 +198,25 @@ export default function HOSPage() {
                         type="text"
                         placeholder="Search drivers..."
                         className={styles.searchInput}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className={styles.filterButton}>
-                    <Filter size={18} />
-                    Filter by Status
-                </button>
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                        padding: "0.5rem 0.75rem", borderRadius: "8px",
+                        border: "1px solid #e2e8f0", fontSize: "0.85rem",
+                        color: "#334155", cursor: "pointer",
+                    }}
+                >
+                    <option value="all">All Status</option>
+                    <option value="driving">Driving</option>
+                    <option value="on_duty">On Duty</option>
+                    <option value="sleeper">Sleeper</option>
+                    <option value="off_duty">Off Duty</option>
+                </select>
             </div>
 
             {/* Drivers HOS Table */}
@@ -211,7 +234,7 @@ export default function HOSPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {driversHOS.map((driver) => {
+                        {filteredDrivers.map((driver) => {
                             const config = statusConfig[driver.status as keyof typeof statusConfig];
                             const StatusIcon = config.icon;
 
@@ -277,7 +300,7 @@ export default function HOSPage() {
                     <strong>ELD Integration Required</strong>
                     <p>
                         Connect your ELD provider to enable real-time HOS tracking.
-                        <Link href="/dashboard/settings/integrations"> Configure integrations →</Link>
+                        <Link href="/dashboard/settings"> Configure integrations →</Link>
                     </p>
                 </div>
             </div>

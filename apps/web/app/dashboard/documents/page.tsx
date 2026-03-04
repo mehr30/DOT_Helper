@@ -336,10 +336,6 @@ export default function DocumentsPage() {
                             className={styles.searchInput}
                         />
                     </div>
-                    <button className={styles.filterButton}>
-                        <Filter size={18} />
-                        Filter
-                    </button>
                 </div>
 
                 {/* Documents Table */}
