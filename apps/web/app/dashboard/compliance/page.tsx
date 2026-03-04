@@ -47,7 +47,7 @@ const federalCategories = [
             { name: "Medical Examiner's Certificate", detail: "All drivers current", status: "compliant" as const, dueDate: null },
             { name: "Certificate of Violations (391.27)", detail: "Annual requirement — 3 pending", status: "actionNeeded" as const, dueDate: "Due: Jan 31, 2026" },
             { name: "Previous Employer Inquiries (391.23)", detail: "Complete for all new hires", status: "compliant" as const, dueDate: null },
-            { name: "Regulatory Background Check", detail: "Clearinghouse & PSP queries current", status: "compliant" as const, dueDate: null },
+            { name: "Drug & Alcohol Background Check", detail: "FMCSA Clearinghouse (drug/alcohol database) queries current", status: "compliant" as const, dueDate: null },
         ],
     },
     {
@@ -84,15 +84,15 @@ const federalCategories = [
     {
         id: "drug",
         name: "Drug & Alcohol Testing",
-        description: "FMCSA Part 382 — Testing program and Clearinghouse requirements",
+        description: "FMCSA Part 382 — Drug & alcohol testing program",
         icon: Activity,
         iconClass: "safety" as const,
         items: [
             { name: "Pre-Employment Testing", detail: "All drivers tested before hire", status: "compliant" as const, dueDate: null },
             { name: "Random Testing Pool", detail: "50% drug / 10% alcohol — enrolled", status: "compliant" as const, dueDate: null },
             { name: "Reasonable Suspicion Training", detail: "Supervisors trained (2 hrs)", status: "compliant" as const, dueDate: null },
-            { name: "Clearinghouse Registration", detail: "Company registered and querying", status: "compliant" as const, dueDate: null },
-            { name: "Annual Clearinghouse Query", detail: "All drivers queried for 2026", status: "compliant" as const, dueDate: null },
+            { name: "Clearinghouse Registration", detail: "Your company is registered in the FMCSA drug/alcohol database", status: "compliant" as const, dueDate: null },
+            { name: "Annual Driver Query", detail: "All drivers checked for drug/alcohol violations this year", status: "compliant" as const, dueDate: null },
             { name: "Drug & Alcohol Policy", detail: "Written policy distributed to all", status: "compliant" as const, dueDate: null },
         ],
     },

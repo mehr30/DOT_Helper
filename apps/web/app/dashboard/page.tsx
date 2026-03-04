@@ -56,11 +56,11 @@ const stats = [
         change: "3 urgent",
     },
     {
-        label: "Clearinghouse",
+        label: "Drug & Alcohol",
         value: "100%",
         icon: Shield,
         color: "success",
-        change: "All queries current",
+        change: "All checks current",
     },
 ];
 
@@ -139,7 +139,7 @@ const statLinks: Record<string, string> = {
     "Active Drivers": "/dashboard/drivers",
     "Vehicles": "/dashboard/vehicles",
     "Pending Actions": "/dashboard/alerts",
-    "Clearinghouse": "/dashboard/compliance",
+    "Drug & Alcohol": "/dashboard/compliance",
 };
 
 export default function DashboardPage() {
