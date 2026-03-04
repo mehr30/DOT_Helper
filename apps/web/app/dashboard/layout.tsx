@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { DemoModeProvider } from "../components/DemoModeContext";
 import { CompanyProfileProvider } from "../components/CompanyProfileContext";
 import Sidebar from "../components/Sidebar";
@@ -11,17 +12,19 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <DemoModeProvider>
-            <CompanyProfileProvider>
-                <div className={styles.layout}>
-                    <Sidebar />
-                    <main className={styles.main}>
-                        <div className={styles.content}>
-                            {children}
-                        </div>
-                    </main>
-                </div>
-            </CompanyProfileProvider>
-        </DemoModeProvider>
+        <Suspense fallback={null}>
+            <DemoModeProvider>
+                <CompanyProfileProvider>
+                    <div className={styles.layout}>
+                        <Sidebar />
+                        <main className={styles.main}>
+                            <div className={styles.content}>
+                                {children}
+                            </div>
+                        </main>
+                    </div>
+                </CompanyProfileProvider>
+            </DemoModeProvider>
+        </Suspense>
     );
 }

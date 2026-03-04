@@ -18,8 +18,7 @@ import {
     ChevronDown,
     Building2,
     Check,
-    Eye,
-    Zap,
+    AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
 import styles from "./Sidebar.module.css";
@@ -55,7 +54,7 @@ export default function Sidebar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const [activeOrg, setActiveOrg] = useState(organizations[0]!);
-    const { isDemoMode, toggleDemoMode } = useDemoMode();
+    const { isDemoMode, exitDemo } = useDemoMode();
     const { needsHOS } = useCompanyProfile();
 
     // Filter navigation: only show HOS if fleet needs it or in demo mode
@@ -127,22 +126,13 @@ export default function Sidebar() {
                 {/* Bottom section */}
                 <div className={styles.bottomSection}>
                     {/* Demo/Live Mode Toggle */}
-                    <div className={styles.modeToggle}>
-                        <button
-                            className={`${styles.modeButton} ${isDemoMode ? styles.modeActive : ""}`}
-                            onClick={() => { if (!isDemoMode) toggleDemoMode(); }}
-                        >
-                            <Eye size={14} />
-                            Demo
-                        </button>
-                        <button
-                            className={`${styles.modeButton} ${!isDemoMode ? styles.modeActive : ""}`}
-                            onClick={() => { if (isDemoMode) toggleDemoMode(); }}
-                        >
-                            <Zap size={14} />
-                            Live
-                        </button>
-                    </div>
+                    {isDemoMode && (
+                        <div className={styles.demoBanner}>
+                            <AlertCircle size={14} />
+                            <span>Viewing sample data</span>
+                            <button onClick={exitDemo} className={styles.demoBannerExit}>Exit demo</button>
+                        </div>
+                    )}
 
                     {/* Org switcher - demo shows mock orgs, live shows placeholder */}
                     {isDemoMode ? (
@@ -201,7 +191,7 @@ export default function Sidebar() {
                         <Link href="/dashboard/alerts" className={styles.bottomLink}>
                             <Bell size={18} />
                             <span>Notifications</span>
-                            <span className={styles.notificationBadge}>3</span>
+                            {isDemoMode && <span className={styles.notificationBadge}>3</span>}
                         </Link>
                         <Link href="/dashboard/settings" className={styles.bottomLink}>
                             <Settings size={18} />

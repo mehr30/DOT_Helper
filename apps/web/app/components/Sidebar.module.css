@@ -147,39 +147,36 @@
     position: relative;
 }
 
-.modeToggle {
-    display: flex;
-    gap: 2px;
-    padding: 3px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    margin-bottom: 0.75rem;
-}
-
-.modeButton {
-    flex: 1;
+.demoBanner {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    padding: 0.4rem;
-    border: none;
+    gap: 0.4rem;
+    padding: 0.45rem 0.65rem;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.25);
     border-radius: 8px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.modeButton:hover {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.modeButton.modeActive {
-    background: rgba(59, 130, 246, 0.25);
+    margin-bottom: 0.75rem;
     color: #93c5fd;
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+
+.demoBannerExit {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #93c5fd;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.demoBannerExit:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .companyInfo {
