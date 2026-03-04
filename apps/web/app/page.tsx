@@ -19,7 +19,90 @@ import {
   Check,
   Quote
 } from "lucide-react";
+import Image from "next/image";
 import styles from "./page.module.css";
+
+const showcaseTabs = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    title: "Your Compliance at a Glance",
+    description: "See your overall compliance score, track drivers and vehicles, and catch upcoming deadlines — all from one dashboard.",
+    image: "/screenshots/dashboard.png",
+  },
+  {
+    id: "drivers",
+    label: "Driver Management",
+    title: "Track Every Driver's Status",
+    description: "CDL expirations, medical cards, missing documents — everything you need to keep your drivers road-ready.",
+    image: "/screenshots/drivers.png",
+  },
+  {
+    id: "compliance",
+    label: "Compliance Checklist",
+    title: "Know Exactly What's Needed",
+    description: "Federal and state requirements broken down into actionable items with due dates and status tracking.",
+    image: "/screenshots/compliance.png",
+  },
+];
+
+function ProductShowcase() {
+  const [activeTab, setActiveTab] = useState(0);
+  const tab = showcaseTabs[activeTab]!;
+
+  return (
+    <section className={styles.showcase}>
+      <div className={styles.showcaseContainer}>
+        <div className={styles.showcaseHeader}>
+          <span className={styles.showcaseLabel}>See It In Action</span>
+          <h2 className={styles.showcaseTitle}>
+            Everything you need to stay compliant
+          </h2>
+          <p className={styles.showcaseSubtitle}>
+            Real screenshots from DOT Helper — no mockups, no filler.
+          </p>
+        </div>
+
+        <div className={styles.showcaseTabs}>
+          {showcaseTabs.map((tab, i) => (
+            <button
+              key={tab.id}
+              className={`${styles.showcaseTab} ${i === activeTab ? styles.showcaseTabActive : ""}`}
+              onClick={() => setActiveTab(i)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.showcaseContent}>
+          <div className={styles.showcaseInfo}>
+            <h3 className={styles.showcaseInfoTitle}>{tab.title}</h3>
+            <p className={styles.showcaseInfoDesc}>{tab.description}</p>
+            <Link href="/register" className={styles.showcaseCta}>
+              Try It Free <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className={styles.showcaseImageWrapper}>
+            <div className={styles.showcaseBrowserBar}>
+              <span className={styles.dot} />
+              <span className={styles.dot} />
+              <span className={styles.dot} />
+            </div>
+            <Image
+              src={tab.image}
+              alt={tab.title}
+              width={1440}
+              height={900}
+              className={styles.showcaseImage}
+              priority={activeTab === 0}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 const features = [
   {
@@ -295,6 +378,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Product Showcase */}
+      <ProductShowcase />
 
       {/* Testimonials Section */}
       <section id="testimonials" className={styles.testimonials}>

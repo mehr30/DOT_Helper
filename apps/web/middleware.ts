@@ -26,6 +26,12 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Allow demo mode bypass (for screenshots / product demos)
+    const demoParam = request.nextUrl.searchParams.get("demo");
+    if (demoParam === "true") {
+        return NextResponse.next();
+    }
+
     // Check for better-auth session cookie
     const sessionCookie = request.cookies.get("better-auth.session_token");
 
