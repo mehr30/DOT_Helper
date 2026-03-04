@@ -154,6 +154,36 @@
     line-height: 1.3;
 }
 
+.multiSelectHint {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #3b82f6;
+    padding: 0.35rem 0.75rem;
+    background: #eff6ff;
+    border-radius: 20px;
+    width: fit-content;
+    margin: 0 auto 0.25rem;
+}
+
+.selectIndicator {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    line-height: 1;
+}
+
+.optionButton {
+    position: relative;
+}
+
+.optionButton.selected .selectIndicator {
+    color: #3b82f6;
+}
+
 .assessmentNav {
     display: flex;
     justify-content: space-between;

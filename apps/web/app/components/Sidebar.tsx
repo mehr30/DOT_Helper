@@ -114,7 +114,7 @@ export default function Sidebar() {
                                     >
                                         <Icon size={20} className={styles.navIcon} />
                                         <span>{item.name}</span>
-                                        {item.badge && (
+                                        {item.badge && isDemoMode && (
                                             <span className={styles.badge}>{item.badge}</span>
                                         )}
                                     </Link>

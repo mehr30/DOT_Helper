@@ -427,15 +427,24 @@ function WizardContent() {
                                 </select>
                             ) : (
                                 <div className={styles.optionsGrid}>
+                                    {question.type === "multi" && (
+                                        <div className={styles.multiSelectHint}>✅ Select all that apply</div>
+                                    )}
                                     {question.options?.map(opt => (
                                         <button
                                             key={opt.value}
                                             className={`${styles.optionButton} ${question.type === "multi"
                                                 ? isMultiSelected(opt.value) ? styles.selected : ""
                                                 : answers[question.id] === opt.value ? styles.selected : ""
-                                                }`}
+                                                } ${question.type === "multi" ? styles.multiOption : ""}`}
                                             onClick={() => handleAnswer(opt.value)}
                                         >
+                                            <span className={styles.selectIndicator}>
+                                                {question.type === "multi"
+                                                    ? (isMultiSelected(opt.value) ? "☑" : "☐")
+                                                    : (answers[question.id] === opt.value ? "●" : "○")
+                                                }
+                                            </span>
                                             <span className={styles.optionIcon}>{opt.icon}</span>
                                             <span className={styles.optionLabel}>{opt.label}</span>
                                         </button>
