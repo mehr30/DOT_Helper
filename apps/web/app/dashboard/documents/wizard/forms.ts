@@ -155,7 +155,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     {
         id: "hazmat",
         question: "Do any of these apply to your operations?",
-        description: "Select all that apply — these trigger additional compliance requirements",
+        description: "Select all that apply — these trigger additional compliance requirements. Note: fuel inside your equipment (skid steers, excavators, generators, etc.) does not count as hazardous materials.",
         type: "multi",
         options: [
             { value: "hazmat", label: "Transport hazardous materials (chemicals, propane, etc.)", icon: "☢️" },
