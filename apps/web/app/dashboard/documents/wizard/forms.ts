@@ -73,7 +73,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     {
         id: "towsTrailer",
         question: "Do any of your vehicles tow trailers?",
-        description: "Important: The DOT counts the combined weight of your vehicle + trailer. A pickup truck (7,000 lbs) pulling an equipment trailer (5,000 lbs) = 12,000 lbs combined — putting you over the 10,001 lb threshold.",
+        description: "Important: The DOT counts your truck's GVWR + your trailer's GVWR as the combined weight (GCWR). For example, a pickup rated at 7,000 lbs pulling a trailer rated at 5,000 lbs = 12,000 lbs combined — that puts you over the 10,001 lb DOT threshold, even if neither vehicle is heavy on its own.",
         type: "single",
         options: [
             { value: "noTrailer", label: "No trailers", icon: "🚐" },
@@ -797,8 +797,8 @@ export function getRecommendedForms(answers: Record<string, string | string[]>):
         effectiveWeight = "over26k";
         alerts.push({
             type: "warning",
-            title: "Combined Weight Over 26,000 lbs",
-            description: "Your vehicle + trailer combined weight exceeds 26,000 lbs. Your drivers will need a CDL (Commercial Driver's License). The GCWR (Gross Combined Weight Rating = vehicle + trailer) determines your CDL class, not just the truck alone.",
+            title: "Combined Weight Over 26,000 lbs — CDL Required",
+            description: "Your truck + trailer combined weight rating (GCWR) exceeds 26,001 lbs, which means any driver operating that combination needs a CDL. One option: if you can pair the trailer with a lighter truck so the combined GCWR stays under 26,001 lbs, a CDL wouldn't be required for that combination. The CDL requirement is based on the specific truck-trailer pairing, not just the trailer alone.",
         });
     } else if (towsTrailer === "medTrailer" && effectiveWeight === "under10k") {
         effectiveWeight = "10k-26k";
@@ -811,7 +811,7 @@ export function getRecommendedForms(answers: Record<string, string | string[]>):
         alerts.push({
             type: "info",
             title: "Check Your Combined Weight",
-            description: "Add your vehicle's GVWR (from the door sticker) + your trailer's GVWR (from the trailer's VIN plate). If the total exceeds 10,001 lbs, DOT regulations apply. If over 26,001 lbs and the trailer is over 10,000 lbs, a CDL is required.",
+            description: "Add your truck's GVWR (on the driver's door sticker) + your trailer's GVWR (on the trailer's VIN plate). If the total is over 10,001 lbs, DOT regulations apply. If over 26,001 lbs, a CDL is required — but you may be able to avoid the CDL by pairing the trailer with a lighter truck to keep the combined total under 26,001 lbs.",
         });
     }
 
