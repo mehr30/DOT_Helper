@@ -1,11 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useSession } from "../../lib/auth-client";
+import { getCompanyForUser } from "../actions/company";
 
 /* ─── Types ─── */
 export interface SavedAddress {
     id: string;
-    label: string;          // e.g. "Main Office", "Denver Branch"
+    label: string;
     street: string;
     city: string;
     state: string;
@@ -18,8 +20,7 @@ export interface CompanyProfile {
     phone: string;
     email: string;
     addresses: SavedAddress[];
-    // Fleet characteristics that control feature visibility
-    hasVehiclesOver10001: boolean;  // triggers HOS visibility
+    hasVehiclesOver10001: boolean;
     operationType: "interstate" | "intrastate" | "both" | "";
 }
 
@@ -53,25 +54,62 @@ function generateId() {
 export function CompanyProfileProvider({ children }: { children: ReactNode }) {
     const [profile, setProfile] = useState<CompanyProfile>(DEFAULT_PROFILE);
     const [loaded, setLoaded] = useState(false);
+    const { data: session } = useSession();
 
-    // Load from localStorage on mount
+    // Load from DB for authenticated users, or localStorage for demo mode
     useEffect(() => {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                setProfile({ ...DEFAULT_PROFILE, ...parsed });
+        let cancelled = false;
+
+        async function loadProfile() {
+            if (session?.user) {
+                // Authenticated — try loading from DB
+                try {
+                    const company = await getCompanyForUser();
+                    if (company && !cancelled) {
+                        setProfile(prev => ({
+                            ...prev,
+                            companyName: company.name || "",
+                            usdotNumber: company.usdotNumber || "",
+                            phone: company.phone || "",
+                            email: company.email || "",
+                            addresses: company.address ? [{
+                                id: "primary",
+                                label: "Main Office",
+                                street: company.address,
+                                city: company.city || "",
+                                state: company.state || "",
+                                zip: company.zip || "",
+                            }] : [],
+                        }));
+                        setLoaded(true);
+                        return;
+                    }
+                } catch {
+                    // Fall through to localStorage
+                }
             }
-        } catch { /* ignore */ }
-        setLoaded(true);
-    }, []);
 
-    // Save to localStorage on change (after initial load)
+            // Demo mode or fallback — use localStorage
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw && !cancelled) {
+                    const parsed = JSON.parse(raw);
+                    setProfile({ ...DEFAULT_PROFILE, ...parsed });
+                }
+            } catch { /* ignore */ }
+            if (!cancelled) setLoaded(true);
+        }
+
+        loadProfile();
+        return () => { cancelled = true; };
+    }, [session?.user]);
+
+    // Save to localStorage on change (after initial load) — only for demo/unauthenticated
     useEffect(() => {
-        if (loaded) {
+        if (loaded && !session?.user) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
         }
-    }, [profile, loaded]);
+    }, [profile, loaded, session?.user]);
 
     const updateProfile = (updates: Partial<CompanyProfile>) => {
         setProfile(prev => ({ ...prev, ...updates }));
@@ -99,7 +137,6 @@ export function CompanyProfileProvider({ children }: { children: ReactNode }) {
         }));
     };
 
-    // HOS is needed if vehicles are over 10,001 lbs
     const needsHOS = profile.hasVehiclesOver10001;
 
     return (

@@ -48,7 +48,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    // Pass pathname as header for server components to read
+    const response = NextResponse.next();
+    response.headers.set("x-pathname", pathname);
+    return response;
 }
 
 export const config = {

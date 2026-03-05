@@ -1,30 +1,30 @@
-"use client";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "../../lib/auth";
+import { prisma } from "@repo/database";
+import DashboardShell from "./DashboardShell";
 
-import { Suspense } from "react";
-import { DemoModeProvider } from "../components/DemoModeContext";
-import { CompanyProfileProvider } from "../components/CompanyProfileContext";
-import Sidebar from "../components/Sidebar";
-import styles from "./layout.module.css";
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    return (
-        <Suspense fallback={null}>
-            <DemoModeProvider>
-                <CompanyProfileProvider>
-                    <div className={styles.layout}>
-                        <Sidebar />
-                        <main className={styles.main}>
-                            <div className={styles.content}>
-                                {children}
-                            </div>
-                        </main>
-                    </div>
-                </CompanyProfileProvider>
-            </DemoModeProvider>
-        </Suspense>
-    );
+    const headersList = await headers();
+    const pathname = headersList.get("x-pathname") || "";
+    const session = await auth.api.getSession({ headers: headersList });
+
+    // If user is logged in and has no company, redirect to onboarding
+    // (skip if already on onboarding page or in demo mode)
+    const isOnboardingPage = pathname.startsWith("/dashboard/onboarding");
+    if (session?.user && !isOnboardingPage) {
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { companyId: true },
+        });
+        if (!user?.companyId) {
+            redirect("/dashboard/onboarding");
+        }
+    }
+
+    return <DashboardShell>{children}</DashboardShell>;
 }
