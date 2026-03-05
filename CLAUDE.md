@@ -18,13 +18,25 @@ We just completed **Phase 1: Security & Auth Hardening** and **Pricing Updates**
 - **Demo Mode**: `?demo=true` in the URL bypasses the `middleware.ts` auth check to allow taking marketing screenshots.
 - **Dashboard Data**: Currently, all dashboard components use *hardcoded/mock data* inside of their `page.tsx` or components files.
 
-## 3. Immediate Next Steps (Phase 2: Wiring Data)
-Your primary objective when picking up this session is to begin **Phase 2 — Wiring Dashboard to Real Data**:
-1. **Company Onboarding**: After signup, a user must create/join a `Company` record. The `User` model has a relation to `Company`.
-2. **Driver & Vehicle CRUD**: Wire the `apps/web/app/dashboard/drivers` and `vehicles` pages to fetch and mutate real data from the Neon database via Server Actions or standard API routes.
-3. **Remove Mock Data**: Systematically replace the inline arrays in the dashboard components with real database fetch calls.
+## 3. Immediate Next Steps & Full Roadmap
+Your primary objective when picking up this session is to begin **Phase 2**, but you should be aware of the full remaining roadmap.
 
-*Do not start working on Stripe or advanced analytics until the core CRUD functionality for Drivers and Vehicles is wired to the database.*
+### Phase 2 — Wire Dashboard to Real Data (START HERE)
+1. **Company Onboarding**: After signup, a user must create/join a `Company` record. The `User` model has a relation to `Company`.
+2. **Driver & Vehicle CRUD**: Wire the `apps/web/app/dashboard/drivers` and `vehicles` pages to fetch and mutate real data from the Neon database via Server Actions or API routes.
+3. **Remove Mock Data**: Systematically replace the inline arrays in the dashboard components with real database fetch calls.
+*Note: Do not start Phase 3 until core CRUD functionality is wired.*
+
+### Phase 3 — Payments & Billing
+- Stripe product/price setup (use the $49/$99/$199 pricing model).
+- Checkout flow & subscription management portal.
+- Free trial logic (14-day, no CC required) and feature gating by plan.
+
+### Phase 4 — Polish & Ops
+- Error monitoring (Sentry) and Analytics (PostHog/Vercel).
+- OAuth providers (Google/Apple real keys).
+- Custom domain setup.
+- "Compliance Audit" free tool for lead gen.
 
 ## 4. Key Files to Know
 - **`apps/web/lib/auth.ts`**: The `better-auth` configuration (database adapter, email sending handlers, security settings).
