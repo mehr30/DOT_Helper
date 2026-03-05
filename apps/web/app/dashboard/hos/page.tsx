@@ -124,7 +124,7 @@ export default function HOSPage() {
                     </div>
                 </header>
                 <EmptyState
-                    icon="⏱️"
+                    icon={Clock}
                     title="No HOS data yet"
                     description="Hours of Service (HOS) tracking shows how many hours your drivers have been driving, on duty, and resting. Add drivers and connect an ELD provider in Settings to see real-time data."
                     primaryAction={{ label: "Add Drivers", href: "/dashboard/drivers" }}

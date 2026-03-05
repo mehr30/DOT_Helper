@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signUp } from "@/lib/auth-client";
-import { ArrowRight, Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import GreenlightLogo from "@/app/components/GreenlightLogo";
 import styles from "../login/page.module.css";
 
@@ -13,7 +13,6 @@ export default function RegisterPage() {
         firstName: "",
         lastName: "",
         email: "",
-        company: "",
         password: "",
         agreeTerms: false
     });
@@ -140,21 +139,6 @@ export default function RegisterPage() {
                                     placeholder="you@company.com"
                                     className={styles.input}
                                     required
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles.inputGroup}>
-                            <label htmlFor="company" className={styles.label}>Company Name</label>
-                            <div className={styles.inputWrapper}>
-                                <Building size={18} className={styles.inputIcon} />
-                                <input
-                                    type="text"
-                                    id="company"
-                                    value={formData.company}
-                                    onChange={(e) => updateField("company", e.target.value)}
-                                    placeholder="Your Trucking Co."
-                                    className={styles.input}
                                 />
                             </div>
                         </div>

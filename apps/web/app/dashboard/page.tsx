@@ -82,5 +82,7 @@ export default async function DashboardPage() {
         }
     }
 
-    return <DashboardContent stats={stats} />;
+    const hasCompany = !!session?.user && stats !== null;
+
+    return <DashboardContent stats={stats} hasCompany={hasCompany} />;
 }

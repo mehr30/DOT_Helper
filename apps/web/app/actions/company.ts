@@ -27,12 +27,13 @@ export async function createCompany(formData: unknown) {
         return { error: "A company with this USDOT number already exists" };
     }
 
-    // Create company and connect user as OWNER
+    // Create company and connect user
     await prisma.$transaction(async (tx) => {
         const company = await tx.company.create({
             data: {
                 name: data.name,
                 usdotNumber: data.usdotNumber,
+                fleetSizeRange: data.fleetSizeRange,
                 mcNumber: data.mcNumber || null,
                 address: data.address || null,
                 city: data.city || null,
@@ -47,7 +48,7 @@ export async function createCompany(formData: unknown) {
             where: { id: session.user.id },
             data: {
                 companyId: company.id,
-                role: "OWNER",
+                role: data.userRole,
             },
         });
     });
@@ -76,6 +77,7 @@ export async function getCompanyForUser() {
                     zip: true,
                     phone: true,
                     email: true,
+                    fleetSizeRange: true,
                 },
             },
         },

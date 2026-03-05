@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import styles from "./page.module.css";
 import { useDemoMode } from "../components/DemoModeContext";
+import OnboardingChecklist from "../components/OnboardingChecklist";
 import type { DashboardStats } from "../actions/dashboard";
 
 // Mock data for demo mode
@@ -65,106 +66,10 @@ function formatDateShort(dateStr: string) {
     });
 }
 
-export default function DashboardContent({ stats }: { stats: DashboardStats | null }) {
+export default function DashboardContent({ stats, hasCompany }: { stats: DashboardStats | null; hasCompany: boolean }) {
     const { isDemoMode } = useDemoMode();
 
-    const isEmptyState = !isDemoMode && stats &&
-        stats.driverCount === 0 && stats.vehicleCount === 0;
-
-    // Show onboarding "get started" UI when empty
-    if (isEmptyState) {
-        return (
-            <div className={styles.dashboard}>
-                <header className={styles.header}>
-                    <div>
-                        <h1 className={styles.title}>Compliance Dashboard</h1>
-                        <p className={styles.subtitle}>
-                            Welcome! Let&apos;s get your DOT compliance set up.
-                        </p>
-                    </div>
-                    <div className={styles.dateDisplay}>
-                        <Calendar size={18} />
-                        <span>{new Date().toLocaleDateString("en-US", {
-                            weekday: "long", year: "numeric", month: "long", day: "numeric"
-                        })}</span>
-                    </div>
-                </header>
-
-                <section style={{
-                    maxWidth: 720, margin: "2rem auto", textAlign: "center" as const,
-                }}>
-                    <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚀</div>
-                    <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#0f172a", marginBottom: "0.75rem" }}>
-                        Get started in 3 steps
-                    </h2>
-                    <p style={{ color: "#64748b", fontSize: "0.95rem", lineHeight: 1.6, marginBottom: "2rem" }}>
-                        Set up your DOT compliance profile, add your drivers and vehicles,
-                        and we&apos;ll handle the rest.
-                    </p>
-
-                    <div style={{
-                        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem",
-                    }}>
-                        <Link href="/dashboard/documents/wizard" className="dashCard" style={{
-                            display: "flex", flexDirection: "column" as const, alignItems: "center",
-                            gap: "0.75rem", padding: "1.5rem", background: "white",
-                            borderRadius: "14px", border: "2px solid #3b82f6",
-                            textDecoration: "none", cursor: "pointer",
-                            boxShadow: "0 2px 8px rgba(59,130,246,0.1)",
-                        }}>
-                            <div style={{
-                                width: 56, height: 56, borderRadius: "14px",
-                                background: "#eff6ff", display: "flex",
-                                alignItems: "center", justifyContent: "center", color: "#3b82f6",
-                            }}><ClipboardList size={24} /></div>
-                            <span style={{ fontWeight: 600, color: "#0f172a" }}>1. Compliance Setup</span>
-                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
-                                Answer questions about your business to find out what you need
-                            </span>
-                            <span style={{
-                                display: "flex", alignItems: "center", gap: "0.35rem",
-                                fontSize: "0.8rem", fontWeight: 600, color: "#3b82f6",
-                            }}>Click to get started <ArrowRight size={14} /></span>
-                        </Link>
-
-                        <Link href="/dashboard/drivers/new" className="dashCard" style={{
-                            display: "flex", flexDirection: "column" as const, alignItems: "center",
-                            gap: "0.75rem", padding: "1.5rem", background: "white",
-                            borderRadius: "14px", border: "1px solid #e2e8f0",
-                            textDecoration: "none", cursor: "pointer",
-                        }}>
-                            <div style={{
-                                width: 56, height: 56, borderRadius: "14px",
-                                background: "#f1f5f9", display: "flex",
-                                alignItems: "center", justifyContent: "center", color: "#475569",
-                            }}><Users size={24} /></div>
-                            <span style={{ fontWeight: 600, color: "#0f172a" }}>2. Add Drivers</span>
-                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
-                                Add your drivers and their qualification files
-                            </span>
-                        </Link>
-
-                        <Link href="/dashboard/vehicles/new" className="dashCard" style={{
-                            display: "flex", flexDirection: "column" as const, alignItems: "center",
-                            gap: "0.75rem", padding: "1.5rem", background: "white",
-                            borderRadius: "14px", border: "1px solid #e2e8f0",
-                            textDecoration: "none", cursor: "pointer",
-                        }}>
-                            <div style={{
-                                width: 56, height: 56, borderRadius: "14px",
-                                background: "#f1f5f9", display: "flex",
-                                alignItems: "center", justifyContent: "center", color: "#475569",
-                            }}><Truck size={24} /></div>
-                            <span style={{ fontWeight: 600, color: "#0f172a" }}>3. Add Vehicles</span>
-                            <span style={{ fontSize: "0.825rem", color: "#64748b", textAlign: "center" as const }}>
-                                Register your fleet vehicles with GVWR and details
-                            </span>
-                        </Link>
-                    </div>
-                </section>
-            </div>
-        );
-    }
+    const showChecklist = !isDemoMode && hasCompany;
 
     // Build stats cards from real data or demo mock
     const statsCards = isDemoMode ? mockStats : [
@@ -198,6 +103,15 @@ export default function DashboardContent({ stats }: { stats: DashboardStats | nu
                     })}</span>
                 </div>
             </header>
+
+            {/* Onboarding Checklist */}
+            {showChecklist && (
+                <OnboardingChecklist
+                    hasCompany={hasCompany}
+                    driverCount={stats?.driverCount ?? 0}
+                    vehicleCount={stats?.vehicleCount ?? 0}
+                />
+            )}
 
             {/* Stats Grid */}
             <section className={styles.statsGrid}>

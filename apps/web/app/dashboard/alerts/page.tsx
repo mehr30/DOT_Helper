@@ -224,7 +224,7 @@ export default function AlertsPage() {
                     </div>
                 </div>
                 <EmptyState
-                    icon="🔔"
+                    icon={Bell}
                     title="No alerts yet"
                     description="Once you add drivers, vehicles, and set up your compliance profile, alerts for upcoming deadlines and expirations will appear here automatically."
                     primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}

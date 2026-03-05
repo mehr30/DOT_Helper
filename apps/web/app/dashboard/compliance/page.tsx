@@ -173,7 +173,7 @@ export default function CompliancePage() {
                     <p style={{ color: "#64748b" }}>Track your DOT compliance status across all categories</p>
                 </header>
                 <EmptyState
-                    icon="🛡️"
+                    icon={Shield}
                     title="No compliance data yet"
                     description="Run the Compliance Setup to discover which regulations apply to your business. Once set up, your compliance checklist and scores will appear here."
                     primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}

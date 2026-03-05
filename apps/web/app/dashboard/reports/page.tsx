@@ -24,7 +24,7 @@ export default function ReportsPage() {
                     <p style={{ color: "#64748b" }}>Generate and download compliance reports for your fleet</p>
                 </header>
                 <EmptyState
-                    icon="📊"
+                    icon={BarChart3}
                     title="No report data yet"
                     description="Add drivers, vehicles, and compliance data to generate reports. Reports will include compliance summaries, DQ file status, vehicle maintenance, and CSA scores."
                     primaryAction={{ label: "Start Compliance Setup", href: "/dashboard/documents/wizard" }}

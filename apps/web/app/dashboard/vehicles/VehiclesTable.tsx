@@ -120,9 +120,10 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                     </Link>
                 </header>
                 <EmptyState
-                    icon="🚛"
+                    icon={Truck}
                     title="No vehicles added yet"
                     description="Add your vehicles and trailers to track annual inspections, preventive maintenance (PM) schedules, and compliance status."
+                    valueProposition="We'll track inspection due dates, registration expirations, and PM schedules — so nothing slips through the cracks."
                     primaryAction={{ label: "Add Your First Vehicle", href: "/dashboard/vehicles/new" }}
                     secondaryAction={{ label: "Run Compliance Setup", href: "/dashboard/documents/wizard" }}
                 />

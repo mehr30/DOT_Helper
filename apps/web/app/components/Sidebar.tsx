@@ -56,7 +56,7 @@ export default function Sidebar() {
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const [activeOrg, setActiveOrg] = useState(organizations[0]!);
     const { isDemoMode, exitDemo } = useDemoMode();
-    const { needsHOS } = useCompanyProfile();
+    const { needsHOS, profile } = useCompanyProfile();
 
     // Filter navigation: only show HOS if fleet needs it or in demo mode
     const visibleNavigation = navigation.filter(item => {
@@ -174,9 +174,21 @@ export default function Sidebar() {
                                 </div>
                             )}
                         </div>
+                    ) : profile.companyName ? (
+                        <div className={styles.companyInfo}>
+                            <div className={styles.orgSwitcher}>
+                                <div className={styles.companyAvatar}>
+                                    {profile.companyName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                                </div>
+                                <div className={styles.companyDetails}>
+                                    <span className={styles.companyName}>{profile.companyName}</span>
+                                    <span className={styles.usdot}>USDOT: {profile.usdotNumber}</span>
+                                </div>
+                            </div>
+                        </div>
                     ) : (
                         <div className={styles.companyInfo}>
-                            <Link href="/dashboard/settings" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
+                            <Link href="/dashboard/onboarding" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
                                 <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
                                 <div className={styles.companyDetails}>
                                     <span className={styles.companyName}>Set Up Your Company</span>

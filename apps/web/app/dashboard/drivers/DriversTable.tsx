@@ -10,6 +10,7 @@ import {
     AlertTriangle,
     Clock,
     FileText,
+    Users,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../../components/DemoModeContext";
@@ -119,9 +120,10 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                     </Link>
                 </header>
                 <EmptyState
-                    icon="👤"
+                    icon={Users}
                     title="No drivers added yet"
                     description="Add your drivers to track their CDL expirations, medical cards, qualification files, and compliance status."
+                    valueProposition="Greenlight DOT automatically tracks every expiration date and alerts you before anything lapses."
                     primaryAction={{ label: "Add Your First Driver", href: "/dashboard/drivers/new" }}
                     secondaryAction={{ label: "Run Compliance Setup", href: "/dashboard/documents/wizard" }}
                 />

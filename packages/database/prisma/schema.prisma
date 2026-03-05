@@ -25,7 +25,8 @@ model Company {
   zip               String?
   phone             String?
   email             String?
-  
+  fleetSizeRange    String?   // "1-5", "6-15", "16-50"
+
   // Compliance dates
   mcs150DueDate     DateTime?
   ucrDueDate        DateTime?

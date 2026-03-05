@@ -1,0 +1,152 @@
+.checklist {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 12px rgba(15, 46, 26, 0.06);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.progressBar {
+    height: 4px;
+    background: #EAFAF1;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #2ECC71, #1B5E35);
+    border-radius: 0 2px 2px 0;
+    transition: width 0.5s ease;
+}
+
+.checklistHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.checklistTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0F2E1A;
+    margin: 0;
+}
+
+.checklistProgress {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.checklistItems {
+    padding: 0 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.checklistItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+a.checklistItem:hover {
+    background: #EAFAF1;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+}
+
+.itemCheck {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.itemCheckDone {
+    background: #1B5E35;
+    color: white;
+}
+
+.itemCheckPending {
+    border: 2px solid #e2e8f0;
+    background: white;
+}
+
+.itemLabel {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.itemLabelDone {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.itemArrow {
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.dismissButton {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.dismissButton:hover {
+    color: #64748b;
+}
+
+/* Celebration */
+.celebration {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.celebrationIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #EAFAF1;
+    color: #1B5E35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.celebrationTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0F2E1A;
+}
+
+.celebrationDesc {
+    font-size: 0.85rem;
+    color: #64748b;
+}
