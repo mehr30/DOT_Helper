@@ -29,6 +29,21 @@ import {
 } from "./forms";
 import { saveDocument, getDocumentByFormId, SavedDocument } from "../savedDocuments";
 import { useCompanyProfile } from "../../../components/CompanyProfileContext";
+import { saveWizardFormAsDocument } from "../../../actions/documents";
+
+// Map wizard form IDs to database DocumentType values
+const formToDocumentType: Record<string, string> = {
+    mcs150: "OTHER",
+    driverApp: "EMPLOYMENT_APPLICATION",
+    annualCertViolations: "OTHER",
+    dvir: "OTHER",
+    accidentRegister: "OTHER",
+    drugAlcoholPolicy: "CLEARINGHOUSE_CONSENT",
+    roadTestCert: "ROAD_TEST_CERTIFICATE",
+    annualMVRReview: "MVR",
+    vehicleMaintenance: "OTHER",
+    boc3: "BOC3",
+};
 
 type WizardStep = "assessment" | "results" | "fillForm";
 
@@ -157,7 +172,7 @@ function WizardContent() {
         });
     };
 
-    const handleSaveForm = () => {
+    const handleSaveForm = async () => {
         if (activeForm) {
             const totalFields = activeForm.sections.reduce((acc, s) => acc + s.fields.length, 0);
             const completedFields = activeForm.sections.reduce((acc, s) => acc + getFilledCount(s), 0);
@@ -187,6 +202,18 @@ function WizardContent() {
             setSavedForms(prev => new Set(prev).add(activeForm.id));
             setSaveNotice(true);
             setTimeout(() => setSaveNotice(false), 4000);
+
+            // Also save to database so the compliance engine can see it
+            try {
+                await saveWizardFormAsDocument({
+                    formId: activeForm.id,
+                    title: activeForm.title,
+                    documentType: formToDocumentType[activeForm.id] ?? "OTHER",
+                    category: activeForm.category,
+                });
+            } catch {
+                // localStorage save succeeded — database save may fail for unauthenticated users
+            }
 
             // Save new address to profile if address fields were filled
             const street = formData["street"] as string;

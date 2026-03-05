@@ -155,30 +155,56 @@ function getActionForItem(item: { label: string; status: string }): { href: stri
     if (item.status === "compliant" || item.status === "not_applicable") return null;
     const lower = item.label.toLowerCase();
 
+    // Driver-related items — link to the drivers page to update expiration dates
     if (lower.includes("license current") || lower.includes("cdl")) {
-        return { href: "/dashboard/drivers", label: "View Drivers" };
+        return { href: "/dashboard/drivers", label: "Update Driver" };
     }
     if (lower.includes("medical certificate")) {
-        return { href: "/dashboard/drivers", label: "View Drivers" };
+        return { href: "/dashboard/drivers", label: "Update Driver" };
     }
-    if (lower.includes("mvr") || lower.includes("employment application") || lower.includes("clearinghouse")) {
-        return { href: "/dashboard/documents", label: "Upload Document" };
-    }
-    if (lower.includes("pre-employment test") || lower.includes("drug test")) {
-        return { href: "/dashboard/documents", label: "Upload Document" };
+
+    // Clearinghouse — explain and link to FMCSA + documents page
+    if (lower.includes("clearinghouse query")) {
+        return { href: "/dashboard/documents", label: "Upload Query" };
     }
     if (lower.includes("clearinghouse consent")) {
-        return { href: "/dashboard/documents", label: "Upload Document" };
+        return { href: "/dashboard/documents", label: "Upload Consent" };
     }
-    if (lower.includes("annual inspection") || lower.includes("preventive maintenance")) {
-        return { href: "/dashboard/vehicles", label: "View Vehicles" };
+
+    // MVR / Employment app — link to wizard for filling out, or documents for uploading
+    if (lower.includes("mvr")) {
+        return { href: "/dashboard/documents/wizard?form=annualMVRReview", label: "Fill Out MVR" };
+    }
+    if (lower.includes("employment application")) {
+        return { href: "/dashboard/documents/wizard?form=driverApp", label: "Fill Out Form" };
+    }
+
+    // Drug test — upload the result
+    if (lower.includes("pre-employment test") || lower.includes("drug test")) {
+        return { href: "/dashboard/documents", label: "Upload Result" };
+    }
+
+    // Vehicle items — link to vehicle page to set dates
+    if (lower.includes("annual inspection")) {
+        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
+    }
+    if (lower.includes("preventive maintenance")) {
+        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
     }
     if (lower.includes("registration")) {
-        return { href: "/dashboard/vehicles", label: "View Vehicles" };
+        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
     }
-    if (lower.includes("operating authority") || lower.includes("boc-3") || lower.includes("ucr") ||
-        lower.includes("mcs-150") || lower.includes("insurance") || lower.includes("ifta")) {
-        return { href: "/dashboard/documents", label: "Upload Document" };
+
+    // Company docs — link to wizard for fillable forms, or documents page for uploads
+    if (lower.includes("mcs-150")) {
+        return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out Form" };
+    }
+    if (lower.includes("boc-3")) {
+        return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out Form" };
+    }
+    if (lower.includes("operating authority") || lower.includes("ucr") ||
+        lower.includes("insurance") || lower.includes("ifta")) {
+        return { href: "/dashboard/documents", label: "Upload Doc" };
     }
 
     return { href: "/dashboard/documents", label: "Take Action" };

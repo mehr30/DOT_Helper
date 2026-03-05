@@ -119,6 +119,52 @@ export async function createDocumentRecord(data: {
     revalidatePath("/dashboard");
 }
 
+// Save a wizard-completed form as a Document in the database
+// so the compliance engine can see it
+export async function saveWizardFormAsDocument(data: {
+    formId: string;
+    title: string;
+    documentType: string;
+    category: "driver" | "vehicle" | "company" | "safety";
+}) {
+    const { companyId, userId } = await requireCompanyUser();
+
+    // Check if we already have this wizard form saved
+    const existing = await prisma.document.findFirst({
+        where: {
+            companyId,
+            fileName: `wizard_${data.formId}`,
+        },
+    });
+
+    if (existing) {
+        // Update existing record
+        await prisma.document.update({
+            where: { id: existing.id },
+            data: {
+                name: data.title,
+                documentType: data.documentType as never,
+            },
+        });
+    } else {
+        await prisma.document.create({
+            data: {
+                name: data.title,
+                documentType: data.documentType as never,
+                fileName: `wizard_${data.formId}`,
+                fileUrl: "", // No physical file — wizard-generated
+                category: data.category,
+                companyId,
+                uploadedById: userId,
+            },
+        });
+    }
+
+    revalidatePath("/dashboard/documents");
+    revalidatePath("/dashboard/compliance");
+    revalidatePath("/dashboard");
+}
+
 export async function deleteDocumentRecord(documentId: string) {
     const { companyId } = await requireCompanyUser();
 
