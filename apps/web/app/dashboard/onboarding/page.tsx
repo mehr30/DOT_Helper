@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, ArrowLeft, Loader2, Building2, Truck, Users, ShieldCheck, Headset, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2, Building2, Truck, Users, ShieldCheck, Headset, Check, HelpCircle, ExternalLink } from "lucide-react";
 import {
     onboardingStep1Schema,
     onboardingStep2Schema,
@@ -135,7 +135,8 @@ function Step1({
     defaultValues: Partial<FormData>;
     onNext: (data: OnboardingStep1Input) => void;
 }) {
-    const { register, handleSubmit, formState: { errors } } = useForm<OnboardingStep1Input>({
+    const [noDot, setNoDot] = useState(!defaultValues.usdotNumber);
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<OnboardingStep1Input>({
         resolver: zodResolver(onboardingStep1Schema),
         defaultValues: {
             name: defaultValues.name ?? "",
@@ -143,11 +144,17 @@ function Step1({
         },
     });
 
+    const handleNoDotToggle = () => {
+        const next = !noDot;
+        setNoDot(next);
+        if (next) setValue("usdotNumber", "");
+    };
+
     return (
         <>
             <div className={styles.header}>
                 <h1>Set up your company</h1>
-                <p>We just need two things to get started.</p>
+                <p>Just your company name to get started.</p>
             </div>
             <form onSubmit={handleSubmit(onNext)}>
                 <div className={styles.fieldGroup}>
@@ -160,16 +167,58 @@ function Step1({
                     />
                     {errors.name && <span className={styles.fieldError}>{errors.name.message}</span>}
                 </div>
-                <div className={styles.fieldGroup}>
-                    <label className={styles.label}>USDOT Number</label>
+
+                {!noDot && (
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>USDOT Number</label>
+                        <input
+                            {...register("usdotNumber")}
+                            placeholder="1234567"
+                            className={styles.input}
+                            inputMode="numeric"
+                        />
+                        {errors.usdotNumber && <span className={styles.fieldError}>{errors.usdotNumber.message}</span>}
+                    </div>
+                )}
+
+                <label style={{
+                    display: "flex", alignItems: "center", gap: "0.5rem",
+                    fontSize: "0.85rem", color: "#64748b", cursor: "pointer",
+                    marginBottom: "0.5rem",
+                }}>
                     <input
-                        {...register("usdotNumber")}
-                        placeholder="1234567"
-                        className={styles.input}
-                        inputMode="numeric"
+                        type="checkbox"
+                        checked={noDot}
+                        onChange={handleNoDotToggle}
+                        style={{ accentColor: "var(--color-brand-green, #22c55e)" }}
                     />
-                    {errors.usdotNumber && <span className={styles.fieldError}>{errors.usdotNumber.message}</span>}
-                </div>
+                    I don&apos;t have a USDOT number yet
+                </label>
+
+                {noDot && (
+                    <div style={{
+                        padding: "0.75rem 1rem", marginBottom: "1rem",
+                        background: "#f0fdf4", border: "1px solid #bbf7d0",
+                        borderRadius: "8px", fontSize: "0.8rem", color: "#166534",
+                        lineHeight: 1.6,
+                    }}>
+                        <strong>No problem!</strong> You can add it later in Settings. If you need to apply
+                        for a USDOT number, you can do so for free on the FMCSA website:
+                        <br />
+                        <a
+                            href="https://www.fmcsa.dot.gov/registration/getting-started"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: "inline-flex", alignItems: "center", gap: "0.25rem",
+                                color: "#15803d", fontWeight: 600, marginTop: "0.25rem",
+                            }}
+                        >
+                            FMCSA Registration — Getting Started <ExternalLink size={12} />
+                        </a>
+                    </div>
+                )}
+
                 <div className={styles.buttonRow}>
                     <button type="submit" className={styles.continueButton}>
                         Continue
@@ -320,8 +369,27 @@ function Step3({
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className={styles.fieldGroup}>
-                    <label className={styles.label}>MC Number</label>
+                    <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                        MC Number
+                        <span
+                            title="Motor Carrier number — required if you transport regulated commodities (freight, passengers, or hazardous materials) across state lines. Apply at FMCSA.dot.gov if you don't have one."
+                            style={{ cursor: "help", color: "#94a3b8" }}
+                        >
+                            <HelpCircle size={14} />
+                        </span>
+                    </label>
                     <input {...register("mcNumber")} placeholder="MC-123456" className={styles.input} />
+                    <span style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.15rem" }}>
+                        Don&apos;t have one?{" "}
+                        <a
+                            href="https://www.fmcsa.dot.gov/registration/getting-started"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "var(--color-brand-green, #22c55e)", fontWeight: 500 }}
+                        >
+                            Apply at FMCSA.dot.gov
+                        </a>
+                    </span>
                 </div>
 
                 <div className={styles.fieldGroup}>

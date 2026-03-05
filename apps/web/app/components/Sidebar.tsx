@@ -206,7 +206,7 @@ export default function Sidebar() {
                                         </div>
                                         <div className={styles.companyDetails}>
                                             <span className={styles.companyName}>{profile.companyName}</span>
-                                            <span className={styles.usdot}>USDOT: {profile.usdotNumber}</span>
+                                            <span className={styles.usdot}>{profile.usdotNumber ? `USDOT: ${profile.usdotNumber}` : "USDOT: Pending"}</span>
                                         </div>
                                     </div>
                                 </div>

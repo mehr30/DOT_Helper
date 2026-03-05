@@ -1,12 +1,13 @@
 import { z } from "zod";
 
-// Step 1: Essential info (required)
+// Step 1: Essential info (company name required, USDOT optional for new carriers)
 export const onboardingStep1Schema = z.object({
     name: z.string().min(1, "Company name is required").max(200),
     usdotNumber: z
         .string()
-        .min(1, "USDOT number is required")
-        .regex(/^\d{1,8}$/, "USDOT number must be 1-8 digits"),
+        .regex(/^(\d{1,8})?$/, "USDOT number must be 1-8 digits")
+        .optional()
+        .or(z.literal("")),
 });
 
 // Step 2: Fleet profile (card selection)

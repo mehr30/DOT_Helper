@@ -19,12 +19,15 @@ export async function createCompany(formData: unknown) {
 
     const data = parsed.data;
 
-    // Check for duplicate USDOT
-    const existing = await prisma.company.findUnique({
-        where: { usdotNumber: data.usdotNumber },
-    });
-    if (existing) {
-        return { error: "A company with this USDOT number already exists" };
+    // Check for duplicate USDOT (only if one was provided)
+    const usdot = data.usdotNumber?.trim() || null;
+    if (usdot) {
+        const existing = await prisma.company.findUnique({
+            where: { usdotNumber: usdot },
+        });
+        if (existing) {
+            return { error: "A company with this USDOT number already exists" };
+        }
     }
 
     // Create company and connect user
@@ -32,7 +35,7 @@ export async function createCompany(formData: unknown) {
         const company = await tx.company.create({
             data: {
                 name: data.name,
-                usdotNumber: data.usdotNumber,
+                usdotNumber: usdot,
                 fleetSizeRange: data.fleetSizeRange,
                 mcNumber: data.mcNumber || null,
                 address: data.address || null,
