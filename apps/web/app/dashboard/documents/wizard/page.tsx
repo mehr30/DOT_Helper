@@ -526,8 +526,14 @@ function WizardContent() {
                                     <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#16a34a" }}>
                                         Signature captured
                                     </span>
-                                    <span style={{ fontSize: "0.7rem", color: "#64748b", display: "block" }}>
-                                        {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                                    <span className="sig-timestamp" style={{ fontSize: "0.7rem", color: "#64748b", display: "block" }}>
+                                        Signed: {(() => {
+                                            const sd = formData["signDate"] || formData["certDate"];
+                                            if (sd && typeof sd === "string") {
+                                                return new Date(sd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+                                            }
+                                            return new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+                                        })()}
                                     </span>
                                 </div>
                                 <button

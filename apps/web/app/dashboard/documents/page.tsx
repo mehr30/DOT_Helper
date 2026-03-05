@@ -354,11 +354,15 @@ export default function DocumentsPage() {
                                             // Generate printable version of this single form
                                             const fields: string[] = [];
                                             const sigs: string[] = [];
+                                            const signDate = (doc.data.signDate as string) || (doc.data.certDate as string) || "";
+                                            const sigTimestamp = signDate
+                                                ? new Date(signDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+                                                : new Date(doc.savedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
                                             Object.entries(doc.data).forEach(([key, val]) => {
                                                 if (!val) return;
                                                 if (typeof val === "string" && val.startsWith("data:image")) {
                                                     const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
-                                                    sigs.push(`<div style="margin-top:1.5rem"><p style="font-weight:600;margin-bottom:0.25rem">${label}:</p><img src="${val}" style="height:60px;border-bottom:1px solid #333" /></div>`);
+                                                    sigs.push(`<div style="margin-top:1.5rem"><p style="font-weight:600;margin-bottom:0.25rem">${label}:</p><img src="${val}" style="height:60px;border-bottom:1px solid #333" /><p style="font-size:0.8rem;color:#64748b;margin-top:0.25rem">Signed: ${sigTimestamp}</p></div>`);
                                                 } else {
                                                     const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
                                                     fields.push(`<tr><td style="padding:0.3rem 1rem 0.3rem 0;font-weight:500;color:#475569;white-space:nowrap">${label}</td><td style="padding:0.3rem 0">${val === true ? "Yes" : val}</td></tr>`);
