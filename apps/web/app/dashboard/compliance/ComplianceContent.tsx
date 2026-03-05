@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
     Shield,
     Users,
@@ -15,6 +16,10 @@ import {
     Download,
     MapPin,
     Activity,
+    ArrowRight,
+    Upload,
+    UserPlus,
+    Wrench,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../../components/DemoModeContext";
@@ -130,10 +135,62 @@ function statusToCss(s: string): string {
     return s;
 }
 
-export default function ComplianceContent({ scores }: { scores: ComplianceScores | null }) {
+// Map 2-letter state codes to full names
+const stateCodeToName: Record<string, string> = {
+    AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
+    CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
+    HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
+    KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
+    MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi",
+    MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire",
+    NJ: "New Jersey", NM: "New Mexico", NY: "New York", NC: "North Carolina",
+    ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania",
+    RI: "Rhode Island", SC: "South Carolina", SD: "South Dakota", TN: "Tennessee",
+    TX: "Texas", UT: "Utah", VT: "Vermont", VA: "Virginia", WA: "Washington",
+    WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
+};
+
+// Determine the action link for a compliance item based on its label
+function getActionForItem(item: { label: string; status: string }): { href: string; label: string } | null {
+    if (item.status === "compliant" || item.status === "not_applicable") return null;
+    const lower = item.label.toLowerCase();
+
+    if (lower.includes("license current") || lower.includes("cdl")) {
+        return { href: "/dashboard/drivers", label: "View Drivers" };
+    }
+    if (lower.includes("medical certificate")) {
+        return { href: "/dashboard/drivers", label: "View Drivers" };
+    }
+    if (lower.includes("mvr") || lower.includes("employment application") || lower.includes("clearinghouse")) {
+        return { href: "/dashboard/documents", label: "Upload Document" };
+    }
+    if (lower.includes("pre-employment test") || lower.includes("drug test")) {
+        return { href: "/dashboard/documents", label: "Upload Document" };
+    }
+    if (lower.includes("clearinghouse consent")) {
+        return { href: "/dashboard/documents", label: "Upload Document" };
+    }
+    if (lower.includes("annual inspection") || lower.includes("preventive maintenance")) {
+        return { href: "/dashboard/vehicles", label: "View Vehicles" };
+    }
+    if (lower.includes("registration")) {
+        return { href: "/dashboard/vehicles", label: "View Vehicles" };
+    }
+    if (lower.includes("operating authority") || lower.includes("boc-3") || lower.includes("ucr") ||
+        lower.includes("mcs-150") || lower.includes("insurance") || lower.includes("ifta")) {
+        return { href: "/dashboard/documents", label: "Upload Document" };
+    }
+
+    return { href: "/dashboard/documents", label: "Take Action" };
+}
+
+export default function ComplianceContent({ scores, companyState }: { scores: ComplianceScores | null; companyState?: string | null }) {
     const { isDemoMode } = useDemoMode();
     const data = isDemoMode ? mockScores : scores;
-    const [selectedState, setSelectedState] = useState("Texas");
+
+    // Default to company's state, or "Texas" for demo
+    const defaultState = companyState ? (stateCodeToName[companyState.toUpperCase()] ?? "Texas") : "Texas";
+    const [selectedState, setSelectedState] = useState(defaultState);
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Driver Qualification", "Vehicle Maintenance"]));
 
     if (!data || (!isDemoMode && data.summary.totalItems === 0)) {
@@ -263,6 +320,7 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                                 <div className={styles.categoryItems}>
                                     {category.items.map((item, idx) => {
                                         const cssStatus = statusToCss(item.status);
+                                        const action = getActionForItem(item);
                                         return (
                                             <div key={idx} className={styles.checklistItem}>
                                                 <div className={`${styles.itemIcon} ${styles[cssStatus]}`}>
@@ -279,11 +337,29 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                                                         )}
                                                     </div>
                                                 </div>
-                                                <span className={`${styles.itemBadge} ${styles[cssStatus]}`}>
-                                                    {item.status === "compliant" ? "Compliant" :
-                                                        item.status === "action_needed" ? "Action Needed" :
-                                                            item.status === "expired" ? "Expired" : "N/A"}
-                                                </span>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                                                    <span className={`${styles.itemBadge} ${styles[cssStatus]}`}>
+                                                        {item.status === "compliant" ? "Compliant" :
+                                                            item.status === "action_needed" ? "Action Needed" :
+                                                                item.status === "expired" ? "Expired" : "N/A"}
+                                                    </span>
+                                                    {action && (
+                                                        <Link
+                                                            href={action.href}
+                                                            style={{
+                                                                display: "inline-flex", alignItems: "center", gap: "0.25rem",
+                                                                padding: "0.3rem 0.6rem", borderRadius: "6px",
+                                                                background: item.status === "expired" ? "#fef2f2" : "#fffbeb",
+                                                                color: item.status === "expired" ? "#dc2626" : "#92400e",
+                                                                fontSize: "0.7rem", fontWeight: 600, textDecoration: "none",
+                                                                border: `1px solid ${item.status === "expired" ? "#fecaca" : "#fef3c7"}`,
+                                                                whiteSpace: "nowrap" as const,
+                                                            }}
+                                                        >
+                                                            {action.label} <ArrowRight size={10} />
+                                                        </Link>
+                                                    )}
+                                                </div>
                                             </div>
                                         );
                                     })}

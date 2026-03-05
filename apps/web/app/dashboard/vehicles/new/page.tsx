@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, HelpCircle } from "lucide-react";
 import { vehicleCreateSchema, type VehicleCreateInput } from "../../../../lib/validations/vehicle";
 import { createVehicle } from "../../../actions/vehicles";
 
@@ -63,16 +63,20 @@ export default function NewVehiclePage() {
                     <div>
                         <label style={labelStyle}>Unit Number *</label>
                         <input {...register("unitNumber")} placeholder="101" style={inputStyle} />
+                        <span style={helpStyle}>Your internal ID for this vehicle (e.g., 101, T-5, etc.)</span>
                         {errors.unitNumber && <span style={errorStyle}>{errors.unitNumber.message}</span>}
                     </div>
                     <div>
                         <label style={labelStyle}>Vehicle Type *</label>
                         <select {...register("vehicleType")} style={inputStyle}>
-                            <option value="TRACTOR">Tractor / Truck</option>
-                            <option value="TRAILER">Trailer</option>
-                            <option value="STRAIGHT_TRUCK">Straight Truck</option>
-                            <option value="BUS">Bus</option>
+                            <option value="TRACTOR">Semi-Truck (Tractor) — pulls a trailer</option>
+                            <option value="STRAIGHT_TRUCK">Straight Truck — box truck, no trailer</option>
+                            <option value="TRAILER">Trailer — pulled by a tractor</option>
+                            <option value="BUS">Bus / Passenger Vehicle</option>
                         </select>
+                        <span style={helpStyle}>
+                            Semi-trucks pull separate trailers. Straight trucks have the cargo area attached (box trucks, flatbeds).
+                        </span>
                     </div>
                 </div>
 
@@ -99,6 +103,7 @@ export default function NewVehiclePage() {
                     <input {...register("vin")} placeholder="1FUJGLDR5CLBP8401" maxLength={17} style={{
                         ...inputStyle, fontFamily: "monospace",
                     }} />
+                    <span style={helpStyle}>17-character Vehicle Identification Number (found on driver door jamb or dashboard)</span>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
@@ -108,22 +113,37 @@ export default function NewVehiclePage() {
                     </div>
                     <div>
                         <label style={labelStyle}>Plate State</label>
-                        <input {...register("licensePlateState")} placeholder="KS" maxLength={2} style={inputStyle} />
+                        <input {...register("licensePlateState")} placeholder="MO" maxLength={2} style={inputStyle} />
                     </div>
                 </div>
 
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "1rem", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>
-                    Scheduling
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "0.25rem", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>
+                    Maintenance Schedule
                 </h3>
+                <p style={{ color: "#64748b", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                    These dates help us alert you before inspections are due. If you don't know them yet, you can add them later.
+                </p>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
                     <div>
-                        <label style={labelStyle}>Annual Inspection Due</label>
+                        <label style={labelStyle}>
+                            Annual DOT Inspection Due
+                            <Tooltip text="Every commercial vehicle must pass an annual safety inspection by a certified mechanic. Check your last inspection sticker or report for the date — the next one is due within 12 months." />
+                        </label>
                         <input {...register("annualInspectionDue")} type="date" style={inputStyle} />
+                        <span style={helpStyle}>
+                            When is the next annual DOT safety inspection due? Check the sticker on your vehicle or your last inspection report.
+                        </span>
                     </div>
                     <div>
-                        <label style={labelStyle}>Next PM Due</label>
+                        <label style={labelStyle}>
+                            Next Preventive Maintenance (PM) Due
+                            <Tooltip text="Preventive maintenance (PM) is your regular scheduled service — oil changes, brake checks, tire rotations, etc. Most fleets do this every 3-6 months or every 10,000-25,000 miles." />
+                        </label>
                         <input {...register("nextPmDue")} type="date" style={inputStyle} />
+                        <span style={helpStyle}>
+                            When is the next scheduled service? (Oil change, brake check, tire rotation, etc.)
+                        </span>
                     </div>
                 </div>
 
@@ -131,7 +151,7 @@ export default function NewVehiclePage() {
                     <button type="submit" disabled={isSubmitting} style={{
                         display: "flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.65rem 1.5rem", borderRadius: "8px",
-                        border: "none", background: "#3b82f6", color: "white",
+                        border: "none", background: "#22c55e", color: "white",
                         fontSize: "0.9rem", fontWeight: 600, cursor: isSubmitting ? "not-allowed" : "pointer",
                         opacity: isSubmitting ? 0.7 : 1,
                     }}>
@@ -155,8 +175,36 @@ export default function NewVehiclePage() {
     );
 }
 
+function Tooltip({ text }: { text: string }) {
+    const [show, setShow] = useState(false);
+
+    return (
+        <span style={{ position: "relative", display: "inline-flex", marginLeft: "0.3rem", verticalAlign: "middle" }}>
+            <HelpCircle
+                size={14}
+                style={{ color: "#94a3b8", cursor: "help" }}
+                onMouseEnter={() => setShow(true)}
+                onMouseLeave={() => setShow(false)}
+                onClick={() => setShow(!show)}
+            />
+            {show && (
+                <span style={{
+                    position: "absolute", bottom: "calc(100% + 6px)", left: "50%",
+                    transform: "translateX(-50%)", width: 280, padding: "0.6rem 0.75rem",
+                    background: "#1e293b", color: "white", fontSize: "0.75rem",
+                    lineHeight: 1.5, borderRadius: "8px", zIndex: 10,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    pointerEvents: "none",
+                }}>
+                    {text}
+                </span>
+            )}
+        </span>
+    );
+}
+
 const labelStyle: React.CSSProperties = {
-    display: "block", fontSize: "0.85rem", fontWeight: 600,
+    display: "flex", alignItems: "center", fontSize: "0.85rem", fontWeight: 600,
     color: "#334155", marginBottom: "0.35rem",
 };
 
@@ -167,4 +215,8 @@ const inputStyle: React.CSSProperties = {
 
 const errorStyle: React.CSSProperties = {
     display: "block", fontSize: "0.78rem", color: "#dc2626", marginTop: "0.25rem",
+};
+
+const helpStyle: React.CSSProperties = {
+    display: "block", fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.25rem", lineHeight: 1.4,
 };

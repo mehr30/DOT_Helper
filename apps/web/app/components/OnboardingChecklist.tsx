@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, ArrowRight, CheckCircle } from "lucide-react";
+import { Check, ArrowRight, CheckCircle, ListChecks } from "lucide-react";
 import styles from "./OnboardingChecklist.module.css";
 
-const DISMISS_KEY = "greenlight_checklist_dismissed";
+const SESSION_DISMISS_KEY = "greenlight_checklist_session_dismissed";
+const PERMANENT_DISMISS_KEY = "greenlight_checklist_dismissed";
 
 interface OnboardingChecklistProps {
     hasCompany: boolean;
@@ -21,9 +22,13 @@ interface ChecklistItem {
 
 export default function OnboardingChecklist({ hasCompany, driverCount, vehicleCount }: OnboardingChecklistProps) {
     const [dismissed, setDismissed] = useState(true); // start hidden to avoid flash
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setDismissed(localStorage.getItem(DISMISS_KEY) === "true");
+        setMounted(true);
+        const permanentlyDismissed = localStorage.getItem(PERMANENT_DISMISS_KEY) === "true";
+        const sessionDismissed = sessionStorage.getItem(SESSION_DISMISS_KEY) === "true";
+        setDismissed(permanentlyDismissed || sessionDismissed);
     }, []);
 
     const items: ChecklistItem[] = [
@@ -31,16 +36,40 @@ export default function OnboardingChecklist({ hasCompany, driverCount, vehicleCo
         { label: "Set up your company", done: hasCompany, href: "/dashboard/onboarding" },
         { label: "Add your first driver", done: driverCount > 0, href: "/dashboard/drivers/new" },
         { label: "Add your first vehicle", done: vehicleCount > 0, href: "/dashboard/vehicles/new" },
-        { label: "Review your compliance dashboard", done: hasCompany && driverCount > 0 && vehicleCount > 0 },
+        { label: "Review your compliance dashboard", done: hasCompany && driverCount > 0 && vehicleCount > 0, href: "/dashboard/compliance" },
     ];
 
     const completedCount = items.filter(i => i.done).length;
     const allDone = completedCount === items.length;
 
+    if (!mounted) return null;
+
+    // Show a small "reopen" button when dismissed but not all done
+    if (dismissed && !allDone) {
+        return (
+            <button
+                className={styles.reopenButton}
+                onClick={() => {
+                    sessionStorage.removeItem(SESSION_DISMISS_KEY);
+                    setDismissed(false);
+                }}
+            >
+                <ListChecks size={16} />
+                <span>Show setup guide ({completedCount}/{items.length})</span>
+            </button>
+        );
+    }
+
     if (dismissed) return null;
 
     const handleDismiss = () => {
-        localStorage.setItem(DISMISS_KEY, "true");
+        if (allDone) {
+            // Permanently dismiss once all items complete
+            localStorage.setItem(PERMANENT_DISMISS_KEY, "true");
+        } else {
+            // Only dismiss for this browser session — comes back on next login
+            sessionStorage.setItem(SESSION_DISMISS_KEY, "true");
+        }
         setDismissed(true);
     };
 
