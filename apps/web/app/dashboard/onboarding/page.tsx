@@ -372,22 +372,23 @@ function Step3({
                     <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
                         MC Number
                         <span
-                            title="Motor Carrier number — required if you transport regulated commodities (freight, passengers, or hazardous materials) across state lines. Apply at FMCSA.dot.gov if you don't have one."
+                            title="You need an MC number if you haul freight or passengers for hire across state lines. If you only carry your own goods, or only operate within one state, you likely don't need one."
                             style={{ cursor: "help", color: "#94a3b8" }}
                         >
                             <HelpCircle size={14} />
                         </span>
                     </label>
                     <input {...register("mcNumber")} placeholder="MC-123456" className={styles.input} />
-                    <span style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.15rem" }}>
-                        Don&apos;t have one?{" "}
+                    <span style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.15rem", lineHeight: 1.5 }}>
+                        You need this if you get paid to move freight or passengers across state lines.
+                        Not sure?{" "}
                         <a
                             href="https://www.fmcsa.dot.gov/registration/getting-started"
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ color: "var(--color-brand-green, #22c55e)", fontWeight: 500 }}
                         >
-                            Apply at FMCSA.dot.gov
+                            Check on FMCSA.dot.gov
                         </a>
                     </span>
                 </div>
