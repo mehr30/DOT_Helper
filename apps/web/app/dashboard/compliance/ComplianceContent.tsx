@@ -151,32 +151,34 @@ const stateCodeToName: Record<string, string> = {
 };
 
 // Determine the action link for a compliance item based on its label
-function getActionForItem(item: { label: string; status: string }): { href: string; label: string } | null {
+function getActionForItem(item: { label: string; status: string; driverId?: string; vehicleId?: string }): { href: string; label: string } | null {
     if (item.status === "compliant" || item.status === "not_applicable") return null;
     const lower = item.label.toLowerCase();
+    const driverParam = item.driverId ? `&driver=${item.driverId}` : "";
+    const vehicleParam = item.vehicleId ? `&vehicle=${item.vehicleId}` : "";
 
-    // Driver-related items — link to the drivers page to update expiration dates
+    // Driver-related items — link to the specific driver's page to update expiration dates
     if (lower.includes("license current") || lower.includes("cdl")) {
-        return { href: "/dashboard/drivers", label: "Update Driver" };
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update Driver" };
     }
     if (lower.includes("medical certificate")) {
-        return { href: "/dashboard/drivers", label: "Update Driver" };
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update Driver" };
     }
 
     // Clearinghouse — link to wizard consent form for consent, documents page for query results
     if (lower.includes("clearinghouse query")) {
-        return { href: "/dashboard/documents/wizard?form=drugAlcoholPolicy", label: "Run Query" };
+        return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Run Query" };
     }
     if (lower.includes("clearinghouse consent")) {
-        return { href: "/dashboard/documents/wizard?form=drugAlcoholPolicy", label: "Get Consent" };
+        return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Get Consent" };
     }
 
-    // MVR / Employment app — link to wizard for filling out, or documents for uploading
+    // MVR / Employment app — link to wizard for filling out with driver pre-selected
     if (lower.includes("mvr")) {
-        return { href: "/dashboard/documents/wizard?form=annualMVRReview", label: "Fill Out MVR" };
+        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out MVR" };
     }
     if (lower.includes("employment application")) {
-        return { href: "/dashboard/documents/wizard?form=driverApp", label: "Fill Out Form" };
+        return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out Form" };
     }
 
     // Drug test — upload the result
@@ -184,15 +186,15 @@ function getActionForItem(item: { label: string; status: string }): { href: stri
         return { href: "/dashboard/documents", label: "Upload Result" };
     }
 
-    // Vehicle items — link to vehicle page to set dates
+    // Vehicle items — link to specific vehicle page to set dates
     if (lower.includes("annual inspection")) {
-        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
     if (lower.includes("preventive maintenance")) {
-        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
     if (lower.includes("registration")) {
-        return { href: "/dashboard/vehicles", label: "Update Vehicle" };
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
 
     // Company docs — link to wizard for fillable forms, or documents page for uploads

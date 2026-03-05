@@ -13,6 +13,8 @@ export interface ComplianceItem {
     regulation: string;
     status: "compliant" | "action_needed" | "expired" | "not_applicable";
     detail?: string;
+    driverId?: string;
+    vehicleId?: string;
 }
 
 export interface ComplianceCategory {
@@ -106,6 +108,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.11",
                 status: cdlDays <= 0 ? "expired" : cdlDays <= 30 ? "action_needed" : "compliant",
                 detail: cdlDays <= 0 ? `Expired ${Math.abs(cdlDays)} days ago` : `${cdlDays} days remaining`,
+                driverId: d.id,
             });
         }
 
@@ -117,6 +120,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.43",
                 status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
                 detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
+                driverId: d.id,
             });
         }
 
@@ -127,6 +131,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 391.25",
             status: hasMVR ? "compliant" : "action_needed",
             detail: hasMVR ? "On file" : "Missing — annual MVR required",
+            driverId: d.id,
         });
 
         // Clearinghouse query
@@ -136,6 +141,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 382.701",
                 status: "action_needed",
                 detail: "No query on file",
+                driverId: d.id,
             });
         } else {
             const daysSince = Math.ceil((now.getTime() - d.clearinghouseQueryDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -144,6 +150,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 382.701",
                 status: daysSince >= 365 ? "expired" : daysSince >= 335 ? "action_needed" : "compliant",
                 detail: daysSince >= 365 ? `Overdue by ${daysSince - 365} days` : `${365 - daysSince} days until next required`,
+                driverId: d.id,
             });
         }
 
@@ -154,6 +161,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 391.21",
             status: hasApp ? "compliant" : "action_needed",
             detail: hasApp ? "On file" : "Missing",
+            driverId: d.id,
         });
     }
 
@@ -178,6 +186,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.17",
                 status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days remaining`,
+                vehicleId: v.id,
             });
         } else {
             vmItems.push({
@@ -185,6 +194,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.17",
                 status: "action_needed",
                 detail: "No inspection date set",
+                vehicleId: v.id,
             });
         }
 
@@ -196,6 +206,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.3",
                 status: days <= 0 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days until next PM`,
+                vehicleId: v.id,
             });
         }
 
@@ -207,6 +218,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "State Law",
                 status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Expired ${Math.abs(days)} days ago` : `${days} days remaining`,
+                vehicleId: v.id,
             });
         }
     }
@@ -233,6 +245,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 382.301",
             status: hasPreEmployment ? "compliant" : "action_needed",
             detail: hasPreEmployment ? "On file" : "Missing pre-employment drug test result",
+            driverId: d.id,
         });
 
         // Clearinghouse consent
@@ -242,6 +255,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 382.703",
             status: hasConsent ? "compliant" : "action_needed",
             detail: hasConsent ? "On file" : "Missing signed consent form",
+            driverId: d.id,
         });
     }
 

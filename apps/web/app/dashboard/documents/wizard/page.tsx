@@ -17,6 +17,8 @@ import {
     ChevronDown,
     ChevronUp,
     Sparkles,
+    Users,
+    Truck,
 } from "lucide-react";
 import styles from "./page.module.css";
 import {
@@ -30,7 +32,13 @@ import {
 } from "./forms";
 import { saveDocument, getDocumentByFormId, SavedDocument } from "../savedDocuments";
 import { useCompanyProfile } from "../../../components/CompanyProfileContext";
-import { saveWizardFormAsDocument } from "../../../actions/documents";
+import {
+    saveWizardFormAsDocument,
+    getDriversForWizard,
+    getVehiclesForWizard,
+    type WizardDriverOption,
+    type WizardVehicleOption,
+} from "../../../actions/documents";
 import SignaturePad from "../../../components/SignaturePad";
 
 // Map wizard form IDs to database DocumentType values
@@ -64,23 +72,123 @@ function WizardContent() {
     const [addressPickerOpen, setAddressPickerOpen] = useState<string | null>(null);
     const { profile, addAddress, removeAddress } = useCompanyProfile();
 
-    // Handle ?form= query parameter to jump directly to a form
+    // Driver/vehicle selection state
+    const [availableDrivers, setAvailableDrivers] = useState<WizardDriverOption[]>([]);
+    const [availableVehicles, setAvailableVehicles] = useState<WizardVehicleOption[]>([]);
+    const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+    const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
+    const [entityLoaded, setEntityLoaded] = useState(false);
+
+    // Load drivers/vehicles list on mount
     useEffect(() => {
+        getDriversForWizard().then(setAvailableDrivers).catch(() => {});
+        getVehiclesForWizard().then(setAvailableVehicles).catch(() => {});
+    }, []);
+
+    // Auto-fill form fields from a selected driver record
+    const applyDriverData = (driver: WizardDriverOption, data: Record<string, string | boolean>) => {
+        const [firstName, ...rest] = driver.name.split(" ");
+        const lastName = rest.join(" ");
+        // Map driver fields to common wizard form field IDs
+        const map: Record<string, string> = {
+            firstName: firstName || "",
+            lastName: lastName || "",
+            driverName: driver.name,
+            employeeName: driver.name,
+            licenseNumber: driver.cdlNumber || "",
+            licenseState: driver.cdlState || "",
+            licenseExpiry: driver.cdlExpiration || "",
+            hireDate: driver.hireDate || "",
+            endorsements: driver.endorsements?.join(", ") || "",
+            phone: driver.phone || "",
+            email: driver.email || "",
+        };
+        // Map CDL class to license class
+        if (driver.cdlClass) {
+            map.licenseClass = driver.cdlClass;
+        }
+        for (const [fieldId, value] of Object.entries(map)) {
+            if (value && !data[fieldId]) {
+                data[fieldId] = value;
+            }
+        }
+        return data;
+    };
+
+    // Auto-fill form fields from a selected vehicle record
+    const applyVehicleData = (vehicle: WizardVehicleOption, data: Record<string, string | boolean>) => {
+        const map: Record<string, string> = {
+            vehicle: vehicle.unitNumber,
+            unitNumber: vehicle.unitNumber,
+            vin: vehicle.vin || "",
+            year: vehicle.year?.toString() || "",
+            make: `${vehicle.make || ""} ${vehicle.model || ""}`.trim(),
+            licensePlate: vehicle.licensePlate || "",
+            vehicleUnit: vehicle.unitNumber,
+        };
+        for (const [fieldId, value] of Object.entries(map)) {
+            if (value && !data[fieldId]) {
+                data[fieldId] = value;
+            }
+        }
+        return data;
+    };
+
+    // Handle ?form= and ?driver= / ?vehicle= query parameters to jump directly to a form
+    useEffect(() => {
+        if (entityLoaded) return; // Already applied entity data, don't re-run
+
         const formId = searchParams.get("form");
+        const driverIdParam = searchParams.get("driver");
+        const vehicleIdParam = searchParams.get("vehicle");
+
         if (formId) {
             const form = dotForms.find(f => f.id === formId);
             if (form) {
+                // If we need driver/vehicle data but it hasn't loaded yet, wait
+                if (driverIdParam && availableDrivers.length === 0) return;
+                if (vehicleIdParam && availableVehicles.length === 0) return;
+
                 // Load any existing saved data
                 const existingDoc = getDocumentByFormId(formId);
-                if (existingDoc) {
-                    setFormData(existingDoc.data);
+                const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
+
+                // Auto-fill company fields
+                const autoFillMap: Record<string, string> = {
+                    usdotNumber: profile.usdotNumber,
+                    carrierName: profile.companyName,
+                    companyName: profile.companyName,
+                };
+                for (const [fieldId, value] of Object.entries(autoFillMap)) {
+                    if (value && !initialData[fieldId]) initialData[fieldId] = value;
                 }
+
+                // Apply driver auto-fill if ?driver= param provided
+                if (driverIdParam) {
+                    const driver = availableDrivers.find(d => d.id === driverIdParam);
+                    if (driver) {
+                        setSelectedDriverId(driverIdParam);
+                        applyDriverData(driver, initialData);
+                    }
+                }
+
+                // Apply vehicle auto-fill if ?vehicle= param provided
+                if (vehicleIdParam) {
+                    const vehicle = availableVehicles.find(v => v.id === vehicleIdParam);
+                    if (vehicle) {
+                        setSelectedVehicleId(vehicleIdParam);
+                        applyVehicleData(vehicle, initialData);
+                    }
+                }
+
+                setEntityLoaded(true);
+                setFormData(initialData);
                 setActiveForm(form);
                 setExpandedSections(new Set([form.sections[0]?.id || ""]));
                 setStep("fillForm");
             }
         }
-    }, [searchParams]);
+    }, [searchParams, availableDrivers, availableVehicles, entityLoaded, profile]);
 
     // ─── Assessment Logic ──────────────────
 
@@ -126,12 +234,42 @@ function WizardContent() {
         return ((answers[question.id] as string[]) || []).includes(value);
     };
 
+    // ─── Driver/Vehicle Selection in the wizard ──────────────────
+
+    const handleDriverSelect = (driverId: string) => {
+        if (!driverId) {
+            setSelectedDriverId(null);
+            return;
+        }
+        const driver = availableDrivers.find(d => d.id === driverId);
+        if (!driver) return;
+        setSelectedDriverId(driverId);
+        setFormData(prev => {
+            const updated = { ...prev };
+            return applyDriverData(driver, updated);
+        });
+    };
+
+    const handleVehicleSelect = (vehicleId: string) => {
+        if (!vehicleId) {
+            setSelectedVehicleId(null);
+            return;
+        }
+        const vehicle = availableVehicles.find(v => v.id === vehicleId);
+        if (!vehicle) return;
+        setSelectedVehicleId(vehicleId);
+        setFormData(prev => {
+            const updated = { ...prev };
+            return applyVehicleData(vehicle, updated);
+        });
+    };
+
     // ─── Form Filling Logic ──────────────────
 
     const startForm = (form: DOTForm) => {
         // Load any existing saved data
         const existingDoc = getDocumentByFormId(form.id);
-        const initialData: Record<string, string | boolean> = existingDoc ? existingDoc.data : {};
+        const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
 
         // Auto-fill company fields from saved profile (only if not already filled)
         const autoFillMap: Record<string, string> = {
@@ -153,6 +291,16 @@ function WizardContent() {
             if (!initialData["city"]) initialData["city"] = addr.city;
             if (!initialData["state"]) initialData["state"] = addr.state;
             if (!initialData["zip"]) initialData["zip"] = addr.zip;
+        }
+
+        // Apply selected driver/vehicle data if already chosen
+        if (selectedDriverId && (form.category === "driver" || form.category === "safety")) {
+            const driver = availableDrivers.find(d => d.id === selectedDriverId);
+            if (driver) applyDriverData(driver, initialData);
+        }
+        if (selectedVehicleId && form.category === "vehicle") {
+            const vehicle = availableVehicles.find(v => v.id === selectedVehicleId);
+            if (vehicle) applyVehicleData(vehicle, initialData);
         }
 
         setActiveForm(form);
@@ -212,6 +360,8 @@ function WizardContent() {
                     title: activeForm.title,
                     documentType: formToDocumentType[activeForm.id] ?? "OTHER",
                     category: activeForm.category,
+                    driverId: selectedDriverId || undefined,
+                    vehicleId: selectedVehicleId || undefined,
                 });
             } catch {
                 // localStorage save succeeded — database save may fail for unauthenticated users
@@ -731,6 +881,76 @@ function WizardContent() {
                             <h2>{activeForm.title}</h2>
                             <span className={styles.formRef}>{activeForm.cfrReference}</span>
                         </div>
+
+                        {/* Driver/Vehicle selector for applicable forms */}
+                        {(activeForm.category === "driver" || activeForm.category === "safety") && availableDrivers.length > 0 && (
+                            <div style={{
+                                display: "flex", alignItems: "center", gap: "0.75rem",
+                                padding: "0.75rem 1rem", marginBottom: "1rem",
+                                background: "#f0fdf4", border: "1px solid #bbf7d0",
+                                borderRadius: "10px",
+                            }}>
+                                <Users size={18} style={{ color: "#16a34a", flexShrink: 0 }} />
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "#15803d", display: "block", marginBottom: "0.25rem" }}>
+                                        Select Driver / Employee
+                                    </label>
+                                    <select
+                                        value={selectedDriverId || ""}
+                                        onChange={(e) => handleDriverSelect(e.target.value)}
+                                        style={{
+                                            width: "100%", padding: "0.4rem 0.5rem",
+                                            border: "1px solid #86efac", borderRadius: "6px",
+                                            fontSize: "0.85rem", background: "white",
+                                        }}
+                                    >
+                                        <option value="">— Choose a driver to auto-fill —</option>
+                                        {availableDrivers.map(d => (
+                                            <option key={d.id} value={d.id}>
+                                                {d.name}{d.cdlNumber ? ` (CDL: ${d.cdlNumber})` : ""}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {selectedDriverId && (
+                                    <CheckCircle size={18} style={{ color: "#16a34a", flexShrink: 0 }} />
+                                )}
+                            </div>
+                        )}
+                        {activeForm.category === "vehicle" && availableVehicles.length > 0 && (
+                            <div style={{
+                                display: "flex", alignItems: "center", gap: "0.75rem",
+                                padding: "0.75rem 1rem", marginBottom: "1rem",
+                                background: "#f0fdf4", border: "1px solid #bbf7d0",
+                                borderRadius: "10px",
+                            }}>
+                                <Truck size={18} style={{ color: "#16a34a", flexShrink: 0 }} />
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "#15803d", display: "block", marginBottom: "0.25rem" }}>
+                                        Select Vehicle
+                                    </label>
+                                    <select
+                                        value={selectedVehicleId || ""}
+                                        onChange={(e) => handleVehicleSelect(e.target.value)}
+                                        style={{
+                                            width: "100%", padding: "0.4rem 0.5rem",
+                                            border: "1px solid #86efac", borderRadius: "6px",
+                                            fontSize: "0.85rem", background: "white",
+                                        }}
+                                    >
+                                        <option value="">— Choose a vehicle to auto-fill —</option>
+                                        {availableVehicles.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {selectedVehicleId && (
+                                    <CheckCircle size={18} style={{ color: "#16a34a", flexShrink: 0 }} />
+                                )}
+                            </div>
+                        )}
 
                         {activeForm.sections.map(section => (
                             <div key={section.id} id={`section-${section.id}`} className={styles.formSection}>

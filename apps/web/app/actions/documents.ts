@@ -126,14 +126,24 @@ export async function saveWizardFormAsDocument(data: {
     title: string;
     documentType: string;
     category: "driver" | "vehicle" | "company" | "safety";
+    driverId?: string;
+    vehicleId?: string;
 }) {
     const { companyId, userId } = await requireCompanyUser();
 
-    // Check if we already have this wizard form saved
+    // Build a unique file name that includes the driver/vehicle association
+    const suffix = data.driverId ? `_d_${data.driverId}` : data.vehicleId ? `_v_${data.vehicleId}` : "";
+    const fileName = `wizard_${data.formId}${suffix}`;
+
+    // Check if we already have this wizard form saved for this entity
     const existing = await prisma.document.findFirst({
         where: {
-            companyId,
-            fileName: `wizard_${data.formId}`,
+            fileName,
+            OR: [
+                { companyId },
+                { driver: { companyId } },
+                { vehicle: { companyId } },
+            ],
         },
     });
 
@@ -151,10 +161,12 @@ export async function saveWizardFormAsDocument(data: {
             data: {
                 name: data.title,
                 documentType: data.documentType as never,
-                fileName: `wizard_${data.formId}`,
+                fileName,
                 fileUrl: "", // No physical file — wizard-generated
                 category: data.category,
-                companyId,
+                driverId: data.driverId || null,
+                vehicleId: data.vehicleId || null,
+                companyId: !data.driverId && !data.vehicleId ? companyId : null,
                 uploadedById: userId,
             },
         });
@@ -163,6 +175,104 @@ export async function saveWizardFormAsDocument(data: {
     revalidatePath("/dashboard/documents");
     revalidatePath("/dashboard/compliance");
     revalidatePath("/dashboard");
+    if (data.driverId) revalidatePath(`/dashboard/drivers/${data.driverId}`);
+    if (data.vehicleId) revalidatePath(`/dashboard/vehicles/${data.vehicleId}`);
+}
+
+// Lightweight driver/vehicle lookups for the wizard auto-fill
+
+export interface WizardDriverOption {
+    id: string;
+    name: string;
+    cdlNumber: string | null;
+    cdlState: string | null;
+    cdlClass: string | null;
+    cdlExpiration: string | null;
+    medicalCardExpiration: string | null;
+    email: string | null;
+    phone: string | null;
+    hireDate: string | null;
+    endorsements: string[];
+}
+
+export interface WizardVehicleOption {
+    id: string;
+    label: string;
+    unitNumber: string;
+    vin: string | null;
+    make: string | null;
+    model: string | null;
+    year: number | null;
+    licensePlate: string | null;
+    licensePlateState: string | null;
+}
+
+export async function getDriversForWizard(): Promise<WizardDriverOption[]> {
+    const { companyId } = await requireCompanyUser();
+
+    const drivers = await prisma.driver.findMany({
+        where: { companyId, status: "ACTIVE" },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            cdlNumber: true,
+            cdlState: true,
+            cdlClass: true,
+            cdlExpiration: true,
+            medicalCardExpiration: true,
+            email: true,
+            phone: true,
+            hireDate: true,
+            endorsements: true,
+        },
+        orderBy: { lastName: "asc" },
+    });
+
+    return drivers.map(d => ({
+        id: d.id,
+        name: `${d.firstName} ${d.lastName}`,
+        cdlNumber: d.cdlNumber,
+        cdlState: d.cdlState,
+        cdlClass: d.cdlClass,
+        cdlExpiration: d.cdlExpiration?.toISOString().split("T")[0] ?? null,
+        medicalCardExpiration: d.medicalCardExpiration?.toISOString().split("T")[0] ?? null,
+        email: d.email,
+        phone: d.phone,
+        hireDate: d.hireDate?.toISOString().split("T")[0] ?? null,
+        endorsements: d.endorsements as string[],
+    }));
+}
+
+export async function getVehiclesForWizard(): Promise<WizardVehicleOption[]> {
+    const { companyId } = await requireCompanyUser();
+
+    const vehicles = await prisma.vehicle.findMany({
+        where: { companyId, status: { in: ["ACTIVE", "MAINTENANCE"] } },
+        select: {
+            id: true,
+            unitNumber: true,
+            vin: true,
+            make: true,
+            model: true,
+            year: true,
+            licensePlate: true,
+            licensePlateState: true,
+        },
+        orderBy: { unitNumber: "asc" },
+    });
+
+    return vehicles.map(v => ({
+        id: v.id,
+        label: `Unit ${v.unitNumber}${v.make ? ` — ${v.year ?? ""} ${v.make} ${v.model ?? ""}`.trim() : ""}`,
+        unitNumber: v.unitNumber,
+        vin: v.vin,
+        make: v.make,
+        model: v.model,
+        year: v.year,
+        licensePlate: v.licensePlate,
+        licensePlateState: v.licensePlateState,
+    }));
 }
 
 export async function deleteDocumentRecord(documentId: string) {
