@@ -55,19 +55,23 @@ export default async function DashboardPage() {
             const upcomingExpirations: DashboardStats["upcomingExpirations"] = [];
 
             for (const d of expiringDrivers) {
-                const cdlDays = Math.ceil((d.cdlExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                if (cdlDays <= 60) {
-                    upcomingExpirations.push({
-                        id: `cdl-${d.id}`, title: `CDL Expiration — ${d.firstName} ${d.lastName}`,
-                        date: d.cdlExpiration.toISOString(), type: "driver", daysLeft: cdlDays,
-                    });
+                if (d.cdlExpiration) {
+                    const cdlDays = Math.ceil((d.cdlExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    if (cdlDays <= 60) {
+                        upcomingExpirations.push({
+                            id: `cdl-${d.id}`, title: `CDL Expiration — ${d.firstName} ${d.lastName}`,
+                            date: d.cdlExpiration.toISOString(), type: "driver", daysLeft: cdlDays,
+                        });
+                    }
                 }
-                const medDays = Math.ceil((d.medicalCardExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                if (medDays <= 60) {
-                    upcomingExpirations.push({
-                        id: `med-${d.id}`, title: `Medical Card — ${d.firstName} ${d.lastName}`,
-                        date: d.medicalCardExpiration.toISOString(), type: "driver", daysLeft: medDays,
-                    });
+                if (d.medicalCardExpiration) {
+                    const medDays = Math.ceil((d.medicalCardExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    if (medDays <= 60) {
+                        upcomingExpirations.push({
+                            id: `med-${d.id}`, title: `Medical Card — ${d.firstName} ${d.lastName}`,
+                            date: d.medicalCardExpiration.toISOString(), type: "driver", daysLeft: medDays,
+                        });
+                    }
                 }
             }
 

@@ -10,10 +10,11 @@ export default async function DriversPage() {
         lastName: string;
         email: string | null;
         phone: string | null;
-        cdlNumber: string;
-        cdlState: string;
-        cdlExpiration: string;
-        medicalCardExpiration: string;
+        licenseType?: string;
+        cdlNumber: string | null;
+        cdlState: string | null;
+        cdlExpiration: string | null;
+        medicalCardExpiration: string | null;
         status: string;
         _count: { documents: number; violations: number };
     }> = [];
@@ -39,10 +40,11 @@ export default async function DriversPage() {
                 lastName: d.lastName,
                 email: d.email,
                 phone: d.phone,
+                licenseType: d.licenseType,
                 cdlNumber: d.cdlNumber,
                 cdlState: d.cdlState,
-                cdlExpiration: d.cdlExpiration.toISOString(),
-                medicalCardExpiration: d.medicalCardExpiration.toISOString(),
+                cdlExpiration: d.cdlExpiration?.toISOString() ?? null,
+                medicalCardExpiration: d.medicalCardExpiration?.toISOString() ?? null,
                 status: d.status,
                 _count: d._count,
             }));

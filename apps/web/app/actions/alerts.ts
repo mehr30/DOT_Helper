@@ -63,42 +63,46 @@ export async function generateAlerts(): Promise<{ generated: number }> {
     });
 
     for (const d of drivers) {
-        const cdlDays = daysUntil(d.cdlExpiration);
-        if (cdlDays <= 60) {
-            const expired = cdlDays <= 0;
-            candidates.push({
-                sourceKey: `cdl-exp:${d.id}`,
-                alertType: "EXPIRATION_WARNING",
-                title: expired
-                    ? `CDL Expired — ${d.firstName} ${d.lastName}`
-                    : `CDL Expiring — ${d.firstName} ${d.lastName}`,
-                message: expired
-                    ? `CDL ${d.cdlNumber} (${d.cdlState}) expired ${Math.abs(cdlDays)} days ago. Driver is non-compliant and cannot operate a CMV until renewed.`
-                    : `CDL ${d.cdlNumber} (${d.cdlState}) expires in ${cdlDays} days. Schedule renewal to avoid compliance lapse.`,
-                dueDate: d.cdlExpiration,
-                severity: getSeverity(cdlDays),
-                entityType: "driver",
-                entityId: d.id,
-            });
+        if (d.cdlExpiration) {
+            const cdlDays = daysUntil(d.cdlExpiration);
+            if (cdlDays <= 60) {
+                const expired = cdlDays <= 0;
+                candidates.push({
+                    sourceKey: `cdl-exp:${d.id}`,
+                    alertType: "EXPIRATION_WARNING",
+                    title: expired
+                        ? `CDL Expired — ${d.firstName} ${d.lastName}`
+                        : `CDL Expiring — ${d.firstName} ${d.lastName}`,
+                    message: expired
+                        ? `CDL ${d.cdlNumber ?? ""} (${d.cdlState ?? ""}) expired ${Math.abs(cdlDays)} days ago. Driver is non-compliant and cannot operate a CMV until renewed.`
+                        : `CDL ${d.cdlNumber ?? ""} (${d.cdlState ?? ""}) expires in ${cdlDays} days. Schedule renewal to avoid compliance lapse.`,
+                    dueDate: d.cdlExpiration,
+                    severity: getSeverity(cdlDays),
+                    entityType: "driver",
+                    entityId: d.id,
+                });
+            }
         }
 
-        const medDays = daysUntil(d.medicalCardExpiration);
-        if (medDays <= 60) {
-            const expired = medDays <= 0;
-            candidates.push({
-                sourceKey: `med-exp:${d.id}`,
-                alertType: "EXPIRATION_WARNING",
-                title: expired
-                    ? `Medical Card Expired — ${d.firstName} ${d.lastName}`
-                    : `Medical Card Expiring — ${d.firstName} ${d.lastName}`,
-                message: expired
-                    ? `Medical examiner's certificate expired ${Math.abs(medDays)} days ago. Driver cannot operate a CMV until a new certificate is filed.`
-                    : `Medical examiner's certificate expires in ${medDays} days. Schedule a DOT physical to avoid a compliance gap.`,
-                dueDate: d.medicalCardExpiration,
-                severity: getSeverity(medDays),
-                entityType: "driver",
-                entityId: d.id,
-            });
+        if (d.medicalCardExpiration) {
+            const medDays = daysUntil(d.medicalCardExpiration);
+            if (medDays <= 60) {
+                const expired = medDays <= 0;
+                candidates.push({
+                    sourceKey: `med-exp:${d.id}`,
+                    alertType: "EXPIRATION_WARNING",
+                    title: expired
+                        ? `Medical Card Expired — ${d.firstName} ${d.lastName}`
+                        : `Medical Card Expiring — ${d.firstName} ${d.lastName}`,
+                    message: expired
+                        ? `Medical examiner's certificate expired ${Math.abs(medDays)} days ago. Driver cannot operate a CMV until a new certificate is filed.`
+                        : `Medical examiner's certificate expires in ${medDays} days. Schedule a DOT physical to avoid a compliance gap.`,
+                    dueDate: d.medicalCardExpiration,
+                    severity: getSeverity(medDays),
+                    entityType: "driver",
+                    entityId: d.id,
+                });
+            }
         }
 
         // Clearinghouse annual query check

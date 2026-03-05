@@ -7,17 +7,46 @@ export const driverCreateSchema = z.object({
     lastName: z.string().min(1, "Last name is required").max(100),
     email: z.string().email("Invalid email").optional().or(z.literal("")),
     phone: z.string().max(20).optional().or(z.literal("")),
-    cdlNumber: z.string().min(1, "CDL number is required").max(30),
-    cdlState: z.string().min(2, "CDL state is required").max(2),
-    cdlClass: cdlClassEnum.default("A"),
-    cdlExpiration: z.string().min(1, "CDL expiration is required"),
-    medicalCardExpiration: z.string().min(1, "Medical card expiration is required"),
+    licenseType: z.enum(["CDL", "NON_CDL"]).default("CDL"),
+    cdlNumber: z.string().max(30).optional().or(z.literal("")),
+    cdlState: z.string().max(2).optional().or(z.literal("")),
+    cdlClass: cdlClassEnum.optional(),
+    cdlExpiration: z.string().optional().or(z.literal("")),
+    medicalCardExpiration: z.string().optional().or(z.literal("")),
     hireDate: z.string().min(1, "Hire date is required"),
     endorsements: z.array(z.string()).default([]),
+}).superRefine((data, ctx) => {
+    // CDL fields are required when license type is CDL
+    if (data.licenseType === "CDL") {
+        if (!data.cdlNumber?.trim()) {
+            ctx.addIssue({ code: "custom", message: "License number is required for CDL drivers", path: ["cdlNumber"] });
+        }
+        if (!data.cdlState?.trim()) {
+            ctx.addIssue({ code: "custom", message: "Issuing state is required for CDL drivers", path: ["cdlState"] });
+        }
+        if (!data.cdlExpiration) {
+            ctx.addIssue({ code: "custom", message: "License expiration is required for CDL drivers", path: ["cdlExpiration"] });
+        }
+        if (!data.medicalCardExpiration) {
+            ctx.addIssue({ code: "custom", message: "Medical card expiration is required for CDL drivers", path: ["medicalCardExpiration"] });
+        }
+    }
 });
 
-export const driverUpdateSchema = driverCreateSchema.partial().extend({
+export const driverUpdateSchema = z.object({
     id: z.string().min(1),
+    firstName: z.string().min(1).max(100).optional(),
+    lastName: z.string().min(1).max(100).optional(),
+    email: z.string().email("Invalid email").optional().or(z.literal("")),
+    phone: z.string().max(20).optional().or(z.literal("")),
+    licenseType: z.enum(["CDL", "NON_CDL"]).optional(),
+    cdlNumber: z.string().max(30).optional().or(z.literal("")),
+    cdlState: z.string().max(2).optional().or(z.literal("")),
+    cdlClass: cdlClassEnum.optional(),
+    cdlExpiration: z.string().optional().or(z.literal("")),
+    medicalCardExpiration: z.string().optional().or(z.literal("")),
+    hireDate: z.string().optional(),
+    endorsements: z.array(z.string()).optional(),
 });
 
 export type DriverCreateInput = z.input<typeof driverCreateSchema>;

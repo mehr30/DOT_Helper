@@ -98,23 +98,27 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     for (const d of drivers) {
         const name = `${d.firstName} ${d.lastName}`;
 
-        // CDL validity
-        const cdlDays = daysUntil(d.cdlExpiration);
-        dqItems.push({
-            label: `CDL Current — ${name}`,
-            regulation: "49 CFR 391.11",
-            status: cdlDays <= 0 ? "expired" : cdlDays <= 30 ? "action_needed" : "compliant",
-            detail: cdlDays <= 0 ? `Expired ${Math.abs(cdlDays)} days ago` : `${cdlDays} days remaining`,
-        });
+        // CDL / License validity
+        if (d.cdlExpiration) {
+            const cdlDays = daysUntil(d.cdlExpiration);
+            dqItems.push({
+                label: `License Current — ${name}`,
+                regulation: "49 CFR 391.11",
+                status: cdlDays <= 0 ? "expired" : cdlDays <= 30 ? "action_needed" : "compliant",
+                detail: cdlDays <= 0 ? `Expired ${Math.abs(cdlDays)} days ago` : `${cdlDays} days remaining`,
+            });
+        }
 
         // Medical certificate
-        const medDays = daysUntil(d.medicalCardExpiration);
-        dqItems.push({
-            label: `Medical Certificate — ${name}`,
-            regulation: "49 CFR 391.43",
-            status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
-            detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
-        });
+        if (d.medicalCardExpiration) {
+            const medDays = daysUntil(d.medicalCardExpiration);
+            dqItems.push({
+                label: `Medical Certificate — ${name}`,
+                regulation: "49 CFR 391.43",
+                status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
+                detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
+            });
+        }
 
         // MVR on file
         const hasMVR = hasDoc("MVR", { driverId: d.id });

@@ -127,16 +127,17 @@ model Driver {
   dateOfBirth           DateTime?
   ssn                   String?      // Last 4 digits only for verification
   
-  // CDL Information
-  cdlNumber             String
-  cdlState              String
-  cdlClass              CDLClass     @default(A)
-  cdlExpiration         DateTime
+  // License Information
+  licenseType           String       @default("CDL")   // "CDL" or "NON_CDL"
+  cdlNumber             String?
+  cdlState              String?
+  cdlClass              CDLClass?
+  cdlExpiration         DateTime?
   endorsements          String[]     // ["H", "N", "T", "P", "S", "X"]
   restrictions          String[]
-  
-  // Medical Certification
-  medicalCardExpiration DateTime
+
+  // Medical Certification (required for CDL, optional for non-CDL)
+  medicalCardExpiration DateTime?
   medicalExaminerName   String?
   medicalExaminerNPI    String?
   

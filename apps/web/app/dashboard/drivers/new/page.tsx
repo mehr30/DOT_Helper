@@ -5,24 +5,36 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, HelpCircle } from "lucide-react";
 import { driverCreateSchema, type DriverCreateInput } from "../../../../lib/validations/driver";
 import { createDriver } from "../../../actions/drivers";
 
 export default function NewDriverPage() {
     const router = useRouter();
     const [serverError, setServerError] = useState("");
+    const [licenseType, setLicenseType] = useState<"CDL" | "NON_CDL">("CDL");
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<DriverCreateInput>({
         resolver: zodResolver(driverCreateSchema),
         defaultValues: {
+            licenseType: "CDL",
             cdlClass: "A",
             endorsements: [],
         },
     });
+
+    const handleLicenseTypeChange = (type: "CDL" | "NON_CDL") => {
+        setLicenseType(type);
+        setValue("licenseType", type);
+        if (type === "NON_CDL") {
+            setValue("cdlClass", undefined);
+            setValue("endorsements", []);
+        }
+    };
 
     const onSubmit = async (data: DriverCreateInput) => {
         setServerError("");
@@ -46,7 +58,7 @@ export default function NewDriverPage() {
 
             <h1 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "0.5rem" }}>Add New Driver</h1>
             <p style={{ color: "#64748b", marginBottom: "2rem" }}>
-                Enter the driver&apos;s details and qualification information.
+                Enter the driver&apos;s details and license information.
             </p>
 
             {serverError && (
@@ -60,6 +72,7 @@ export default function NewDriverPage() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Basic Info */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
                     <div>
                         <label style={labelStyle}>First Name *</label>
@@ -84,43 +97,133 @@ export default function NewDriverPage() {
                     </div>
                 </div>
 
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "1rem", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>
-                    CDL Information
+                {/* License Type Selector */}
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "0.75rem", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>
+                    License Information
                 </h3>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
-                    <div>
-                        <label style={labelStyle}>CDL Number *</label>
-                        <input {...register("cdlNumber")} placeholder="D1234567" style={inputStyle} />
-                        {errors.cdlNumber && <span style={errorStyle}>{errors.cdlNumber.message}</span>}
-                    </div>
-                    <div>
-                        <label style={labelStyle}>CDL State *</label>
-                        <input {...register("cdlState")} placeholder="KS" maxLength={2} style={inputStyle} />
-                        {errors.cdlState && <span style={errorStyle}>{errors.cdlState.message}</span>}
-                    </div>
-                    <div>
-                        <label style={labelStyle}>CDL Class</label>
-                        <select {...register("cdlClass")} style={inputStyle}>
-                            <option value="A">Class A</option>
-                            <option value="B">Class B</option>
-                            <option value="C">Class C</option>
-                        </select>
+                <div style={{ marginBottom: "1.25rem" }}>
+                    <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                        What type of license does this driver have?
+                        <span
+                            title="CDL (Commercial Driver's License) is required for vehicles over 26,001 lbs, buses with 16+ passengers, or hazmat transport. Most pickup trucks and vans only need a regular license."
+                            style={{ cursor: "help", color: "#94a3b8" }}
+                        >
+                            <HelpCircle size={14} />
+                        </span>
+                    </label>
+                    <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.35rem" }}>
+                        <button
+                            type="button"
+                            onClick={() => handleLicenseTypeChange("CDL")}
+                            style={{
+                                flex: 1, padding: "0.85rem 1rem", borderRadius: "10px",
+                                border: licenseType === "CDL" ? "2px solid var(--color-brand-green, #22c55e)" : "1px solid #e2e8f0",
+                                background: licenseType === "CDL" ? "#f0fdf4" : "white",
+                                cursor: "pointer", textAlign: "left",
+                            }}
+                        >
+                            <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "#0f172a" }}>CDL</div>
+                            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.15rem" }}>
+                                Commercial Driver&apos;s License (Class A, B, or C)
+                            </div>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleLicenseTypeChange("NON_CDL")}
+                            style={{
+                                flex: 1, padding: "0.85rem 1rem", borderRadius: "10px",
+                                border: licenseType === "NON_CDL" ? "2px solid var(--color-brand-green, #22c55e)" : "1px solid #e2e8f0",
+                                background: licenseType === "NON_CDL" ? "#f0fdf4" : "white",
+                                cursor: "pointer", textAlign: "left",
+                            }}
+                        >
+                            <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "#0f172a" }}>Regular License</div>
+                            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.15rem" }}>
+                                Standard driver&apos;s license (non-CDL)
+                            </div>
+                        </button>
                     </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
-                    <div>
-                        <label style={labelStyle}>CDL Expiration *</label>
-                        <input {...register("cdlExpiration")} type="date" style={inputStyle} />
-                        {errors.cdlExpiration && <span style={errorStyle}>{errors.cdlExpiration.message}</span>}
-                    </div>
-                    <div>
-                        <label style={labelStyle}>Medical Card Expiration *</label>
-                        <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
-                        {errors.medicalCardExpiration && <span style={errorStyle}>{errors.medicalCardExpiration.message}</span>}
-                    </div>
-                </div>
+                {/* CDL-specific fields */}
+                {licenseType === "CDL" && (
+                    <>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+                            <div>
+                                <label style={labelStyle}>CDL Number *</label>
+                                <input {...register("cdlNumber")} placeholder="D1234567" style={inputStyle} />
+                                {errors.cdlNumber && <span style={errorStyle}>{errors.cdlNumber.message}</span>}
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Issuing State *</label>
+                                <input {...register("cdlState")} placeholder="KS" maxLength={2} style={inputStyle} />
+                                {errors.cdlState && <span style={errorStyle}>{errors.cdlState.message}</span>}
+                            </div>
+                            <div>
+                                <label style={labelStyle}>CDL Class</label>
+                                <select {...register("cdlClass")} style={inputStyle}>
+                                    <option value="A">Class A — Tractor-trailers, semis</option>
+                                    <option value="B">Class B — Straight trucks, buses</option>
+                                    <option value="C">Class C — Small vehicles (hazmat/passenger)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+                            <div>
+                                <label style={labelStyle}>CDL Expiration *</label>
+                                <input {...register("cdlExpiration")} type="date" style={inputStyle} />
+                                {errors.cdlExpiration && <span style={errorStyle}>{errors.cdlExpiration.message}</span>}
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Medical Card Expiration *</label>
+                                <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
+                                {errors.medicalCardExpiration && <span style={errorStyle}>{errors.medicalCardExpiration.message}</span>}
+                                <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
+                                    DOT medical certificate — usually valid for 2 years
+                                </span>
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* Non-CDL fields */}
+                {licenseType === "NON_CDL" && (
+                    <>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+                            <div>
+                                <label style={labelStyle}>License Number</label>
+                                <input {...register("cdlNumber")} placeholder="D1234567" style={inputStyle} />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Issuing State</label>
+                                <input {...register("cdlState")} placeholder="KS" maxLength={2} style={inputStyle} />
+                            </div>
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+                            <div>
+                                <label style={labelStyle}>License Expiration</label>
+                                <input {...register("cdlExpiration")} type="date" style={inputStyle} />
+                            </div>
+                            <div>
+                                <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                    Medical Card Expiration
+                                    <span
+                                        title="A DOT medical card may be required even without a CDL if the driver operates a vehicle over 10,001 lbs in interstate commerce."
+                                        style={{ cursor: "help", color: "#94a3b8" }}
+                                    >
+                                        <HelpCircle size={14} />
+                                    </span>
+                                </label>
+                                <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
+                                <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
+                                    Only needed if operating vehicles over 10,001 lbs interstate
+                                </span>
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 <div style={{ marginBottom: "1.5rem" }}>
                     <label style={labelStyle}>Hire Date *</label>
@@ -132,7 +235,7 @@ export default function NewDriverPage() {
                     <button type="submit" disabled={isSubmitting} style={{
                         display: "flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.65rem 1.5rem", borderRadius: "8px",
-                        border: "none", background: "#3b82f6", color: "white",
+                        border: "none", background: "var(--color-brand-green, #22c55e)", color: "white",
                         fontSize: "0.9rem", fontWeight: 600, cursor: isSubmitting ? "not-allowed" : "pointer",
                         opacity: isSubmitting ? 0.7 : 1,
                     }}>

@@ -57,10 +57,11 @@ interface DriverRow {
     lastName: string;
     email: string | null;
     phone: string | null;
-    cdlNumber: string;
-    cdlState: string;
-    cdlExpiration: string;
-    medicalCardExpiration: string;
+    licenseType?: string;
+    cdlNumber: string | null;
+    cdlState: string | null;
+    cdlExpiration: string | null;
+    medicalCardExpiration: string | null;
     status: string;
     _count?: { documents: number; violations: number };
 }
@@ -88,8 +89,10 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
         ...d,
         email: d.email ?? "",
         phone: d.phone ?? "",
-        cdlExpiration: typeof d.cdlExpiration === "string" ? d.cdlExpiration : new Date(d.cdlExpiration).toISOString(),
-        medicalCardExpiration: typeof d.medicalCardExpiration === "string" ? d.medicalCardExpiration : new Date(d.medicalCardExpiration).toISOString(),
+        cdlNumber: d.cdlNumber ?? null,
+        cdlState: d.cdlState ?? null,
+        cdlExpiration: d.cdlExpiration ? (typeof d.cdlExpiration === "string" ? d.cdlExpiration : new Date(d.cdlExpiration).toISOString()) : null,
+        medicalCardExpiration: d.medicalCardExpiration ? (typeof d.medicalCardExpiration === "string" ? d.medicalCardExpiration : new Date(d.medicalCardExpiration).toISOString()) : null,
         complianceScore: 0,
         missingDocs: 0,
         expiringDocs: 0,
@@ -195,7 +198,7 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                     <thead>
                         <tr>
                             <th>Driver</th>
-                            <th>CDL Info</th>
+                            <th>License</th>
                             <th>Medical Card</th>
                             <th>Status</th>
                             <th></th>
@@ -203,8 +206,8 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                     </thead>
                     <tbody>
                         {filteredDrivers.map((driver) => {
-                            const cdlDays = getDaysUntil(driver.cdlExpiration);
-                            const medDays = getDaysUntil(driver.medicalCardExpiration);
+                            const cdlDays = driver.cdlExpiration ? getDaysUntil(driver.cdlExpiration) : null;
+                            const medDays = driver.medicalCardExpiration ? getDaysUntil(driver.medicalCardExpiration) : null;
 
                             return (
                                 <tr key={driver.id}>
@@ -223,22 +226,38 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                                     </td>
                                     <td>
                                         <div className={styles.cdlInfo}>
-                                            <span className={styles.cdlNumber}>{driver.cdlNumber}</span>
-                                            <span className={styles.cdlExpiry}>
-                                                {cdlDays <= 30 && <Clock size={12} className={styles.warningIcon} />}
-                                                Exp: {formatDate(driver.cdlExpiration)}
-                                            </span>
+                                            {driver.cdlNumber ? (
+                                                <>
+                                                    <span className={styles.cdlNumber}>{driver.cdlNumber}</span>
+                                                    {driver.cdlExpiration && (
+                                                        <span className={styles.cdlExpiry}>
+                                                            {cdlDays !== null && cdlDays <= 30 && <Clock size={12} className={styles.warningIcon} />}
+                                                            Exp: {formatDate(driver.cdlExpiration)}
+                                                        </span>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <span style={{ color: "#94a3b8", fontSize: "0.8rem" }}>
+                                                    {("licenseType" in driver && driver.licenseType === "NON_CDL") ? "Non-CDL" : "—"}
+                                                </span>
+                                            )}
                                         </div>
                                     </td>
                                     <td>
                                         <div className={styles.medicalInfo}>
-                                            <span className={`${styles.medicalExpiry} ${medDays <= 30 ? styles.expiringSoon : ""}`}>
-                                                {medDays <= 30 && <AlertTriangle size={12} />}
-                                                {formatDate(driver.medicalCardExpiration)}
-                                            </span>
-                                            <span className={styles.daysLeft}>
-                                                {medDays} days left
-                                            </span>
+                                            {driver.medicalCardExpiration ? (
+                                                <>
+                                                    <span className={`${styles.medicalExpiry} ${medDays !== null && medDays <= 30 ? styles.expiringSoon : ""}`}>
+                                                        {medDays !== null && medDays <= 30 && <AlertTriangle size={12} />}
+                                                        {formatDate(driver.medicalCardExpiration)}
+                                                    </span>
+                                                    <span className={styles.daysLeft}>
+                                                        {medDays !== null && medDays > 0 ? `${medDays} days left` : "Expired"}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span style={{ color: "#94a3b8", fontSize: "0.8rem" }}>—</span>
+                                            )}
                                         </div>
                                     </td>
                                     <td>

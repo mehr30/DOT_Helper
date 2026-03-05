@@ -25,11 +25,12 @@ interface DriverData {
     lastName: string;
     email: string | null;
     phone: string | null;
-    cdlNumber: string;
-    cdlState: string;
-    cdlClass: string;
-    cdlExpiration: string;
-    medicalCardExpiration: string;
+    licenseType: string;
+    cdlNumber: string | null;
+    cdlState: string | null;
+    cdlClass: string | null;
+    cdlExpiration: string | null;
+    medicalCardExpiration: string | null;
     hireDate: string;
     status: string;
     endorsements: string[];
@@ -64,8 +65,9 @@ function getDaysUntil(dateStr: string) {
 }
 
 export default function DriverDetail({ driver }: { driver: DriverData }) {
-    const cdlDays = getDaysUntil(driver.cdlExpiration);
-    const medDays = getDaysUntil(driver.medicalCardExpiration);
+    const cdlDays = driver.cdlExpiration ? getDaysUntil(driver.cdlExpiration) : null;
+    const medDays = driver.medicalCardExpiration ? getDaysUntil(driver.medicalCardExpiration) : null;
+    const isCDL = driver.licenseType === "CDL";
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -121,38 +123,57 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                 display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                 gap: "1rem", marginBottom: "2rem",
             }}>
-                {/* CDL Card */}
+                {/* License Card */}
                 <div style={{
                     background: "white", borderRadius: "12px", padding: "1.25rem",
                     border: "1px solid #e2e8f0",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem", color: "#3b82f6" }}>
                         <Shield size={18} />
-                        <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>CDL Information</span>
+                        <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                            {isCDL ? "CDL Information" : "License Information"}
+                        </span>
+                        {!isCDL && (
+                            <span style={{
+                                fontSize: "0.7rem", fontWeight: 600, padding: "0.1rem 0.4rem",
+                                borderRadius: "4px", background: "#f1f5f9", color: "#64748b",
+                            }}>Non-CDL</span>
+                        )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Number</span>
-                            <span style={{ fontWeight: 500, fontFamily: "monospace" }}>{driver.cdlNumber}</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>State</span>
-                            <span style={{ fontWeight: 500 }}>{driver.cdlState}</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Class</span>
-                            <span style={{ fontWeight: 500 }}>{driver.cdlClass}</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Expires</span>
-                            <span style={{
-                                fontWeight: 500,
-                                color: cdlDays <= 30 ? "#dc2626" : cdlDays <= 60 ? "#d97706" : "#0f172a",
-                            }}>
-                                {formatDate(driver.cdlExpiration)}
-                                {cdlDays <= 30 && <AlertTriangle size={12} style={{ marginLeft: 4, verticalAlign: "middle" }} />}
-                            </span>
-                        </div>
+                        {driver.cdlNumber && (
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Number</span>
+                                <span style={{ fontWeight: 500, fontFamily: "monospace" }}>{driver.cdlNumber}</span>
+                            </div>
+                        )}
+                        {driver.cdlState && (
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "#64748b", fontSize: "0.85rem" }}>State</span>
+                                <span style={{ fontWeight: 500 }}>{driver.cdlState}</span>
+                            </div>
+                        )}
+                        {isCDL && driver.cdlClass && (
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Class</span>
+                                <span style={{ fontWeight: 500 }}>Class {driver.cdlClass}</span>
+                            </div>
+                        )}
+                        {driver.cdlExpiration && (
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Expires</span>
+                                <span style={{
+                                    fontWeight: 500,
+                                    color: cdlDays !== null && cdlDays <= 30 ? "#dc2626" : cdlDays !== null && cdlDays <= 60 ? "#d97706" : "#0f172a",
+                                }}>
+                                    {formatDate(driver.cdlExpiration)}
+                                    {cdlDays !== null && cdlDays <= 30 && <AlertTriangle size={12} style={{ marginLeft: 4, verticalAlign: "middle" }} />}
+                                </span>
+                            </div>
+                        )}
+                        {!driver.cdlNumber && !driver.cdlExpiration && (
+                            <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>No license details on file</span>
+                        )}
                     </div>
                     {driver.endorsements.length > 0 && (
                         <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
@@ -176,24 +197,34 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                         <FileText size={18} />
                         <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>Medical Card</span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Expires</span>
-                        <span style={{
-                            fontWeight: 500,
-                            color: medDays <= 30 ? "#dc2626" : medDays <= 60 ? "#d97706" : "#0f172a",
-                        }}>
-                            {formatDate(driver.medicalCardExpiration)}
+                    {driver.medicalCardExpiration ? (
+                        <>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Expires</span>
+                                <span style={{
+                                    fontWeight: 500,
+                                    color: medDays !== null && medDays <= 30 ? "#dc2626" : medDays !== null && medDays <= 60 ? "#d97706" : "#0f172a",
+                                }}>
+                                    {formatDate(driver.medicalCardExpiration)}
+                                </span>
+                            </div>
+                            {medDays !== null && (
+                                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem" }}>
+                                    <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Days left</span>
+                                    <span style={{
+                                        fontWeight: 600,
+                                        color: medDays <= 30 ? "#dc2626" : medDays <= 60 ? "#d97706" : "#059669",
+                                    }}>
+                                        {medDays > 0 ? `${medDays} days` : `${Math.abs(medDays)} days overdue`}
+                                    </span>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>
+                            {isCDL ? "Not on file — required for CDL drivers" : "Not on file"}
                         </span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem" }}>
-                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Days left</span>
-                        <span style={{
-                            fontWeight: 600,
-                            color: medDays <= 30 ? "#dc2626" : medDays <= 60 ? "#d97706" : "#059669",
-                        }}>
-                            {medDays > 0 ? `${medDays} days` : `${Math.abs(medDays)} days overdue`}
-                        </span>
-                    </div>
+                    )}
                 </div>
 
                 {/* Employment */}
