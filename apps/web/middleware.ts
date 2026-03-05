@@ -34,8 +34,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // Check for better-auth session cookie
-    const sessionCookie = request.cookies.get("better-auth.session_token");
+    // Check for better-auth session cookie (prefixed with __Secure- on HTTPS)
+    const sessionCookie =
+        request.cookies.get("__Secure-better-auth.session_token") ||
+        request.cookies.get("better-auth.session_token");
 
     // If accessing a protected route without a session, redirect to login
     const isProtectedPath = protectedPaths.some(
