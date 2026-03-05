@@ -2,6 +2,7 @@ import { getServerSession } from "../../lib/session";
 import { prisma } from "@repo/database";
 import DashboardContent from "./DashboardContent";
 import type { DashboardStats } from "../actions/dashboard";
+import { generateAlerts } from "../actions/alerts";
 
 export default async function DashboardPage() {
     const session = await getServerSession();
@@ -15,6 +16,10 @@ export default async function DashboardPage() {
 
         if (user?.companyId) {
             const companyId = user.companyId;
+
+            // Refresh auto-generated alerts from current data
+            try { await generateAlerts(); } catch { /* ok */ }
+
             const now = new Date();
             const sixtyDaysFromNow = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
