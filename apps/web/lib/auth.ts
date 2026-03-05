@@ -18,10 +18,13 @@ async function sendEmail(to: string, subject: string, html: string) {
     await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
 }
 
+const baseURL = process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app";
+
 export const auth = betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app",
+    baseURL,
     trustHost: true,
     trustedOrigins: [
+        baseURL,
         "https://dot-helper-web.vercel.app",
         "http://localhost:3000"
     ],
