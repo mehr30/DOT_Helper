@@ -1,169 +1,68 @@
-# DOT Helper — Project Context
+# AI Handoff Context: DOT Helper
 
-## Overview
-DOT Helper is a SaaS platform (web + mobile) that helps small business fleet owners achieve and maintain DOT/FMCSA compliance. Built as a Turborepo monorepo. Live at **https://dot-helper-web.vercel.app**.
+> **Note to Claude/AI agent**: This file serves as your canonical source of truth for the DOT Helper codebase. Read this entire document before executing any commands or making code changes.
 
-## Tech Stack
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Monorepo | Turborepo | 2.8.3 |
-| Web App | Next.js (App Router) | 16.1.5 |
-| Mobile App | Expo / React Native | 54 / 0.81.5 |
-| Styling | CSS Modules + globals.css | — |
-| Icons | Lucide React | 0.487.0 |
-| Database | Prisma + PostgreSQL (Neon) | 6.19.2 |
-| Payments | Stripe (stripe + @stripe/stripe-js) | — |
-| Auth | better-auth (email/password + Google/Apple OAuth) | 1.5.3 |
-| Language | TypeScript | 5.9.2 |
+## 1. Project Overview & Architecture
+DOT Helper is a SaaS platform designed to help small business fleet owners (1-50 vehicles) achieve and maintain FMCSA/DOT compliance.
+- **Framework**: Turborepo monorepo (`apps/web` Next.js 16 App Router, `apps/mobile` Expo React Native).
+- **Database**: PostgreSQL hosted on **Neon** (`packages/database/prisma/schema.prisma`).
+- **Auth**: `better-auth` v1.5 with Prisma adapter.
+- **Deployment**: Vercel (Production URL: `https://dot-helper-web.vercel.app`).
 
-## Monorepo Structure
-```
-DOT_Helper/
-├── apps/
-│   ├── web/          # Next.js 16 web app (port 3000)
-│   │   ├── app/
-│   │   │   ├── page.tsx              # Marketing landing page (w/ product showcase)
-│   │   │   ├── layout.tsx            # Root layout w/ SEO meta + JSON-LD
-│   │   │   ├── globals.css           # Design system (CSS custom properties)
-│   │   │   ├── pricing/              # Stripe-integrated pricing page
-│   │   │   ├── login/                # Login page (email + Google/Apple OAuth)
-│   │   │   ├── register/             # Registration page
-│   │   │   ├── features/             # Features page
-│   │   │   ├── blog/                 # Blog index + 55 SEO-optimized posts
-│   │   │   │   ├── BlogPostLayout.tsx  # Shared blog post component
-│   │   │   │   ├── blog.module.css     # Blog styling
-│   │   │   │   └── [slug]/page.tsx     # Individual post pages
-│   │   │   ├── checkout/             # Stripe success/cancel pages
-│   │   │   ├── api/auth/[...all]/    # better-auth API catch-all route
-│   │   │   ├── actions/stripe.ts     # Stripe Server Actions
-│   │   │   ├── robots.ts             # SEO robots.txt
-│   │   │   ├── sitemap.ts            # SEO sitemap.xml (55 blog URLs)
-│   │   │   ├── components/
-│   │   │   │   ├── Sidebar.tsx         # Dashboard sidebar nav
-│   │   │   │   ├── DemoModeContext.tsx  # Demo mode state (activates via ?demo=true)
-│   │   │   │   ├── AuthProvider.tsx     # No-op wrapper (better-auth handles sessions)
-│   │   │   │   └── Sidebar.module.css
-│   │   │   └── dashboard/
-│   │   │       ├── page.tsx          # Dashboard overview
-│   │   │       ├── compliance/       # Compliance checklist
-│   │   │       ├── alerts/           # Alerts & notifications
-│   │   │       ├── drivers/          # Driver management
-│   │   │       ├── vehicles/         # Vehicle management
-│   │   │       ├── hos/              # Hours of Service
-│   │   │       └── documents/        # Document management + compliance wizard
-│   │   ├── lib/
-│   │   │   ├── auth.ts              # better-auth server (Prisma adapter, PostgreSQL)
-│   │   │   └── auth-client.ts       # better-auth React client (signIn, signUp, signOut, useSession)
-│   │   ├── middleware.ts            # Route protection (/dashboard requires session, ?demo=true bypasses)
-│   │   ├── public/screenshots/      # Marketing screenshots (dashboard, drivers, compliance)
-│   │   └── .env.example             # Template for env vars
-│   └── mobile/       # Expo React Native app
-│       ├── App.tsx                   # Main app with tab nav
-│       └── screens/                  # Screen components
-├── packages/
-│   ├── database/     # Prisma schema + client
-│   │   └── prisma/schema.prisma     # 14 models + better-auth tables
-│   ├── ui/           # Shared React component library
-│   ├── eslint-config/
-│   └── typescript-config/
-```
+## 2. Current State (As of Last Session)
+We just completed **Phase 1: Security & Auth Hardening** and **Pricing Updates**.
+- **Auth**: Fully functioning email/password signup, login, password reset (`/forgot-password`, `/reset-password`), and email verification workflows.
+- **Emails (Resend)**: Configured in `apps/web/lib/auth.ts`. We use a custom `sendEmail` lazy-loaded wrapper so the build doesn't crash if the env var is missing. **The user's Resend API key is `re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW`.** It MUST be set in Vercel.
+- **Production Login Bug Fix**: In `lib/auth.ts`, `baseURL` is heavily enforced. `trustHost: true` and explicit `trustedOrigins` have been added to fix CORS/Vercel proxy issues.
+- **Pricing**: $49/mo (Starter), $99/mo (Growth), $199/mo (Fleet). Flat-fee, not per-driver. Added $11,000 fine ROI conversion copy.
+- **Demo Mode**: `?demo=true` in the URL bypasses the `middleware.ts` auth check to allow taking marketing screenshots.
+- **Dashboard Data**: Currently, all dashboard components use *hardcoded/mock data* inside of their `page.tsx` or components files.
 
-## Commands
+## 3. Immediate Next Steps (Phase 2: Wiring Data)
+Your primary objective when picking up this session is to begin **Phase 2 — Wiring Dashboard to Real Data**:
+1. **Company Onboarding**: After signup, a user must create/join a `Company` record. The `User` model has a relation to `Company`.
+2. **Driver & Vehicle CRUD**: Wire the `apps/web/app/dashboard/drivers` and `vehicles` pages to fetch and mutate real data from the Neon database via Server Actions or standard API routes.
+3. **Remove Mock Data**: Systematically replace the inline arrays in the dashboard components with real database fetch calls.
+
+*Do not start working on Stripe or advanced analytics until the core CRUD functionality for Drivers and Vehicles is wired to the database.*
+
+## 4. Key Files to Know
+- **`apps/web/lib/auth.ts`**: The `better-auth` configuration (database adapter, email sending handlers, security settings).
+- **`apps/web/lib/auth-client.ts`**: The React client export for `better-auth` (`signIn`, `signUp`, etc.).
+- **`apps/web/middleware.ts`**: Protects `/dashboard` routes. Checks for `better-auth.session_token` cookie.
+- **`packages/database/prisma/schema.prisma`**: The source of truth for the data model (contains User, Company, Driver, Vehicle, Document, Alert, etc.). Run `npx prisma db push` from `packages/database` to migrate Neon.
+- **`apps/web/app/page.tsx` & `apps/web/app/pricing/page.tsx`**: Marketing and pricing boundaries. Contains exact feature arrays and pricing math.
+
+## 5. Development Commands
 ```bash
-# Dev (all apps)
-npm run dev           # or: npx turbo dev
-
-# Dev (web only)
+# Run web app locally
 npx turbo dev --filter=web
 
-# Build
+# Sync Prisma Schema to Neon Database (run inside packages/database)
+DATABASE_URL="..." npx prisma db push --accept-data-loss
+
+# Build web app (useful for checking TypeScript/build errors)
 npx turbo build --filter=web
-
-# Type check
-npx turbo check-types --filter=web
-
-# Database
-cd packages/database && npx prisma db push       # Push schema to Neon
-cd packages/database && npx prisma studio         # Open Prisma Studio
-
-# Mobile
-cd apps/mobile && npx expo start
 ```
 
-## Design System
-- **Color scheme**: Professional blue/gray with CSS custom properties in `globals.css`
-- **Font**: Inter (Google Fonts)
-- **Styling**: CSS Modules per page (`page.module.css`) + global utility classes
-- **Dark mode**: Supported via `prefers-color-scheme`
-- **Pattern**: Each dashboard page has `page.tsx` + `page.module.css`
+## 6. Environment Variables (`apps/web/.env`)
+The following are required for local development. Make sure they are also set in Vercel for production.
+```env
+# Neon Database
+DATABASE_URL="postgresql://...neon.tech/..."
 
-## Authentication (better-auth)
-- **better-auth v1.5** with Prisma adapter for PostgreSQL (Neon)
-- **Providers**: Email/Password, Google OAuth, Apple Sign In
-- **Server**: `lib/auth.ts` → `betterAuth()` with `prismaAdapter()`
-- **Client**: `lib/auth-client.ts` → `signIn.email()`, `signUp.email()`, `signIn.social()`, `signOut()`, `useSession()`
-- **API route**: `app/api/auth/[...all]/route.ts` → `toNextJsHandler(auth)`
-- **Middleware**: `middleware.ts` protects `/dashboard/*` routes; redirects to `/login` if no session
-- **Demo bypass**: `?demo=true` query param bypasses auth (for screenshots/demos)
-- **Sessions**: 30-day expiry, 5-minute cookie cache
+# Better Auth
+BETTER_AUTH_SECRET="your-32-char-secret"
+BETTER_AUTH_URL="http://localhost:3000" # Use vercel URL in prod
 
-## Database (Neon PostgreSQL + Prisma)
-- **Host**: Neon (us-east-2)
-- **Schema**: `packages/database/prisma/schema.prisma`
-- **Auth models**: User, Session, Account, Verification
-- **DOT models**: Company, Driver, Vehicle, HOSLog, HOSEntry, DrugTest, Inspection, MaintenanceRecord, Violation, Document, Alert
-- **Build**: `prisma generate` runs as postinstall and before `next build`
-
-## Demo Mode
-- Dashboard pages use **demo/mock data** by default (via `DemoModeContext`)
-- Activated by `?demo=true` URL parameter
-- Middleware allows unauthenticated access with `?demo=true`
-- Useful for marketing screenshots and product demos
-- Subtle "Viewing sample data / Exit demo" banner in sidebar
-
-## SEO Content Hub (55 pages)
-5 pillar pages + 50 cluster pages (10 per pillar):
-- **P1**: DOT Compliance Checklist + 10 clusters
-- **P2**: FMCSA Regulations & Audit + 10 clusters
-- **P3**: Driver Compliance & Qualification + 10 clusters
-- **P4**: Vehicle Maintenance & Inspection + 10 clusters
-- **P5**: Drug & Alcohol Testing + 10 clusters
-
-Blog posts use plain-language, beginner-friendly tone with practical examples.
-
-## Deployment
-- **Hosting**: Vercel (hobby plan)
-- **URL**: https://dot-helper-web.vercel.app
-- **Auto-deploy**: Pushes to `main` branch auto-deploy via GitHub integration
-- **Build command**: `prisma generate && next build` (configured in `package.json`)
-
-## Environment Variables
-```
-# Database (Neon PostgreSQL)
-DATABASE_URL=postgresql://...@...neon.tech/neondb?sslmode=require
-
-# better-auth
-BETTER_AUTH_SECRET=...          # Generate with: openssl rand -base64 32
-BETTER_AUTH_URL=http://localhost:3000   # Production: https://dot-helper-web.vercel.app
-
-# OAuth Providers (optional)
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-APPLE_CLIENT_ID=...
-APPLE_CLIENT_SECRET=...
-
-# Stripe
-STRIPE_SECRET_KEY=sk_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+# Resend (Email)
+RESEND_API_KEY="re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW"
+EMAIL_FROM="DOT Helper <noreply@yourdomain.com>"
 ```
 
-## Current State
-- ✅ Auth: Real email/password signup + login via better-auth + Neon
-- ✅ Database: 14 tables live on Neon PostgreSQL
-- ✅ Middleware: Dashboard routes protected, demo mode bypass
-- ✅ Marketing: Homepage with product screenshot showcase (3 tabbed views)
-- ✅ Blog: 55 SEO-optimized posts with beginner-friendly tone
-- ⏳ Dashboard data: Uses demo/mock data (not yet wired to database)
-- ⏳ Stripe: Uses placeholder price IDs (need real Stripe keys)
-- ⏳ OAuth: Google/Apple configured but need real client IDs
-- ⏳ Mobile: Tab navigation with placeholder screens
+## 7. AI Persona & Constraints
+- Write complete, robust production code. Do not leave `// TODO`s for the user unless it requires a proprietary key.
+- ALWAYS use absolute paths when editing files.
+- The UI must look incredibly modern and polished (premium SaaS aesthetic). Avoid basic/default component looks.
+- Use `lucide-react` for icons.
+- Avoid using `any` in TypeScript. Rely on generated Prisma types where possible.

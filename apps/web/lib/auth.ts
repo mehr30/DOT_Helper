@@ -19,6 +19,12 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 export const auth = betterAuth({
+    baseURL: process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app",
+    trustHost: true,
+    trustedOrigins: [
+        "https://dot-helper-web.vercel.app",
+        "http://localhost:3000"
+    ],
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
