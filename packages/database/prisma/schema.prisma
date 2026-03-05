@@ -469,9 +469,28 @@ model Document {
   company           Company?     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   
   uploadedById      String?
-  
+
+  signatures        DocumentSignature[]
+
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+}
+
+// E-Signature records — audit trail for who signed what and when
+model DocumentSignature {
+  id                String       @id @default(cuid())
+
+  documentId        String
+  document          Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  signerName        String       // Full legal name typed at signing
+  signerEmail       String?
+  signerRole        String?      // "driver", "owner", "safety_manager"
+
+  signatureImageUrl String       // Data URL (base64 PNG) or Blob URL
+  ipAddress         String?      // For audit trail
+
+  signedAt          DateTime     @default(now())
 }
 
 enum DocumentType {
