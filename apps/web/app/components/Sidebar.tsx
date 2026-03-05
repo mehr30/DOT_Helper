@@ -66,6 +66,9 @@ export default function Sidebar() {
         return true;
     });
 
+    // During onboarding, show a minimal sidebar (no nav links)
+    const isOnboarding = pathname.startsWith("/dashboard/onboarding");
+
     return (
         <>
             {/* Mobile menu button */}
@@ -89,38 +92,57 @@ export default function Sidebar() {
             <aside className={`${styles.sidebar} ${mobileOpen ? styles.open : ""}`}>
                 {/* Logo */}
                 <div className={styles.logo}>
-                    <Link href="/dashboard" className={styles.logoLink}>
-                        <GreenlightLogo size={44} />
-                        <span className={styles.logoText}>Greenlight DOT</span>
-                    </Link>
+                    {isOnboarding ? (
+                        <div className={styles.logoLink}>
+                            <GreenlightLogo size={44} />
+                            <span className={styles.logoText}>Greenlight DOT</span>
+                        </div>
+                    ) : (
+                        <Link href="/dashboard" className={styles.logoLink}>
+                            <GreenlightLogo size={44} />
+                            <span className={styles.logoText}>Greenlight DOT</span>
+                        </Link>
+                    )}
                 </div>
 
-                {/* Navigation */}
-                <nav className={styles.nav}>
-                    <ul className={styles.navList}>
-                        {visibleNavigation.map((item) => {
-                            const isActive = pathname === item.href ||
-                                (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                            const Icon = item.icon;
+                {/* Navigation — hidden during onboarding */}
+                {!isOnboarding && (
+                    <nav className={styles.nav}>
+                        <ul className={styles.navList}>
+                            {visibleNavigation.map((item) => {
+                                const isActive = pathname === item.href ||
+                                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                                const Icon = item.icon;
 
-                            return (
-                                <li key={item.name}>
-                                    <Link
-                                        href={item.href}
-                                        className={`${styles.navLink} ${isActive ? styles.active : ""}`}
-                                        onClick={() => setMobileOpen(false)}
-                                    >
-                                        <Icon size={20} className={styles.navIcon} />
-                                        <span>{item.name}</span>
-                                        {item.badge && isDemoMode && (
-                                            <span className={styles.badge}>{item.badge}</span>
-                                        )}
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </nav>
+                                return (
+                                    <li key={item.name}>
+                                        <Link
+                                            href={item.href}
+                                            className={`${styles.navLink} ${isActive ? styles.active : ""}`}
+                                            onClick={() => setMobileOpen(false)}
+                                        >
+                                            <Icon size={20} className={styles.navIcon} />
+                                            <span>{item.name}</span>
+                                            {item.badge && isDemoMode && (
+                                                <span className={styles.badge}>{item.badge}</span>
+                                            )}
+                                        </Link>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
+                )}
+
+                {isOnboarding && (
+                    <div style={{
+                        padding: "1.5rem 1rem", textAlign: "center",
+                        color: "rgba(255,255,255,0.5)", fontSize: "0.8rem",
+                        lineHeight: 1.6,
+                    }}>
+                        Complete your company setup to unlock all features.
+                    </div>
+                )}
 
                 {/* Bottom section */}
                 <div className={styles.bottomSection}>
@@ -133,81 +155,89 @@ export default function Sidebar() {
                         </div>
                     )}
 
-                    {/* Org switcher - demo shows mock orgs, live shows placeholder */}
-                    {isDemoMode ? (
-                        <div className={styles.companyInfo}>
-                            <button
-                                className={styles.orgSwitcher}
-                                onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-                            >
-                                <div className={styles.companyAvatar}>{activeOrg.initials}</div>
-                                <div className={styles.companyDetails}>
-                                    <span className={styles.companyName}>{activeOrg.name}</span>
-                                    <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
-                                </div>
-                                <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
-                            </button>
+                    {/* Org switcher - hidden during onboarding */}
+                    {!isOnboarding && (
+                        <>
+                            {isDemoMode ? (
+                                <div className={styles.companyInfo}>
+                                    <button
+                                        className={styles.orgSwitcher}
+                                        onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                                    >
+                                        <div className={styles.companyAvatar}>{activeOrg.initials}</div>
+                                        <div className={styles.companyDetails}>
+                                            <span className={styles.companyName}>{activeOrg.name}</span>
+                                            <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
+                                        </div>
+                                        <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
+                                    </button>
 
-                            {orgDropdownOpen && (
-                                <div className={styles.orgDropdown}>
-                                    <div className={styles.orgDropdownHeader}>
-                                        <Building2 size={14} />
-                                        <span>Switch Business Unit</span>
-                                    </div>
-                                    {organizations.map(org => (
-                                        <button
-                                            key={org.id}
-                                            className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
-                                            onClick={() => {
-                                                setActiveOrg(org);
-                                                setOrgDropdownOpen(false);
-                                            }}
-                                        >
-                                            <div className={styles.orgOptionAvatar}>{org.initials}</div>
-                                            <div className={styles.orgOptionDetails}>
-                                                <span className={styles.orgOptionName}>{org.name}</span>
-                                                <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
+                                    {orgDropdownOpen && (
+                                        <div className={styles.orgDropdown}>
+                                            <div className={styles.orgDropdownHeader}>
+                                                <Building2 size={14} />
+                                                <span>Switch Business Unit</span>
                                             </div>
-                                            {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
-                                        </button>
-                                    ))}
+                                            {organizations.map(org => (
+                                                <button
+                                                    key={org.id}
+                                                    className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
+                                                    onClick={() => {
+                                                        setActiveOrg(org);
+                                                        setOrgDropdownOpen(false);
+                                                    }}
+                                                >
+                                                    <div className={styles.orgOptionAvatar}>{org.initials}</div>
+                                                    <div className={styles.orgOptionDetails}>
+                                                        <span className={styles.orgOptionName}>{org.name}</span>
+                                                        <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
+                                                    </div>
+                                                    {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : profile.companyName ? (
+                                <div className={styles.companyInfo}>
+                                    <div className={styles.orgSwitcher}>
+                                        <div className={styles.companyAvatar}>
+                                            {profile.companyName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                                        </div>
+                                        <div className={styles.companyDetails}>
+                                            <span className={styles.companyName}>{profile.companyName}</span>
+                                            <span className={styles.usdot}>USDOT: {profile.usdotNumber}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={styles.companyInfo}>
+                                    <Link href="/dashboard/onboarding" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
+                                        <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
+                                        <div className={styles.companyDetails}>
+                                            <span className={styles.companyName}>Set Up Your Company</span>
+                                            <span className={styles.usdot}>Add USDOT &amp; details</span>
+                                        </div>
+                                    </Link>
                                 </div>
                             )}
-                        </div>
-                    ) : profile.companyName ? (
-                        <div className={styles.companyInfo}>
-                            <div className={styles.orgSwitcher}>
-                                <div className={styles.companyAvatar}>
-                                    {profile.companyName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-                                </div>
-                                <div className={styles.companyDetails}>
-                                    <span className={styles.companyName}>{profile.companyName}</span>
-                                    <span className={styles.usdot}>USDOT: {profile.usdotNumber}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={styles.companyInfo}>
-                            <Link href="/dashboard/onboarding" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
-                                <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
-                                <div className={styles.companyDetails}>
-                                    <span className={styles.companyName}>Set Up Your Company</span>
-                                    <span className={styles.usdot}>Add USDOT &amp; details</span>
-                                </div>
-                            </Link>
-                        </div>
+                        </>
                     )}
 
                     <div className={styles.bottomLinks}>
-                        <Link href="/dashboard/alerts" className={styles.bottomLink}>
-                            <Bell size={18} />
-                            <span>Notifications</span>
-                            {isDemoMode && <span className={styles.notificationBadge}>3</span>}
-                        </Link>
-                        <Link href="/dashboard/settings" className={styles.bottomLink}>
-                            <Settings size={18} />
-                            <span>Settings</span>
-                        </Link>
+                        {!isOnboarding && (
+                            <>
+                                <Link href="/dashboard/alerts" className={styles.bottomLink}>
+                                    <Bell size={18} />
+                                    <span>Notifications</span>
+                                    {isDemoMode && <span className={styles.notificationBadge}>3</span>}
+                                </Link>
+                                <Link href="/dashboard/settings" className={styles.bottomLink}>
+                                    <Settings size={18} />
+                                    <span>Settings</span>
+                                </Link>
+                            </>
+                        )}
                         <button className={styles.logoutButton}>
                             <LogOut size={18} />
                             <span>Log out</span>
