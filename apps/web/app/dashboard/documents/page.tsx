@@ -7,7 +7,6 @@ import {
     Filter,
     Upload,
     FileText,
-    Download,
     MoreVertical,
     AlertTriangle,
     Clock,
@@ -20,6 +19,7 @@ import {
     Edit3,
     Trash2,
     Package,
+    Printer,
     PenTool,
     ExternalLink,
     Loader2,
@@ -229,21 +229,25 @@ export default function DocumentsPage() {
                         Store, organize, and track all your compliance documents
                     </p>
                 </div>
-                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-                    <Link href="/dashboard/documents/wizard" className="btn btn-secondary" style={{
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                    <Link href="/dashboard/documents/wizard" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
-                        padding: "0.6rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0",
-                        background: "white", color: "#475569", fontWeight: 500, fontSize: "0.875rem",
+                        padding: "0.55rem 0.9rem", borderRadius: "8px", border: "1px solid #e2e8f0",
+                        background: "white", color: "#475569", fontWeight: 500, fontSize: "0.8rem",
                         textDecoration: "none", whiteSpace: "nowrap",
                     }}>
-                        <ClipboardList size={18} />
+                        <ClipboardList size={16} />
                         Fill a Form
                     </Link>
-                    {!isDemoMode && (
-                        <DocumentUpload onUploadComplete={() => loadRealDocs()} />
-                    )}
                 </div>
             </header>
+
+            {/* Upload section - separate row so it doesn't break header layout */}
+            {!isDemoMode && (
+                <div style={{ marginBottom: "1.25rem" }}>
+                    <DocumentUpload onUploadComplete={() => loadRealDocs()} />
+                </div>
+            )}
 
             {/* Wizard-Saved Documents */}
             {savedDocs.length > 0 && (
@@ -337,11 +341,40 @@ export default function DocumentsPage() {
                                         style={{
                                             flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
                                             gap: "0.3rem", padding: "0.5rem", borderRadius: "8px",
-                                            background: "#3b82f6", color: "white", fontSize: "0.8rem",
+                                            background: "#22c55e", color: "white", fontSize: "0.8rem",
                                             fontWeight: 600, textDecoration: "none",
                                         }}
                                     >
                                         <Edit3 size={14} /> Edit
+                                    </Link>
+                                    <Link
+                                        href={`/dashboard/documents/wizard?form=${doc.formId}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            // Generate printable version of this single form
+                                            let content = `${doc.title}\n${doc.cfrReference}\n`;
+                                            content += "=".repeat(50) + "\n\n";
+                                            Object.entries(doc.data).forEach(([key, val]) => {
+                                                if (val) {
+                                                    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
+                                                    content += `${label}: ${val === true ? "Yes" : val}\n`;
+                                                }
+                                            });
+                                            const w = window.open("", "_blank");
+                                            if (w) {
+                                                w.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:system-ui;padding:2rem;max-width:700px;margin:0 auto}h1{font-size:1.3rem}pre{white-space:pre-wrap;font-size:0.9rem;line-height:1.8}</style></head><body><h1>${doc.title}</h1><p style="color:#64748b">${doc.cfrReference}</p><pre>${content}</pre><script>window.print()</script></body></html>`);
+                                                w.document.close();
+                                            }
+                                        }}
+                                        style={{
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            gap: "0.3rem", padding: "0.5rem 0.75rem", borderRadius: "8px",
+                                            border: "1px solid #e2e8f0", background: "white",
+                                            color: "#475569", fontSize: "0.8rem", fontWeight: 500,
+                                            textDecoration: "none", cursor: "pointer",
+                                        }}
+                                    >
+                                        <Printer size={14} />
                                     </Link>
                                     <button
                                         onClick={() => handleDeleteSavedDoc(doc.id)}
@@ -604,7 +637,7 @@ export default function DocumentsPage() {
                                         <td>
                                             <div className={styles.actions}>
                                                 <button className={styles.actionBtn} title="Download">
-                                                    <Download size={16} />
+                                                    <ExternalLink size={16} />
                                                 </button>
                                                 <button className={styles.actionBtn} title="More">
                                                     <MoreVertical size={16} />

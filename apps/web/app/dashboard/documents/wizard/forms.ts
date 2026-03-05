@@ -230,6 +230,38 @@ export const stateRegulations: Record<string, StateRegInfo> = {
     DC: { state: "Washington D.C.", requiresIntrastateDOT: false, weightThreshold: 10001, passengerNotes: "Follows federal rules", specialNotes: ["Strict commercial vehicle restrictions in DC"] },
 };
 
+// ─── Shared Options ─────────────────────────────────────────────
+
+export const US_STATE_OPTIONS = [
+    { value: "", label: "Select state..." },
+    { value: "AL", label: "Alabama" }, { value: "AK", label: "Alaska" },
+    { value: "AZ", label: "Arizona" }, { value: "AR", label: "Arkansas" },
+    { value: "CA", label: "California" }, { value: "CO", label: "Colorado" },
+    { value: "CT", label: "Connecticut" }, { value: "DE", label: "Delaware" },
+    { value: "FL", label: "Florida" }, { value: "GA", label: "Georgia" },
+    { value: "HI", label: "Hawaii" }, { value: "ID", label: "Idaho" },
+    { value: "IL", label: "Illinois" }, { value: "IN", label: "Indiana" },
+    { value: "IA", label: "Iowa" }, { value: "KS", label: "Kansas" },
+    { value: "KY", label: "Kentucky" }, { value: "LA", label: "Louisiana" },
+    { value: "ME", label: "Maine" }, { value: "MD", label: "Maryland" },
+    { value: "MA", label: "Massachusetts" }, { value: "MI", label: "Michigan" },
+    { value: "MN", label: "Minnesota" }, { value: "MS", label: "Mississippi" },
+    { value: "MO", label: "Missouri" }, { value: "MT", label: "Montana" },
+    { value: "NE", label: "Nebraska" }, { value: "NV", label: "Nevada" },
+    { value: "NH", label: "New Hampshire" }, { value: "NJ", label: "New Jersey" },
+    { value: "NM", label: "New Mexico" }, { value: "NY", label: "New York" },
+    { value: "NC", label: "North Carolina" }, { value: "ND", label: "North Dakota" },
+    { value: "OH", label: "Ohio" }, { value: "OK", label: "Oklahoma" },
+    { value: "OR", label: "Oregon" }, { value: "PA", label: "Pennsylvania" },
+    { value: "RI", label: "Rhode Island" }, { value: "SC", label: "South Carolina" },
+    { value: "SD", label: "South Dakota" }, { value: "TN", label: "Tennessee" },
+    { value: "TX", label: "Texas" }, { value: "UT", label: "Utah" },
+    { value: "VT", label: "Vermont" }, { value: "VA", label: "Virginia" },
+    { value: "WA", label: "Washington" }, { value: "WV", label: "West Virginia" },
+    { value: "WI", label: "Wisconsin" }, { value: "WY", label: "Wyoming" },
+    { value: "DC", label: "Washington D.C." },
+];
+
 // ─── Form Definitions ────────────────────────────────────────────
 
 export const dotForms: DOTForm[] = [
@@ -268,7 +300,7 @@ export const dotForms: DOTForm[] = [
                 fields: [
                     { id: "street", label: "Street Address", type: "text", required: true },
                     { id: "city", label: "City", type: "text", required: true, halfWidth: true },
-                    { id: "state", label: "State", type: "text", required: true, halfWidth: true },
+                    { id: "state", label: "State", type: "select", required: true, halfWidth: true, options: US_STATE_OPTIONS },
                     { id: "zip", label: "ZIP Code", type: "text", required: true, halfWidth: true },
                     { id: "phone", label: "Phone", type: "tel", required: true, halfWidth: true },
                     { id: "email", label: "Email", type: "email", required: true },
@@ -324,9 +356,33 @@ export const dotForms: DOTForm[] = [
                 fields: [
                     { id: "street", label: "Street Address", type: "text", required: true },
                     { id: "city", label: "City", type: "text", required: true, halfWidth: true },
-                    { id: "state", label: "State", type: "text", required: true, halfWidth: true },
+                    { id: "state", label: "State", type: "select", required: true, halfWidth: true, options: US_STATE_OPTIONS },
                     { id: "zip", label: "ZIP Code", type: "text", required: true, halfWidth: true },
                     { id: "yearsAtAddress", label: "Years at Address", type: "number", required: true, halfWidth: true },
+                ],
+            },
+            {
+                id: "prevAddress",
+                title: "Previous Address (if less than 3 years at current)",
+                description: "FMCSA requires address history for the past 3 years. Add your previous address if you've been at your current one for less than 3 years.",
+                fields: [
+                    { id: "prevStreet", label: "Previous Street Address", type: "text" },
+                    { id: "prevCity", label: "City", type: "text", halfWidth: true },
+                    { id: "prevState", label: "State", type: "select", halfWidth: true, options: US_STATE_OPTIONS },
+                    { id: "prevZip", label: "ZIP Code", type: "text", halfWidth: true },
+                    { id: "prevYearsAtAddress", label: "Years at This Address", type: "number", halfWidth: true },
+                ],
+            },
+            {
+                id: "prevAddress2",
+                title: "Additional Previous Address (if needed)",
+                description: "If you still haven't covered 3 years of address history, add another previous address.",
+                fields: [
+                    { id: "prev2Street", label: "Street Address", type: "text" },
+                    { id: "prev2City", label: "City", type: "text", halfWidth: true },
+                    { id: "prev2State", label: "State", type: "select", halfWidth: true, options: US_STATE_OPTIONS },
+                    { id: "prev2Zip", label: "ZIP Code", type: "text", halfWidth: true },
+                    { id: "prev2YearsAtAddress", label: "Years at This Address", type: "number", halfWidth: true },
                 ],
             },
             {
@@ -334,7 +390,7 @@ export const dotForms: DOTForm[] = [
                 title: "License Information",
                 fields: [
                     { id: "licenseNumber", label: "Driver's License Number", type: "text", required: true },
-                    { id: "licenseState", label: "Issuing State", type: "text", required: true, halfWidth: true },
+                    { id: "licenseState", label: "Issuing State", type: "select", required: true, halfWidth: true, options: US_STATE_OPTIONS },
                     {
                         id: "licenseClass", label: "License Class", type: "select", required: true, halfWidth: true, options: [
                             { value: "", label: "Select..." },
@@ -600,7 +656,7 @@ export const dotForms: DOTForm[] = [
                     { id: "driverName", label: "Driver Name", type: "text", required: true },
                     { id: "ssn", label: "Last 4 of SSN", type: "text", halfWidth: true },
                     { id: "licenseNumber", label: "CDL/License Number", type: "text", required: true, halfWidth: true },
-                    { id: "licenseState", label: "License State", type: "text", halfWidth: true },
+                    { id: "licenseState", label: "License State", type: "select", halfWidth: true, options: US_STATE_OPTIONS },
                 ],
             },
             {
@@ -645,7 +701,7 @@ export const dotForms: DOTForm[] = [
                 fields: [
                     { id: "driverName", label: "Driver Name", type: "text", required: true },
                     { id: "licenseNumber", label: "CDL/License Number", type: "text", required: true, halfWidth: true },
-                    { id: "licenseState", label: "License State", type: "text", required: true, halfWidth: true },
+                    { id: "licenseState", label: "License State", type: "select", required: true, halfWidth: true, options: US_STATE_OPTIONS },
                 ],
             },
             {
@@ -750,7 +806,7 @@ export const dotForms: DOTForm[] = [
                     { id: "mcNumber", label: "MC/MX/FF Number", type: "text", halfWidth: true },
                     { id: "businessAddress", label: "Principal Business Address", type: "text", required: true },
                     { id: "city", label: "City", type: "text", required: true, halfWidth: true },
-                    { id: "state", label: "State", type: "text", required: true, halfWidth: true },
+                    { id: "state", label: "State", type: "select", required: true, halfWidth: true, options: US_STATE_OPTIONS },
                     { id: "zip", label: "ZIP Code", type: "text", required: true },
                 ],
             },

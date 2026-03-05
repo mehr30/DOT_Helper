@@ -9,8 +9,9 @@ import {
     CheckCircle,
     ClipboardList,
     FileText,
-    Download,
+    Printer,
     Save,
+    Trash2,
     AlertCircle,
     HelpCircle,
     ChevronDown,
@@ -60,7 +61,7 @@ function WizardContent() {
     const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
     const [saveNotice, setSaveNotice] = useState(false);
     const [addressPickerOpen, setAddressPickerOpen] = useState<string | null>(null);
-    const { profile, addAddress } = useCompanyProfile();
+    const { profile, addAddress, removeAddress } = useCompanyProfile();
 
     // Handle ?form= query parameter to jump directly to a form
     useEffect(() => {
@@ -301,30 +302,54 @@ function WizardContent() {
                                     Select an address
                                 </div>
                                 {profile.addresses.map(addr => (
-                                    <button
+                                    <div
                                         key={addr.id}
-                                        type="button"
-                                        onClick={() => {
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                [field.id]: addr.street,
-                                                city: addr.city,
-                                                state: addr.state,
-                                                zip: addr.zip,
-                                            }));
-                                            setAddressPickerOpen(null);
-                                        }}
                                         style={{
-                                            display: "block", width: "100%", textAlign: "left" as const,
-                                            padding: "0.5rem 0.75rem", border: "none", background: "none",
-                                            cursor: "pointer", fontSize: "0.8rem", lineHeight: 1.4,
+                                            display: "flex", alignItems: "center",
+                                            borderBottom: "1px solid #f1f5f9",
                                         }}
                                     >
-                                        <div style={{ fontWeight: 500, color: "#0f172a" }}>{addr.label}</div>
-                                        <div style={{ color: "#64748b", fontSize: "0.7rem" }}>
-                                            {addr.street}, {addr.city}, {addr.state} {addr.zip}
-                                        </div>
-                                    </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    [field.id]: addr.street,
+                                                    city: addr.city,
+                                                    state: addr.state,
+                                                    zip: addr.zip,
+                                                }));
+                                                setAddressPickerOpen(null);
+                                            }}
+                                            style={{
+                                                flex: 1, textAlign: "left" as const,
+                                                padding: "0.5rem 0.75rem", border: "none", background: "none",
+                                                cursor: "pointer", fontSize: "0.8rem", lineHeight: 1.4,
+                                            }}
+                                        >
+                                            <div style={{ fontWeight: 500, color: "#0f172a" }}>{addr.label}</div>
+                                            <div style={{ color: "#64748b", fontSize: "0.7rem" }}>
+                                                {addr.street}, {addr.city}, {addr.state} {addr.zip}
+                                            </div>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeAddress(addr.id);
+                                            }}
+                                            title="Remove address"
+                                            style={{
+                                                padding: "0.4rem", border: "none", background: "none",
+                                                cursor: "pointer", color: "#94a3b8", marginRight: "0.4rem",
+                                                borderRadius: "4px", display: "flex",
+                                            }}
+                                            onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
+                                            onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
                                 ))}
                                 <div style={{ padding: "0.4rem 0.75rem", borderTop: "1px solid #f1f5f9", fontSize: "0.65rem", color: "#94a3b8" }}>
                                     Or type a new address below
@@ -698,8 +723,8 @@ function WizardContent() {
                             <button className={styles.saveButton} onClick={handleSaveForm}>
                                 <Save size={16} /> Save to Documents
                             </button>
-                            <button className={styles.downloadButton}>
-                                <Download size={16} /> Download as PDF
+                            <button className={styles.downloadButton} onClick={() => window.print()}>
+                                <Printer size={16} /> Print / Save as PDF
                             </button>
                         </div>
 

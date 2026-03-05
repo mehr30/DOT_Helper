@@ -163,12 +163,12 @@ function getActionForItem(item: { label: string; status: string }): { href: stri
         return { href: "/dashboard/drivers", label: "Update Driver" };
     }
 
-    // Clearinghouse — explain and link to FMCSA + documents page
+    // Clearinghouse — link to wizard consent form for consent, documents page for query results
     if (lower.includes("clearinghouse query")) {
-        return { href: "/dashboard/documents", label: "Upload Query" };
+        return { href: "/dashboard/documents/wizard?form=drugAlcoholPolicy", label: "Run Query" };
     }
     if (lower.includes("clearinghouse consent")) {
-        return { href: "/dashboard/documents", label: "Upload Consent" };
+        return { href: "/dashboard/documents/wizard?form=drugAlcoholPolicy", label: "Get Consent" };
     }
 
     // MVR / Employment app — link to wizard for filling out, or documents for uploading
@@ -274,7 +274,34 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                             <option key={state} value={state}>{state}</option>
                         ))}
                     </select>
-                    <button className={styles.downloadBtn}>
+                    <button
+                        className={styles.downloadBtn}
+                        onClick={() => {
+                            let content = "DOT COMPLIANCE REPORT\n";
+                            content += `Generated: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
+                            content += `Overall Score: ${data.overall}%\n`;
+                            content += "=".repeat(60) + "\n\n";
+                            content += `Summary: ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need action, ${data.summary.expired} expired\n\n`;
+                            data.categories.forEach(cat => {
+                                content += `${"─".repeat(50)}\n`;
+                                content += `${cat.name} — ${cat.score}%\n`;
+                                content += `${"─".repeat(50)}\n`;
+                                cat.items.forEach(item => {
+                                    const status = item.status === "compliant" ? "✓" : item.status === "expired" ? "✗" : "!";
+                                    content += `  [${status}] ${item.label}\n`;
+                                    content += `      ${item.detail} (${item.regulation})\n`;
+                                });
+                                content += "\n";
+                            });
+                            const blob = new Blob([content], { type: "text/plain" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `compliance-report-${new Date().toISOString().split("T")[0]}.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                        }}
+                    >
                         <Download size={16} /> Export Report
                     </button>
                 </div>
