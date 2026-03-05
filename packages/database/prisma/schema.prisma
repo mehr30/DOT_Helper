@@ -37,7 +37,8 @@ model Company {
   vehicles          Vehicle[]
   documents         Document[]
   users             User[]
-  
+  signingRequests   SigningRequest[]
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -158,7 +159,8 @@ model Driver {
   violations            Violation[]
   documents             Document[]
   inspections           Inspection[]
-  
+  signingRequests       SigningRequest[]
+
   companyId             String
   company               Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   
@@ -316,7 +318,8 @@ model Vehicle {
   inspections         Inspection[]
   documents           Document[]
   maintenanceRecords  MaintenanceRecord[]
-  
+  signingRequests     SigningRequest[]
+
   companyId           String
   company             Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   
@@ -523,6 +526,45 @@ enum DocumentType {
   INSURANCE_POLICY
   
   OTHER
+}
+
+// ============================================================================
+// SIGNING REQUESTS (Magic Links for Driver Signatures)
+// ============================================================================
+
+model SigningRequest {
+  id            String   @id @default(cuid())
+  token         String   @unique @default(cuid())
+
+  formId        String   // wizard form ID (e.g., "driverApp")
+  formTitle     String
+  formData      Json     // all form field values (everything except signature)
+
+  status        SigningStatus @default(PENDING)
+  signature     String?  // data URL (base64 PNG) of the signature
+  signedAt      DateTime?
+  signerIp      String?  // IP address for audit trail
+
+  expiresAt     DateTime
+
+  driverId      String?
+  driver        Driver?  @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  vehicleId     String?
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdById   String   // the admin who created it
+
+  createdAt     DateTime @default(now())
+}
+
+enum SigningStatus {
+  PENDING
+  SIGNED
+  EXPIRED
 }
 
 // ============================================================================

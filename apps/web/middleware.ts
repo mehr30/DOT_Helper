@@ -15,6 +15,7 @@ const publicPaths = [
     "/features",
     "/checkout",
     "/api/auth",
+    "/sign",
 ];
 
 export function middleware(request: NextRequest) {

@@ -19,6 +19,10 @@ import {
     Sparkles,
     Users,
     Truck,
+    Send,
+    Copy,
+    ExternalLink,
+    Loader2,
 } from "lucide-react";
 import styles from "./page.module.css";
 import {
@@ -39,6 +43,7 @@ import {
     type WizardDriverOption,
     type WizardVehicleOption,
 } from "../../../actions/documents";
+import { createSigningRequest } from "../../../actions/signing";
 import SignaturePad from "../../../components/SignaturePad";
 
 // Map wizard form IDs to database DocumentType values
@@ -70,6 +75,9 @@ function WizardContent() {
     const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
     const [saveNotice, setSaveNotice] = useState(false);
     const [addressPickerOpen, setAddressPickerOpen] = useState<string | null>(null);
+    const [signingLinkUrl, setSigningLinkUrl] = useState<string | null>(null);
+    const [signingLinkSending, setSigningLinkSending] = useState(false);
+    const [signingLinkCopied, setSigningLinkCopied] = useState(false);
     const { profile, addAddress, removeAddress } = useCompanyProfile();
 
     // Driver/vehicle selection state
@@ -380,6 +388,37 @@ function WizardContent() {
                     addAddress({ label: `${city}, ${state}`, street, city, state, zip: zip || "" });
                 }
             }
+        }
+    };
+
+    const handleSendForSignature = async () => {
+        if (!activeForm) return;
+        setSigningLinkSending(true);
+
+        // Find the driver's email for auto-sending
+        const driverEmail = selectedDriverId
+            ? availableDrivers.find(d => d.id === selectedDriverId)?.email || undefined
+            : undefined;
+
+        try {
+            const result = await createSigningRequest({
+                formId: activeForm.id,
+                formTitle: activeForm.title,
+                formData: formData,
+                driverId: selectedDriverId || undefined,
+                vehicleId: selectedVehicleId || undefined,
+                driverEmail,
+            });
+
+            if ("error" in result) {
+                alert(result.error);
+            } else if (result.url) {
+                setSigningLinkUrl(result.url);
+            }
+        } catch {
+            alert("Failed to create signing link");
+        } finally {
+            setSigningLinkSending(false);
         }
     };
 
@@ -994,7 +1033,98 @@ function WizardContent() {
                             <button className={styles.downloadButton} onClick={() => window.print()}>
                                 <Printer size={16} /> Print / Save as PDF
                             </button>
+                            {(activeForm.category === "driver" || activeForm.category === "safety") && (
+                                <button
+                                    className={styles.downloadButton}
+                                    onClick={handleSendForSignature}
+                                    disabled={signingLinkSending}
+                                    style={{
+                                        background: "#eff6ff", color: "#2563eb",
+                                        border: "1px solid #bfdbfe",
+                                    }}
+                                >
+                                    {signingLinkSending ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Send size={16} />}
+                                    {signingLinkSending ? "Creating link..." : "Send for Signature"}
+                                </button>
+                            )}
                         </div>
+
+                        {/* Signing link modal */}
+                        {signingLinkUrl && (
+                            <div style={{
+                                padding: "1rem", marginTop: "1rem",
+                                background: "#eff6ff", border: "1px solid #bfdbfe",
+                                borderRadius: "10px",
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                                    <Send size={16} style={{ color: "#2563eb" }} />
+                                    <strong style={{ color: "#1e40af", fontSize: "0.9rem" }}>Signing Link Created</strong>
+                                </div>
+                                {selectedDriverId && availableDrivers.find(d => d.id === selectedDriverId)?.email && (
+                                    <p style={{ color: "#3b82f6", fontSize: "0.8rem", marginBottom: "0.75rem" }}>
+                                        An email has been sent to {availableDrivers.find(d => d.id === selectedDriverId)?.email}
+                                    </p>
+                                )}
+                                <div style={{
+                                    display: "flex", gap: "0.5rem", alignItems: "center",
+                                }}>
+                                    <input
+                                        readOnly
+                                        value={signingLinkUrl}
+                                        style={{
+                                            flex: 1, padding: "0.5rem 0.75rem",
+                                            border: "1px solid #93c5fd", borderRadius: "6px",
+                                            fontSize: "0.8rem", background: "white", color: "#1e3a5f",
+                                        }}
+                                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(signingLinkUrl);
+                                            setSigningLinkCopied(true);
+                                            setTimeout(() => setSigningLinkCopied(false), 2000);
+                                        }}
+                                        style={{
+                                            padding: "0.5rem 0.75rem", border: "1px solid #93c5fd",
+                                            borderRadius: "6px", background: "white",
+                                            cursor: "pointer", display: "flex", alignItems: "center", gap: "0.3rem",
+                                            fontSize: "0.8rem", fontWeight: 500,
+                                            color: signingLinkCopied ? "#16a34a" : "#2563eb",
+                                        }}
+                                    >
+                                        {signingLinkCopied ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                        {signingLinkCopied ? "Copied" : "Copy"}
+                                    </button>
+                                    <a
+                                        href={signingLinkUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            padding: "0.5rem 0.75rem", border: "1px solid #93c5fd",
+                                            borderRadius: "6px", background: "white",
+                                            display: "flex", alignItems: "center", gap: "0.3rem",
+                                            fontSize: "0.8rem", fontWeight: 500, color: "#2563eb",
+                                            textDecoration: "none",
+                                        }}
+                                    >
+                                        <ExternalLink size={14} /> Open
+                                    </a>
+                                </div>
+                                <p style={{ color: "#64748b", fontSize: "0.7rem", marginTop: "0.5rem" }}>
+                                    Share this link with the employee. They can review and sign without an account. Link expires in 7 days.
+                                </p>
+                                <button
+                                    onClick={() => setSigningLinkUrl(null)}
+                                    style={{
+                                        marginTop: "0.5rem", padding: "0.3rem 0.6rem",
+                                        border: "none", background: "none",
+                                        cursor: "pointer", fontSize: "0.75rem", color: "#94a3b8",
+                                    }}
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        )}
 
                         {saveNotice && (
                             <div className={styles.savedNotice}>
