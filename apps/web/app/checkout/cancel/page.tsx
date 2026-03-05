@@ -2,7 +2,7 @@ import Link from "next/link";
 import { XCircle, ArrowRight, ArrowLeft } from "lucide-react";
 
 export const metadata = {
-    title: "Checkout Cancelled | DOT Helper",
+    title: "Checkout Cancelled | Greenlight DOT",
     description: "Your checkout was cancelled. You can try again anytime.",
 };
 

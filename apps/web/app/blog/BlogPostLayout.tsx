@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Truck, ArrowRight, Calendar, Clock, ChevronLeft } from "lucide-react";
+import { ArrowRight, Calendar, Clock, ChevronLeft } from "lucide-react";
+import GreenlightLogo from "../components/GreenlightLogo";
 import styles from "./blog.module.css";
 
 interface BlogPostLayoutProps {
@@ -15,7 +16,7 @@ interface BlogPostLayoutProps {
 export default function BlogPostLayout({
     category,
     title,
-    author = "DOT Helper Team",
+    author = "Greenlight DOT Team",
     date,
     readTime,
     children,
@@ -25,8 +26,8 @@ export default function BlogPostLayout({
         <div className={styles.blogLayout}>
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}><Truck size={22} /></div>
-                    <span className={styles.logoText}>DOT Helper</span>
+                    <GreenlightLogo size={36} />
+                    <span className={styles.logoText}>Greenlight DOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/blog" className={styles.navLink}>
@@ -95,9 +96,9 @@ export default function BlogPostLayout({
 
                 <div className={styles.articleCta}>
                     <h3>Stop Risking Fines. Start Managing Compliance.</h3>
-                    <p>DOT Helper automates compliance tracking so you can focus on running your fleet.</p>
+                    <p>Greenlight DOT automates compliance tracking so you can focus on running your fleet.</p>
                     <Link href="/pricing" className={styles.articleCtaBtn}>
-                        Try DOT Helper Free <ArrowRight size={16} />
+                        Try Greenlight DOT Free <ArrowRight size={16} />
                     </Link>
                 </div>
             </article>

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "USDOT Number Requirements: Who Needs One & How to Get It", description: "Everything about USDOT numbers — who needs one, how to apply, how to keep it active, and what happens if you operate without one.", alternates: { canonical: "/blog/usdot-number-requirements" } };
+export const metadata: Metadata = { title: "USDOT Number Requirements: Who Needs One & How to Get It", description: "Everything about USDOT numbers — who needs one, how to apply, how to keep it active, and what happens if you operate without one.", alternates: { canonical: "/blog/usdot-number-requirements" }, openGraph: { title: "USDOT Number Requirements: Who Needs One & How to Get It", description: "Everything about USDOT numbers — who needs one, how to apply, how to keep it active, and what happens if you operate without one.", type: "article" } };
 
 export default function Page() {
     return (

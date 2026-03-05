@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { Truck, ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
+import GreenlightLogo from "@/app/components/GreenlightLogo";
 import styles from "../login/page.module.css";
 
 export default function ForgotPasswordPage() {
@@ -37,10 +38,8 @@ export default function ForgotPasswordPage() {
                 {/* Left Side - Branding */}
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
-                        <div className={styles.logoIcon}>
-                            <Truck size={28} />
-                        </div>
-                        <span>DOT Helper</span>
+                        <GreenlightLogo size={44} />
+                        <span>Greenlight DOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
                         <h1>Reset Your Password</h1>

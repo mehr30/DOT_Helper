@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Fleet Maintenance Record Keeping: What to Track and How Long to Keep It", description: "Guide to fleet maintenance record keeping requirements under Part 396. What records to keep, retention periods, digital vs paper, and audit preparation.", alternates: { canonical: "/blog/fleet-maintenance-records" } };
+export const metadata: Metadata = { title: "Fleet Maintenance Record Keeping: What to Track and How Long to Keep It", description: "Guide to fleet maintenance record keeping requirements under Part 396. What records to keep, retention periods, digital vs paper, and audit preparation.", alternates: { canonical: "/blog/fleet-maintenance-records" }, openGraph: { title: "Fleet Maintenance Record Keeping: What to Track & Retain", description: "Guide to fleet maintenance record keeping requirements under Part 396. What records to keep, retention periods, digital vs paper, and audit preparation.", type: "article" } };
 
 export default function Page() {
     return (

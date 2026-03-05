@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
-import { Truck, ArrowRight, Eye, EyeOff, Lock } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock } from "lucide-react";
+import GreenlightLogo from "@/app/components/GreenlightLogo";
 import styles from "../login/page.module.css";
 
 function ResetPasswordForm() {
@@ -162,10 +163,8 @@ export default function ResetPasswordPage() {
             <div className={styles.authContainer}>
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
-                        <div className={styles.logoIcon}>
-                            <Truck size={28} />
-                        </div>
-                        <span>DOT Helper</span>
+                        <GreenlightLogo size={44} />
+                        <span>Greenlight DOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
                         <h1>Almost There</h1>

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "SAP Return-to-Duty Process: Steps, Timeline & Costs", description: "Complete guide to the SAP return-to-duty process after a DOT drug or alcohol violation. Steps, evaluation requirements, follow-up testing, and timeline.", alternates: { canonical: "/blog/sap-return-to-duty-process" } };
+export const metadata: Metadata = { title: "SAP Return-to-Duty Process: Steps, Timeline & Costs", description: "Complete guide to the SAP return-to-duty process after a DOT drug or alcohol violation. Steps, evaluation requirements, follow-up testing, and timeline.", alternates: { canonical: "/blog/sap-return-to-duty-process" }, openGraph: { title: "SAP Return-to-Duty Process: Steps, Timeline & Costs", description: "Complete guide to the SAP return-to-duty process after a DOT drug or alcohol violation. Steps, evaluation requirements, follow-up testing, and timeline.", type: "article" } };
 
 export default function Page() {
     return (

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Compliance for Owner-Operators: Your Solo Carrier Guide", description: "DOT compliance guide specifically for owner-operators. Covers running under your own authority vs leasing, required filings, and managing compliance as a one-person operation.", alternates: { canonical: "/blog/dot-compliance-owner-operators" } };
+export const metadata: Metadata = { title: "DOT Compliance for Owner-Operators: Your Solo Carrier Guide", description: "DOT compliance guide specifically for owner-operators. Covers running under your own authority vs leasing, required filings, and managing compliance as a one-person operation.", alternates: { canonical: "/blog/dot-compliance-owner-operators" }, openGraph: { title: "DOT Compliance for Owner-Operators: Your Solo Carrier Guide", description: "DOT compliance guide specifically for owner-operators. Covers running under your own authority vs leasing, required filings, and managing compliance as a one-person operation.", type: "article" } };
 
 export default function Page() {
     return (

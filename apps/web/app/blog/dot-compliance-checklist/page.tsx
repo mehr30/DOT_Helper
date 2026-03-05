@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -17,35 +17,16 @@ export const metadata: Metadata = {
 
 export default function DotComplianceChecklistPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}><Truck size={22} /></div>
-                    <span className={styles.logoText}>DOT Helper</span>
-                </Link>
-                <div className={styles.navLinks}>
-                    <Link href="/blog" className={styles.navLink}>← Blog</Link>
-                    <Link href="/pricing" className={styles.navLink}>Pricing</Link>
-                    <Link href="/login" className={styles.loginBtn}>Sign In</Link>
-                </div>
-            </nav>
-
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Compliance</div>
-                    <h1 className={styles.articleTitle}>
-                        The Ultimate DOT Compliance Checklist for Small Businesses in 2026
-                    </h1>
-                    <div className={styles.articleMeta}>
-                        <span>By DOT Helper Team</span>
-                        <span>•</span>
-                        <span>March 1, 2026</span>
-                        <span>•</span>
-                        <span>12 min read</span>
-                    </div>
-                </header>
-
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Compliance"
+            title="The Ultimate DOT Compliance Checklist for Small Businesses in 2026"
+            date="March 1, 2026"
+            readTime="12 min read"
+            relatedPosts={[
+                { slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide" },
+                { slug: "how-to-pass-dot-audit", title: "How to Pass a DOT Audit" },
+            ]}
+        >
                     <p>
                         If you run trucks commercially — whether that&apos;s hauling freight, towing equipment to job sites, or sending service vehicles out — there&apos;s a list of federal requirements you need to meet. Miss one, and you could be looking at fines up to <strong>$16,864 per violation</strong>, vehicles pulled off the road, or worse.
                     </p>
@@ -127,17 +108,7 @@ export default function DotComplianceChecklistPost() {
                     <p>
                         The first time you see this list, it feels like a lot. That&apos;s because it <em>is</em> a lot. But most of it is just staying organized — knowing what&apos;s due, when it&apos;s due, and where to find the paperwork when someone asks for it.
                     </p>
-                    <p>That&apos;s exactly what DOT Helper does. We track every item on this checklist, send you reminders before things expire, and keep everything in one place so you&apos;re always ready if an auditor comes knocking.</p>
-
-                    <div className={styles.articleCta}>
-                        <h3>Never Miss a Compliance Deadline Again</h3>
-                        <p>DOT Helper tracks every requirement on this checklist automatically and alerts you before anything expires.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>
-                            Start Your Free Trial <ArrowRight size={16} />
-                        </Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+                    <p>That&apos;s exactly what Greenlight DOT does. We track every item on this checklist, send you reminders before things expire, and keep everything in one place so you&apos;re always ready if an auditor comes knocking.</p>
+        </BlogPostLayout>
     );
 }

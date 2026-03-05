@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Insurance Requirements: Minimums, Filing & Common Pitfalls", description: "Guide to DOT/FMCSA insurance requirements for motor carriers. Covers minimum coverage amounts, BMC-91 filing, what happens when insurance lapses, and how to save.", alternates: { canonical: "/blog/dot-insurance-requirements" } };
+export const metadata: Metadata = { title: "DOT Insurance Requirements: Minimums, Filing & Common Pitfalls", description: "Guide to DOT/FMCSA insurance requirements for motor carriers. Covers minimum coverage amounts, BMC-91 filing, what happens when insurance lapses, and how to save.", alternates: { canonical: "/blog/dot-insurance-requirements" }, openGraph: { title: "DOT Insurance Requirements: Minimums, Filing & Common Pitfalls", description: "Guide to DOT/FMCSA insurance requirements for motor carriers. Covers minimum coverage amounts, BMC-91 filing, what happens when insurance lapses, and how to save.", type: "article" } };
 
 export default function Page() {
     return (

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Annual DOT Inspection: What's Covered, Who Can Inspect & How to Prepare", description: "Complete guide to annual DOT vehicle inspections. Inspection checklist, qualified inspector requirements, report retention, and common failure points.", alternates: { canonical: "/blog/annual-dot-inspection-guide" } };
+export const metadata: Metadata = { title: "Annual DOT Inspection: What's Covered, Who Can Inspect & How to Prepare", description: "Complete guide to annual DOT vehicle inspections. Inspection checklist, qualified inspector requirements, report retention, and common failure points.", alternates: { canonical: "/blog/annual-dot-inspection-guide" }, openGraph: { title: "Annual DOT Inspection: Coverage, Inspectors & Preparation", description: "Complete guide to annual DOT vehicle inspections. Inspection checklist, qualified inspector requirements, report retention, and common failure points.", type: "article" } };
 
 export default function Page() {
     return (

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Reasonable Suspicion Training: What Supervisors Must Know", description: "Guide to DOT reasonable suspicion training for supervisors. Training requirements, signs to watch for, documentation procedures, and testing protocols.", alternates: { canonical: "/blog/reasonable-suspicion-training-guide" } };
+export const metadata: Metadata = { title: "Reasonable Suspicion Training: What Supervisors Must Know", description: "Guide to DOT reasonable suspicion training for supervisors. Training requirements, signs to watch for, documentation procedures, and testing protocols.", alternates: { canonical: "/blog/reasonable-suspicion-training-guide" }, openGraph: { title: "Reasonable Suspicion Training: What Supervisors Must Know", description: "Guide to DOT reasonable suspicion training for supervisors. Training requirements, signs to watch for, documentation procedures, and testing protocols.", type: "article" } };
 
 export default function Page() {
     return (

@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "FMCSA Clearinghouse Guide: Registration, Queries & Compliance", description: "Complete guide to the FMCSA Drug & Alcohol Clearinghouse for employers. Covers registration, full and limited queries, reporting requirements, and common mistakes.", alternates: { canonical: "/blog/fmcsa-clearinghouse-guide" } };
+export const metadata: Metadata = { title: "FMCSA Clearinghouse Guide: Registration, Queries & Compliance", description: "Complete guide to the FMCSA Drug & Alcohol Clearinghouse for employers. Covers registration, full and limited queries, reporting requirements, and common mistakes.", alternates: { canonical: "/blog/fmcsa-clearinghouse-guide" }, openGraph: { title: "FMCSA Clearinghouse Guide: Registration, Queries & Compliance", description: "Complete guide to the FMCSA Drug & Alcohol Clearinghouse for employers. Covers registration, full and limited queries, reporting requirements, and common mistakes.", type: "article" } };
 
 export default function Page() {
     return (

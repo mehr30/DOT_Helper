@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Alcohol Testing Requirements: BAC Thresholds, Testing Methods & Rules", description: "Guide to DOT alcohol testing requirements. BAC thresholds for CMV drivers, testing methods, when alcohol testing is required, and consequences.", alternates: { canonical: "/blog/dot-alcohol-testing-requirements" } };
+export const metadata: Metadata = { title: "DOT Alcohol Testing Requirements: BAC Thresholds, Testing Methods & Rules", description: "Guide to DOT alcohol testing requirements. BAC thresholds for CMV drivers, testing methods, when alcohol testing is required, and consequences.", alternates: { canonical: "/blog/dot-alcohol-testing-requirements" }, openGraph: { title: "DOT Alcohol Testing: BAC Thresholds, Testing Methods & Rules", description: "Guide to DOT alcohol testing requirements. BAC thresholds for CMV drivers, testing methods, when alcohol testing is required, and consequences.", type: "article" } };
 
 export default function Page() {
     return (

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -12,18 +12,16 @@ export const metadata: Metadata = {
 
 export default function VehicleMaintenanceGuidePost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}><div className={styles.logoIcon}><Truck size={22} /></div><span className={styles.logoText}>DOT Helper</span></Link>
-                <div className={styles.navLinks}><Link href="/blog" className={styles.navLink}>← Blog</Link><Link href="/pricing" className={styles.navLink}>Pricing</Link><Link href="/login" className={styles.loginBtn}>Sign In</Link></div>
-            </nav>
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Vehicle Compliance • Complete Guide</div>
-                    <h1 className={styles.articleTitle}>Complete Guide to DOT Vehicle Maintenance &amp; Inspection Compliance</h1>
-                    <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 20, 2026</span><span>•</span><span>15 min read</span></div>
-                </header>
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Vehicle Compliance"
+            title="Complete Guide to DOT Vehicle Maintenance & Inspection Compliance"
+            date="February 20, 2026"
+            readTime="15 min read"
+            relatedPosts={[
+                { slug: "preventive-maintenance-program-guide", title: "Preventive Maintenance Program Guide" },
+                { slug: "dvir-best-practices", title: "DVIR Best Practices" },
+            ]}
+        >
                     <p>Vehicle maintenance isn&apos;t just about keeping your trucks running — it&apos;s a <strong>federal requirement</strong>. Under <strong>FMCSA Part 396</strong>, every motor carrier must systematically inspect, repair, and maintain all commercial motor vehicles under its control. Brake violations alone account for <strong>over 30% of all roadside out-of-service orders</strong>, making vehicle maintenance the single most impactful compliance area for your fleet.</p>
                     <p>This comprehensive guide covers every aspect of DOT vehicle maintenance compliance and links to deeper guides on specific topics.</p>
 
@@ -104,14 +102,6 @@ export default function VehicleMaintenanceGuidePost() {
                         <h4>🔧 Pro Tip: Brake Checks Save You Money</h4>
                         <p>Brake violations are the #1 reason vehicles are put out of service. A 5-minute brake stroke measurement at every PM service can prevent thousands in fines and lost revenue.</p>
                     </div>
-
-                    <div className={styles.articleCta}>
-                        <h3>Automate Your Fleet Maintenance Compliance</h3>
-                        <p>DOT Helper tracks PM schedules, inspection dates, and DVIR completion for every vehicle in your fleet.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>Start Your Free Trial <ArrowRight size={16} /></Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

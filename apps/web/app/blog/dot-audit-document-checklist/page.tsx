@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Audit Document Checklist: Every Record You Need Ready", description: "Complete document checklist for DOT compliance reviews. Organized by regulatory area with retention periods and tips for quick retrieval.", alternates: { canonical: "/blog/dot-audit-document-checklist" } };
+export const metadata: Metadata = { title: "DOT Audit Document Checklist: Every Record You Need Ready", description: "Complete document checklist for DOT compliance reviews. Organized by regulatory area with retention periods and tips for quick retrieval.", alternates: { canonical: "/blog/dot-audit-document-checklist" }, openGraph: { title: "DOT Audit Document Checklist: Every Record You Need Ready", description: "Complete document checklist for DOT compliance reviews. Organized by regulatory area with retention periods and tips for quick retrieval.", type: "article" } };
 
 export default function Page() {
     return (

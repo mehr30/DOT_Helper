@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Tire Compliance: DOT Tread Depth Minimums & Inspection Rules", description: "Guide to DOT tire compliance requirements. Covers minimum tread depths, steer vs drive tire rules, inspection criteria, and OOS conditions.", alternates: { canonical: "/blog/tire-compliance-requirements" } };
+export const metadata: Metadata = { title: "Tire Compliance: DOT Tread Depth Minimums & Inspection Rules", description: "Guide to DOT tire compliance requirements. Covers minimum tread depths, steer vs drive tire rules, inspection criteria, and OOS conditions.", alternates: { canonical: "/blog/tire-compliance-requirements" }, openGraph: { title: "Tire Compliance: DOT Tread Depth Minimums & Inspection Rules", description: "Guide to DOT tire compliance requirements. Covers minimum tread depths, steer vs drive tire rules, inspection criteria, and OOS conditions.", type: "article" } };
 
 export default function Page() {
     return (

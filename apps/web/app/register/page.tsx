@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
-import { Truck, ArrowRight, Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
+import GreenlightLogo from "@/app/components/GreenlightLogo";
 import styles from "../login/page.module.css";
 
 export default function RegisterPage() {
@@ -57,14 +58,12 @@ export default function RegisterPage() {
                 {/* Left Side - Branding */}
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
-                        <div className={styles.logoIcon}>
-                            <Truck size={28} />
-                        </div>
-                        <span>DOT Helper</span>
+                        <GreenlightLogo size={44} />
+                        <span>Greenlight DOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
-                        <h1>Start Your Free Trial</h1>
-                        <p>Join 500+ trucking companies that trust DOT Helper for their compliance needs.</p>
+                        <h1>See What You're Missing.</h1>
+                        <p>See exactly what you're missing. Fix it before the DOT shows up.</p>
                         <div className={styles.brandingFeatures}>
                             <div className={styles.brandingFeature}>
                                 <span className={styles.checkmark}>✓</span>
@@ -90,7 +89,7 @@ export default function RegisterPage() {
                 <div className={styles.authForm}>
                     <div className={styles.formHeader}>
                         <h2>Create your account</h2>
-                        <p>Get started with DOT Helper in minutes</p>
+                        <p>Get started with Greenlight DOT in minutes</p>
                     </div>
 
                     {/* OAuth Buttons */}

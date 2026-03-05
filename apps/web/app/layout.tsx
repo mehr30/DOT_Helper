@@ -3,13 +3,13 @@ import "./globals.css";
 import AuthProvider from "./components/AuthProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://dothelper.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://greenlightdot.com"),
   title: {
-    default: "DOT Helper — DOT Compliance Software for Small Fleets | FMCSA Compliance Made Simple",
-    template: "%s | DOT Helper",
+    default: "Greenlight DOT — DOT Compliance, Plain and Simple",
+    template: "%s | Greenlight DOT",
   },
   description:
-    "DOT Helper is the #1 DOT compliance software for small business fleets. Manage driver qualification files, HOS logs, vehicle inspections, drug & alcohol testing, and stay audit-ready. Start your free trial today.",
+    "Greenlight DOT is DOT compliance software for small business fleets. Track driver qualifications, vehicle inspections, HOS, and stay audit-ready. Start your free trial today.",
   keywords: [
     "DOT compliance software",
     "FMCSA compliance",
@@ -27,31 +27,31 @@ export const metadata: Metadata = {
     "vehicle maintenance compliance",
     "small fleet compliance",
   ],
-  authors: [{ name: "DOT Helper" }],
-  creator: "DOT Helper",
-  publisher: "DOT Helper",
+  authors: [{ name: "Greenlight DOT" }],
+  creator: "Greenlight DOT",
+  publisher: "Greenlight DOT",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "DOT Helper",
-    title: "DOT Helper — DOT Compliance Software for Small Fleets",
+    siteName: "Greenlight DOT",
+    title: "Greenlight DOT — DOT Compliance, Plain and Simple",
     description:
-      "The easiest way for small business owners to be and stay DOT compliant. Manage drivers, vehicles, HOS, inspections, and documents — all in one place.",
+      "DOT compliance software built for small fleets. Track drivers, vehicles, inspections, and documents — all in one place.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "DOT Helper — DOT Compliance Software",
+        alt: "Greenlight DOT — DOT Compliance Software",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DOT Helper — DOT Compliance Software for Small Fleets",
+    title: "Greenlight DOT — DOT Compliance, Plain and Simple",
     description:
-      "The easiest way for small business owners to be and stay DOT compliant. Start your free trial today.",
+      "DOT compliance software built for small fleets. Start your free trial today.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "DOT Helper",
+  name: "Greenlight DOT",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web, iOS, Android",
   description:
@@ -103,7 +103,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Nunito:wght@600;700&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

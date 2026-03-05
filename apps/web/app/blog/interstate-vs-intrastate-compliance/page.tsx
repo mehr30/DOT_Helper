@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Interstate vs Intrastate Trucking: Compliance Differences Explained", description: "Key differences between interstate and intrastate trucking compliance. Which regulations apply, exemptions, and how to determine your operation type.", alternates: { canonical: "/blog/interstate-vs-intrastate-compliance" } };
+export const metadata: Metadata = { title: "Interstate vs Intrastate Trucking: Compliance Differences Explained", description: "Key differences between interstate and intrastate trucking compliance. Which regulations apply, exemptions, and how to determine your operation type.", alternates: { canonical: "/blog/interstate-vs-intrastate-compliance" }, openGraph: { title: "Interstate vs Intrastate Trucking: Compliance Differences Explained", description: "Key differences between interstate and intrastate trucking compliance. Which regulations apply, exemptions, and how to determine your operation type.", type: "article" } };
 
 export default function Page() {
     return (

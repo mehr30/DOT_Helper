@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -17,30 +16,16 @@ export const metadata: Metadata = {
 
 export default function HowToPassDotAuditPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}><Truck size={22} /></div>
-                    <span className={styles.logoText}>DOT Helper</span>
-                </Link>
-                <div className={styles.navLinks}>
-                    <Link href="/blog" className={styles.navLink}>← Blog</Link>
-                    <Link href="/pricing" className={styles.navLink}>Pricing</Link>
-                    <Link href="/login" className={styles.loginBtn}>Sign In</Link>
-                </div>
-            </nav>
-
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Audit Prep</div>
-                    <h1 className={styles.articleTitle}>How to Pass a DOT Audit: A Complete Preparation Guide</h1>
-                    <div className={styles.articleMeta}>
-                        <span>By DOT Helper Team</span><span>•</span>
-                        <span>February 25, 2026</span><span>•</span><span>10 min read</span>
-                    </div>
-                </header>
-
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Audit Prep"
+            title="How to Pass a DOT Audit: A Complete Preparation Guide"
+            date="February 25, 2026"
+            readTime="10 min read"
+            relatedPosts={[
+                { slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" },
+                { slug: "driver-qualification-file-requirements", title: "Driver Qualification File Requirements" },
+            ]}
+        >
                     <p>
                         Getting a letter that says &quot;DOT audit&quot; is enough to ruin your whole week. We get it. But here&apos;s the thing — <strong>the audit itself isn&apos;t as scary as it sounds</strong> if you know what they&apos;re checking and you&apos;ve got your paperwork in order. Most carriers who fail don&apos;t fail because they&apos;re doing something dangerous. They fail because they forgot to file something or didn&apos;t keep a record they were supposed to.
                     </p>
@@ -136,16 +121,6 @@ export default function HowToPassDotAuditPost() {
                     <p>
                         The good news? Even a Conditional rating is fixable. The key is responding quickly, making the corrections, and documenting everything you did to fix the problem.
                     </p>
-
-                    <div className={styles.articleCta}>
-                        <h3>Be Audit-Ready 365 Days a Year</h3>
-                        <p>DOT Helper continuously monitors your compliance status and flags issues before they become audit findings.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>
-                            Start Your Free Trial <ArrowRight size={16} />
-                        </Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

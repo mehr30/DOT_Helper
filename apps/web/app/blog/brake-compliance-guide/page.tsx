@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Brake Compliance: The #1 Out-of-Service Violation and How to Fix It", description: "Deep dive into brake compliance for CMVs. Brake adjustment standards, common violations, measurement techniques, and maintaining compliant brakes.", alternates: { canonical: "/blog/brake-compliance-guide" } };
+export const metadata: Metadata = { title: "Brake Compliance: The #1 Out-of-Service Violation and How to Fix It", description: "Deep dive into brake compliance for CMVs. Brake adjustment standards, common violations, measurement techniques, and maintaining compliant brakes.", alternates: { canonical: "/blog/brake-compliance-guide" }, openGraph: { title: "Brake Compliance: The #1 Out-of-Service Violation and How to Fix It", description: "Deep dive into brake compliance for CMVs. Brake adjustment standards, common violations, measurement techniques, and maintaining compliant brakes.", type: "article" } };
 
 export default function Page() {
     return (

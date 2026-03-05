@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Drug Testing Panel: What's Tested and How It Works", description: "Breakdown of the DOT 5-panel drug test — substances tested, cutoff levels, the testing process, split specimen procedures, and MRO review.", alternates: { canonical: "/blog/dot-drug-testing-panel" } };
+export const metadata: Metadata = { title: "DOT Drug Testing Panel: What's Tested and How It Works", description: "Breakdown of the DOT 5-panel drug test — substances tested, cutoff levels, the testing process, split specimen procedures, and MRO review.", alternates: { canonical: "/blog/dot-drug-testing-panel" }, openGraph: { title: "DOT Drug Testing Panel: What's Tested and How It Works", description: "Breakdown of the DOT 5-panel drug test — substances tested, cutoff levels, the testing process, split specimen procedures, and MRO review.", type: "article" } };
 
 export default function Page() {
     return (

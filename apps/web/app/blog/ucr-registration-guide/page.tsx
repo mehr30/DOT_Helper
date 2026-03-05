@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "UCR Registration Guide: Fees, Deadlines & Requirements (2026)", description: "Complete guide to Unified Carrier Registration for motor carriers. Covers who must register, fee brackets, deadlines, and penalties for non-compliance.", alternates: { canonical: "/blog/ucr-registration-guide" } };
+export const metadata: Metadata = { title: "UCR Registration Guide: Fees, Deadlines & Requirements (2026)", description: "Complete guide to Unified Carrier Registration for motor carriers. Covers who must register, fee brackets, deadlines, and penalties for non-compliance.", alternates: { canonical: "/blog/ucr-registration-guide" }, openGraph: { title: "UCR Registration Guide: Fees, Deadlines & Requirements (2026)", description: "Complete guide to Unified Carrier Registration for motor carriers. Covers who must register, fee brackets, deadlines, and penalties for non-compliance.", type: "article" } };
 
 export default function Page() {
     return (

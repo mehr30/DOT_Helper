@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "CMV Emergency Equipment Requirements: What You Must Carry", description: "Guide to emergency equipment requirements for commercial motor vehicles. Fire extinguishers, warning triangles, spare fuses, and inspection tips.", alternates: { canonical: "/blog/emergency-equipment-requirements" } };
+export const metadata: Metadata = { title: "CMV Emergency Equipment Requirements: What You Must Carry", description: "Guide to emergency equipment requirements for commercial motor vehicles. Fire extinguishers, warning triangles, spare fuses, and inspection tips.", alternates: { canonical: "/blog/emergency-equipment-requirements" }, openGraph: { title: "CMV Emergency Equipment Requirements: What You Must Carry", description: "Guide to emergency equipment requirements for commercial motor vehicles. Fire extinguishers, warning triangles, spare fuses, and inspection tips.", type: "article" } };
 
 export default function Page() {
     return (

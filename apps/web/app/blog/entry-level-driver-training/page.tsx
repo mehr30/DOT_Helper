@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Entry-Level Driver Training (ELDT) Requirements for Motor Carriers", description: "Guide to FMCSA entry-level driver training requirements. Who must complete ELDT, what it covers, Training Provider Registry, and carrier responsibilities.", alternates: { canonical: "/blog/entry-level-driver-training" } };
+export const metadata: Metadata = { title: "Entry-Level Driver Training (ELDT) Requirements for Motor Carriers", description: "Guide to FMCSA entry-level driver training requirements. Who must complete ELDT, what it covers, Training Provider Registry, and carrier responsibilities.", alternates: { canonical: "/blog/entry-level-driver-training" }, openGraph: { title: "Entry-Level Driver Training (ELDT) Requirements for Motor Carriers", description: "Guide to FMCSA entry-level driver training requirements. Who must complete ELDT, what it covers, Training Provider Registry, and carrier responsibilities.", type: "article" } };
 
 export default function Page() {
     return (

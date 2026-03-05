@@ -2,8 +2,8 @@ import Link from "next/link";
 import { CheckCircle, ArrowRight, Truck } from "lucide-react";
 
 export const metadata = {
-    title: "Welcome to DOT Helper! | Subscription Confirmed",
-    description: "Your DOT Helper subscription is active. Start managing your fleet compliance today.",
+    title: "Welcome to Greenlight DOT! | Subscription Confirmed",
+    description: "Your Greenlight DOT subscription is active. Start managing your fleet compliance today.",
 };
 
 export default function CheckoutSuccessPage() {
@@ -45,7 +45,7 @@ export default function CheckoutSuccessPage() {
                     color: "var(--text-primary)",
                     marginBottom: "0.75rem",
                 }}>
-                    Welcome to DOT Helper!
+                    Welcome to Greenlight DOT!
                 </h1>
                 <p style={{
                     fontSize: "1rem",

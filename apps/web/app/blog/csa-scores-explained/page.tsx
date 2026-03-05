@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "CSA Scores Explained: What They Mean for Your Trucking Business", description: "Understand FMCSA CSA scores — how they're calculated, the 7 BASICs, intervention thresholds, and how to improve your safety scores.", alternates: { canonical: "/blog/csa-scores-explained" } };
+export const metadata: Metadata = { title: "CSA Scores Explained: What They Mean for Your Trucking Business", description: "Understand FMCSA CSA scores — how they're calculated, the 7 BASICs, intervention thresholds, and how to improve your safety scores.", alternates: { canonical: "/blog/csa-scores-explained" }, openGraph: { title: "CSA Scores Explained: What They Mean for Your Trucking Business", description: "Understand FMCSA CSA scores — how they're calculated, the 7 BASICs, intervention thresholds, and how to improve your safety scores.", type: "article" } };
 
 export default function Page() {
     return (

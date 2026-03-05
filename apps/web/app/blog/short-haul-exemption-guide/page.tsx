@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Short-Haul Exemption Explained: 150 Air-Mile Radius Rules", description: "Complete guide to the FMCSA short-haul exemption. Who qualifies, the 150 air-mile radius, timecard exception, and when you lose the exemption.", alternates: { canonical: "/blog/short-haul-exemption-guide" } };
+export const metadata: Metadata = { title: "Short-Haul Exemption Explained: 150 Air-Mile Radius Rules", description: "Complete guide to the FMCSA short-haul exemption. Who qualifies, the 150 air-mile radius, timecard exception, and when you lose the exemption.", alternates: { canonical: "/blog/short-haul-exemption-guide" }, openGraph: { title: "Short-Haul Exemption Explained: 150 Air-Mile Radius Rules", description: "Complete guide to the FMCSA short-haul exemption. Who qualifies, the 150 air-mile radius, timecard exception, and when you lose the exemption.", type: "article" } };
 
 export default function Page() {
     return (

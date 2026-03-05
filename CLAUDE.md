@@ -1,9 +1,9 @@
-# AI Handoff Context: DOT Helper
+# AI Handoff Context: Greenlight DOT
 
-> **Note to Claude/AI agent**: This file serves as your canonical source of truth for the DOT Helper codebase. Read this entire document before executing any commands or making code changes.
+> **Note to Claude/AI agent**: This file serves as your canonical source of truth for the Greenlight DOT codebase. Read this entire document before executing any commands or making code changes.
 
 ## 1. Project Overview & Architecture
-DOT Helper is a SaaS platform designed to help small business fleet owners (1-50 vehicles) achieve and maintain FMCSA/DOT compliance.
+Greenlight DOT is a SaaS platform designed to help small business fleet owners (1-50 vehicles) achieve and maintain FMCSA/DOT compliance.
 - **Framework**: Turborepo monorepo (`apps/web` Next.js 16 App Router, `apps/mobile` Expo React Native).
 - **Database**: PostgreSQL hosted on **Neon** (`packages/database/prisma/schema.prisma`).
 - **Auth**: `better-auth` v1.5 with Prisma adapter.
@@ -79,10 +79,33 @@ BETTER_AUTH_URL="http://localhost:3000" # Use vercel URL in prod
 
 # Resend (Email)
 RESEND_API_KEY="re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW"
-EMAIL_FROM="DOT Helper <noreply@yourdomain.com>"
+EMAIL_FROM="Greenlight DOT <noreply@yourdomain.com>"
 ```
 
-## 7. AI Persona & Constraints
+## 7. Troubleshooting & Known Issues
+
+### Auth Signup 500 "Bad escaped character in JSON"
+**Symptom**: POST `/api/auth/sign-up/email` returns 500 with `SyntaxError: Bad escaped character in JSON at position N`.
+**Root Cause**: The request body JSON contains invalid escape sequences. Common trigger: using bash `echo -n` to generate JSON with special characters like `!` — bash escapes `!` to `\!`, producing invalid JSON (`"Test1234\!"` instead of `"Test1234!"`).
+**Fix**: Not a code bug. Use `printf` or Python to generate test JSON, or single-quote the string in bash to prevent history expansion.
+
+### Prisma DB Pull Overwrites Schema
+**Symptom**: Running `npx prisma db pull` replaces the hand-crafted `schema.prisma` with an introspected version that loses comments, enums, and relation naming.
+**Fix**: Use `git restore packages/database/prisma/schema.prisma` immediately. Always use `prisma db push` to sync schema → DB, never `db pull` unless intentionally introspecting.
+
+### OAuth Social Providers Not Working
+**Symptom**: Google/Apple sign-in buttons redirect but fail.
+**Root Cause**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `APPLE_CLIENT_ID`, `APPLE_CLIENT_SECRET` are empty in `.env`.
+**Fix**: Create OAuth apps in Google Cloud Console and Apple Developer Portal, then populate the env vars.
+
+### Emails Not Sending Locally
+**Symptom**: Console shows `[auth] RESEND_API_KEY not set — skipping email`.
+**Fix**: Add `RESEND_API_KEY=re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW` to `apps/web/.env`. The `sendEmail()` function in `auth.ts` gracefully skips when the key is missing.
+
+### Signup Notification
+Every new user signup sends a notification email to `scottmehr10@gmail.com` via the `databaseHooks.user.create.after` hook in `auth.ts`.
+
+## 8. AI Persona & Constraints
 - Write complete, robust production code. Do not leave `// TODO`s for the user unless it requires a proprietary key.
 - ALWAYS use absolute paths when editing files.
 - The UI must look incredibly modern and polished (premium SaaS aesthetic). Avoid basic/default component looks.

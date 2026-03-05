@@ -151,7 +151,7 @@
   right: -200px;
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(46, 204, 113, 0.15) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -188,6 +188,7 @@
 
 .heroTitle {
   font-size: 3.5rem;
+  font-family: var(--font-display);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -227,13 +228,13 @@
   font-size: 1rem;
   font-weight: 600;
   border-radius: var(--radius-xl);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 46, 26, 0.35);
   transition: all var(--transition-fast);
 }
 
 .ctaPrimary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 12px 32px rgba(15, 46, 26, 0.4);
   color: white;
 }
 
@@ -355,6 +356,7 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: var(--font-label);
   color: var(--color-primary-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -363,6 +365,7 @@
 
 .featuresTitle {
   font-size: 2.25rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -450,6 +453,7 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: var(--font-label);
   color: var(--color-primary-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -458,6 +462,7 @@
 
 .showcaseTitle {
   font-size: 2.25rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -631,6 +636,7 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: var(--font-label);
   color: var(--color-primary-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -639,6 +645,7 @@
 
 .testimonialsTitle {
   font-size: 2.25rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -747,6 +754,7 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: var(--font-label);
   color: var(--color-primary-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -755,6 +763,7 @@
 
 .pricingTitle {
   font-size: 2.25rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -791,7 +800,7 @@
 
 .pricingPopular {
   border-color: var(--color-primary-500);
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 8px 32px rgba(15, 46, 26, 0.15);
 }
 
 .popularBadge {
@@ -803,6 +812,7 @@
   color: white;
   font-size: 0.75rem;
   font-weight: 600;
+  font-family: var(--font-label);
   padding: var(--space-1) var(--space-4);
   border-radius: var(--radius-full);
 }
@@ -962,6 +972,7 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: var(--font-label);
   color: var(--color-primary-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -970,6 +981,7 @@
 
 .benefitsTitle {
   font-size: 2rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -1097,7 +1109,7 @@
 /* CTA Section */
 .cta {
   padding: 100px var(--space-6);
-  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #1B5E35 0%, #0F2E1A 100%);
   text-align: center;
 }
 
@@ -1108,6 +1120,7 @@
 
 .ctaTitle {
   font-size: 2.25rem;
+  font-family: var(--font-display);
   font-weight: 700;
   color: white;
   margin-bottom: var(--space-4);

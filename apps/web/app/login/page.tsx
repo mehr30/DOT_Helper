@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
-import { Truck, ArrowRight, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import GreenlightLogo from "@/app/components/GreenlightLogo";
 import styles from "./page.module.css";
 
 export default function LoginPage() {
@@ -46,14 +47,12 @@ export default function LoginPage() {
                 {/* Left Side - Branding */}
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
-                        <div className={styles.logoIcon}>
-                            <Truck size={28} />
-                        </div>
-                        <span>DOT Helper</span>
+                        <GreenlightLogo size={44} />
+                        <span>Greenlight DOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
-                        <h1>Stay DOT Compliant</h1>
-                        <p>Access your compliance dashboard and keep your fleet running smoothly.</p>
+                        <h1>Good to Go.</h1>
+                        <p>Your compliance dashboard is one click away.</p>
                         <div className={styles.brandingFeatures}>
                             <div className={styles.brandingFeature}>
                                 <span className={styles.checkmark}>✓</span>

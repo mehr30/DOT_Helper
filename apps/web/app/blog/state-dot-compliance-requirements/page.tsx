@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "State DOT Compliance: Requirements That Go Beyond Federal Rules", description: "Overview of state-specific DOT compliance requirements that differ from federal FMCSA rules. Covers intrastate authority, state inspections, emissions, and permits.", alternates: { canonical: "/blog/state-dot-compliance-requirements" } };
+export const metadata: Metadata = { title: "State DOT Compliance: Requirements That Go Beyond Federal Rules", description: "Overview of state-specific DOT compliance requirements that differ from federal FMCSA rules. Covers intrastate authority, state inspections, emissions, and permits.", alternates: { canonical: "/blog/state-dot-compliance-requirements" }, openGraph: { title: "State DOT Compliance: Requirements That Go Beyond Federal Rules", description: "Overview of state-specific DOT compliance requirements that differ from federal FMCSA rules. Covers intrastate authority, state inspections, emissions, and permits.", type: "article" } };
 
 export default function Page() {
     return (

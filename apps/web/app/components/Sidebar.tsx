@@ -20,6 +20,7 @@ import {
     Check,
     AlertCircle,
 } from "lucide-react";
+import GreenlightLogo from "./GreenlightLogo";
 import { useState } from "react";
 import styles from "./Sidebar.module.css";
 import { useDemoMode } from "./DemoModeContext";
@@ -89,10 +90,8 @@ export default function Sidebar() {
                 {/* Logo */}
                 <div className={styles.logo}>
                     <Link href="/dashboard" className={styles.logoLink}>
-                        <div className={styles.logoIcon}>
-                            <Truck size={28} />
-                        </div>
-                        <span className={styles.logoText}>DOT Helper</span>
+                        <GreenlightLogo size={44} />
+                        <span className={styles.logoText}>Greenlight DOT</span>
                     </Link>
                 </div>
 

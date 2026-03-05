@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DOT Helper",
-    "slug": "dot-helper",
+    "name": "Greenlight DOT",
+    "slug": "greenlight-dot",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

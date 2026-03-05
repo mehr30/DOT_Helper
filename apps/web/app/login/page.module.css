@@ -29,7 +29,7 @@
 
 /* Branding Side */
 .authBranding {
-    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #1B5E35 0%, #0F2E1A 100%);
     padding: var(--space-10);
     display: flex;
     flex-direction: column;
@@ -71,6 +71,7 @@
 
 .brandingContent h1 {
     font-size: 2.25rem;
+  font-family: var(--font-display);
     font-weight: 700;
     margin-bottom: var(--space-4);
     letter-spacing: -0.02em;
@@ -229,7 +230,7 @@
 
 .submitButton:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 20px rgba(15, 46, 26, 0.35);
 }
 
 .submitButton:disabled {

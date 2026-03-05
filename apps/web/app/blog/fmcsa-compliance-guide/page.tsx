@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -17,30 +17,16 @@ export const metadata: Metadata = {
 
 export default function FmcsaComplianceGuidePost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}><Truck size={22} /></div>
-                    <span className={styles.logoText}>DOT Helper</span>
-                </Link>
-                <div className={styles.navLinks}>
-                    <Link href="/blog" className={styles.navLink}>← Blog</Link>
-                    <Link href="/pricing" className={styles.navLink}>Pricing</Link>
-                    <Link href="/login" className={styles.loginBtn}>Sign In</Link>
-                </div>
-            </nav>
-
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Regulations</div>
-                    <h1 className={styles.articleTitle}>FMCSA Compliance Guide for Small Fleet Owners</h1>
-                    <div className={styles.articleMeta}>
-                        <span>By DOT Helper Team</span><span>•</span>
-                        <span>February 18, 2026</span><span>•</span><span>14 min read</span>
-                    </div>
-                </header>
-
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Compliance"
+            title="FMCSA Compliance Guide for Small Fleet Owners"
+            date="February 18, 2026"
+            readTime="14 min read"
+            relatedPosts={[
+                { slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" },
+                { slug: "csa-scores-explained", title: "CSA Scores Explained" },
+            ]}
+        >
                     <p>
                         If you operate commercial trucks, vans, or equipment vehicles, there&apos;s a federal agency keeping an eye on you: the <strong>FMCSA</strong> (Federal Motor Carrier Safety Administration). They&apos;re the ones who set the rules for who can drive commercially, how long they can drive, how vehicles must be maintained, and a lot more.
                     </p>
@@ -132,18 +118,8 @@ export default function FmcsaComplianceGuidePost() {
 
                     <h2>It&apos;s a Lot. We Know.</h2>
                     <p>
-                        Managing all of this across multiple drivers and vehicles while also running your actual business is overwhelming. That&apos;s why we built <strong>DOT Helper</strong> — specifically for small fleet owners who need to stay compliant without hiring a full-time compliance person. We track every requirement, send reminders, and keep your documentation organized so you&apos;re always ready.
+                        Managing all of this across multiple drivers and vehicles while also running your actual business is overwhelming. That&apos;s why we built <strong>Greenlight DOT</strong> — specifically for small fleet owners who need to stay compliant without hiring a full-time compliance person. We track every requirement, send reminders, and keep your documentation organized so you&apos;re always ready.
                     </p>
-
-                    <div className={styles.articleCta}>
-                        <h3>Simplify Your FMCSA Compliance Today</h3>
-                        <p>Join small fleet owners who trust DOT Helper to manage their compliance.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>
-                            Start Your Free Trial <ArrowRight size={16} />
-                        </Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

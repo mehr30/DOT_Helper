@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Drug & Alcohol Testing Record Retention: What to Keep and How Long", description: "DOT drug and alcohol testing record retention requirements. Organized by document type with retention periods and storage best practices.", alternates: { canonical: "/blog/drug-testing-record-retention" } };
+export const metadata: Metadata = { title: "Drug & Alcohol Testing Record Retention: What to Keep and How Long", description: "DOT drug and alcohol testing record retention requirements. Organized by document type with retention periods and storage best practices.", alternates: { canonical: "/blog/drug-testing-record-retention" }, openGraph: { title: "Drug & Alcohol Testing Record Retention: What to Keep & How Long", description: "DOT drug and alcohol testing record retention requirements. Organized by document type with retention periods and storage best practices.", type: "article" } };
 
 export default function Page() {
     return (

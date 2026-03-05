@@ -98,7 +98,7 @@ export default function App() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>DOT Helper</Text>
+        <Text style={styles.headerTitle}>Greenlight DOT</Text>
         <Text style={styles.headerSubtitle}>Driver Vehicle Inspection</Text>
       </View>
 

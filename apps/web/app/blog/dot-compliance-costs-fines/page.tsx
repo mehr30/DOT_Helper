@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -12,18 +11,16 @@ export const metadata: Metadata = {
 
 export default function DotComplianceCostsFinesPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}><div className={styles.logoIcon}><Truck size={22} /></div><span className={styles.logoText}>DOT Helper</span></Link>
-                <div className={styles.navLinks}><Link href="/blog" className={styles.navLink}>← Blog</Link><Link href="/pricing" className={styles.navLink}>Pricing</Link><Link href="/login" className={styles.loginBtn}>Sign In</Link></div>
-            </nav>
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Business</div>
-                    <h1 className={styles.articleTitle}>DOT Compliance Costs &amp; Fines: What Non-Compliance Really Costs Your Business</h1>
-                    <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>January 28, 2026</span><span>•</span><span>8 min read</span></div>
-                </header>
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Business"
+            title="DOT Compliance Costs & Fines: What Non-Compliance Really Costs Your Business"
+            date="January 28, 2026"
+            readTime="8 min read"
+            relatedPosts={[
+                { slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" },
+                { slug: "common-dot-violations", title: "10 Most Common DOT Violations" },
+            ]}
+        >
                     <p>Many small fleet owners think of <strong>DOT compliance</strong> as just another cost of doing business. But the cost of <em>non-compliance</em> can be staggering — from fines up to <strong>$16,864 per violation</strong> to losing your operating authority entirely. Here&apos;s a complete breakdown of what DOT violations really cost.</p>
 
                     <h2>Federal Fine Amounts (2026)</h2>
@@ -94,14 +91,6 @@ export default function DotComplianceCostsFinesPost() {
                         <li><strong>Train your team</strong> — drivers and dispatchers should understand the rules</li>
                         <li><strong>Document everything</strong> — if it&apos;s not documented, it didn&apos;t happen</li>
                     </ul>
-
-                    <div className={styles.articleCta}>
-                        <h3>Protect Your Bottom Line</h3>
-                        <p>DOT Helper costs less than a single DOT fine. Start managing your compliance today and avoid costly violations.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>Start Your Free Trial <ArrowRight size={16} /></Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

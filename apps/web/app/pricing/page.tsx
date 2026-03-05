@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-    Truck,
     Check,
     ChevronDown,
     ArrowRight,
@@ -11,6 +10,7 @@ import {
     Zap,
     Star,
 } from "lucide-react";
+import GreenlightLogo from "../components/GreenlightLogo";
 import { createCheckoutSession } from "../actions/stripe";
 import styles from "./page.module.css";
 
@@ -100,7 +100,7 @@ export default function PricingPage() {
 
     const handleCheckout = async (planKey: string) => {
         if (planKey === "fleet") {
-            window.location.href = "mailto:sales@dothelper.com?subject=Enterprise Plan Inquiry";
+            window.location.href = "mailto:sales@greenlightdot.com?subject=Fleet Plan Inquiry";
             return;
         }
 
@@ -124,10 +124,8 @@ export default function PricingPage() {
             {/* Navigation */}
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}>
-                        <Truck size={22} />
-                    </div>
-                    <span className={styles.logoText}>DOT Helper</span>
+                    <GreenlightLogo size={40} />
+                    <span className={styles.logoText}>Greenlight DOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/" className={styles.navLink}>Home</Link>
@@ -144,10 +142,10 @@ export default function PricingPage() {
                     14-Day Free Trial — No Credit Card Required
                 </div>
                 <h1 className={styles.heroTitle}>
-                    Simple, Transparent Pricing for DOT Compliance
+                    One fine from the DOT costs $11,000. Greenlight DOT costs $49 a month.
                 </h1>
                 <p className={styles.heroSubtitle}>
-                    Choose the plan that fits your fleet. All plans include a free trial so you can experience full compliance management before committing.
+                    Choose the plan that fits your fleet. All plans include a 14-day free trial. No credit card required.
                 </p>
             </div>
 

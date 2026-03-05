@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Roadside Inspection Survival Guide: Levels, Rights & Tips", description: "What to expect during a DOT roadside inspection. The 6 inspection levels, driver rights, how to reduce your inspection rate, and what to do if you get a violation.", alternates: { canonical: "/blog/roadside-inspection-guide" } };
+export const metadata: Metadata = { title: "Roadside Inspection Survival Guide: Levels, Rights & Tips", description: "What to expect during a DOT roadside inspection. The 6 inspection levels, driver rights, how to reduce your inspection rate, and what to do if you get a violation.", alternates: { canonical: "/blog/roadside-inspection-guide" }, openGraph: { title: "Roadside Inspection Survival Guide: Levels, Rights & Tips", description: "What to expect during a DOT roadside inspection. The 6 inspection levels, driver rights, how to reduce your inspection rate, and what to do if you get a violation.", type: "article" } };
 
 export default function Page() {
     return (

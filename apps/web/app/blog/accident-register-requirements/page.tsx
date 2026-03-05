@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Accident Register Requirements: What You Must Document", description: "Guide to maintaining a DOT accident register under Part 390. What qualifies as a recordable accident, required information, and retention periods.", alternates: { canonical: "/blog/accident-register-requirements" } };
+export const metadata: Metadata = { title: "DOT Accident Register Requirements: What You Must Document", description: "Guide to maintaining a DOT accident register under Part 390. What qualifies as a recordable accident, required information, and retention periods.", alternates: { canonical: "/blog/accident-register-requirements" }, openGraph: { title: "DOT Accident Register Requirements: What You Must Document", description: "Guide to maintaining a DOT accident register under Part 390. What qualifies as a recordable accident, required information, and retention periods.", type: "article" } };
 
 export default function Page() {
     return (

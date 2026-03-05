@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Truck, ArrowRight, Clock, Calendar } from "lucide-react";
+import { ArrowRight, Clock, Calendar } from "lucide-react";
 import type { Metadata } from "next";
+import GreenlightLogo from "../components/GreenlightLogo";
 import styles from "./blog.module.css";
 
 export const metadata: Metadata = {
@@ -147,8 +148,8 @@ export default function BlogIndexPage() {
         <div className={styles.blogLayout}>
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
-                    <div className={styles.logoIcon}><Truck size={22} /></div>
-                    <span className={styles.logoText}>DOT Helper</span>
+                    <GreenlightLogo size={36} />
+                    <span className={styles.logoText}>Greenlight DOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/" className={styles.navLink}>Home</Link>
@@ -234,7 +235,7 @@ export default function BlogIndexPage() {
             <div className={styles.footerCta}>
                 <h2 className={styles.footerCtaTitle}>Ready to Simplify Your DOT Compliance?</h2>
                 <p className={styles.footerCtaText}>
-                    Stop worrying about audits and fines. DOT Helper keeps your fleet compliant 24/7.
+                    Stop worrying about audits and fines. Greenlight DOT keeps your fleet compliant 24/7.
                 </p>
                 <Link href="/pricing" className={styles.footerCtaBtn}>
                     Start Free Trial

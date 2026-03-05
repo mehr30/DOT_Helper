@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Random Drug Testing Requirements: Rates, Selection & Common Errors", description: "Guide to DOT random drug testing — annual testing rates, random selection methods, selection pool requirements, and carrier responsibilities.", alternates: { canonical: "/blog/random-drug-testing-requirements" } };
+export const metadata: Metadata = { title: "Random Drug Testing Requirements: Rates, Selection & Common Errors", description: "Guide to DOT random drug testing — annual testing rates, random selection methods, selection pool requirements, and carrier responsibilities.", alternates: { canonical: "/blog/random-drug-testing-requirements" }, openGraph: { title: "Random Drug Testing Requirements: Rates, Selection & Common Errors", description: "Guide to DOT random drug testing — annual testing rates, random selection methods, selection pool requirements, and carrier responsibilities.", type: "article" } };
 
 export default function Page() {
     return (

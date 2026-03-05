@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "IFTA Reporting Guide for Small Fleets: Quarterly Filing Made Simple", description: "Step-by-step guide to IFTA fuel tax reporting for trucking companies. Covers registration, quarterly filing, record keeping, and avoiding common mistakes.", alternates: { canonical: "/blog/ifta-reporting-guide" } };
+export const metadata: Metadata = { title: "IFTA Reporting Guide for Small Fleets: Quarterly Filing Made Simple", description: "Step-by-step guide to IFTA fuel tax reporting for trucking companies. Covers registration, quarterly filing, record keeping, and avoiding common mistakes.", alternates: { canonical: "/blog/ifta-reporting-guide" }, openGraph: { title: "IFTA Reporting Guide: Quarterly Filing Made Simple", description: "Step-by-step guide to IFTA fuel tax reporting for trucking companies. Covers registration, quarterly filing, record keeping, and avoiding common mistakes.", type: "article" } };
 
 export default function Page() {
     return (

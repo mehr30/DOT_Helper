@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "FMCSA Operating Authority: MC Number, Broker Authority & More", description: "Complete guide to FMCSA operating authority types — MC numbers, broker authority, freight forwarder. How to apply, activation timeline, and maintaining your authority.", alternates: { canonical: "/blog/fmcsa-operating-authority-guide" } };
+export const metadata: Metadata = { title: "FMCSA Operating Authority: MC Number, Broker Authority & More", description: "Complete guide to FMCSA operating authority types — MC numbers, broker authority, freight forwarder. How to apply, activation timeline, and maintaining your authority.", alternates: { canonical: "/blog/fmcsa-operating-authority-guide" }, openGraph: { title: "FMCSA Operating Authority: MC Number, Broker Authority & More", description: "Complete guide to FMCSA operating authority types — MC numbers, broker authority, freight forwarder. How to apply, activation timeline, and maintaining your authority.", type: "article" } };
 
 export default function Page() {
     return (

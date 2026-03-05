@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DOT Medical Card Requirements: Examiners, Conditions & Renewals", description: "Guide to DOT medical examiner certificates. National Registry examiners, disqualifying conditions, waiver programs, and keeping medical cards current.", alternates: { canonical: "/blog/dot-medical-card-requirements" } };
+export const metadata: Metadata = { title: "DOT Medical Card Requirements: Examiners, Conditions & Renewals", description: "Guide to DOT medical examiner certificates. National Registry examiners, disqualifying conditions, waiver programs, and keeping medical cards current.", alternates: { canonical: "/blog/dot-medical-card-requirements" }, openGraph: { title: "DOT Medical Card Requirements: Examiners, Conditions & Renewals", description: "Guide to DOT medical examiner certificates. National Registry examiners, disqualifying conditions, waiver programs, and keeping medical cards current.", type: "article" } };
 
 export default function Page() {
     return (

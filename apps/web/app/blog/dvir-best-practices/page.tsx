@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "DVIR Best Practices: How to Never Fail a Roadside Inspection", description: "Guide to DVIR best practices for drivers and carriers. What to inspect, how to document defects, and building a culture of thorough pre-trip inspections.", alternates: { canonical: "/blog/dvir-best-practices" } };
+export const metadata: Metadata = { title: "DVIR Best Practices: How to Never Fail a Roadside Inspection", description: "Guide to DVIR best practices for drivers and carriers. What to inspect, how to document defects, and building a culture of thorough pre-trip inspections.", alternates: { canonical: "/blog/dvir-best-practices" }, openGraph: { title: "DVIR Best Practices: How to Never Fail a Roadside Inspection", description: "Guide to DVIR best practices for drivers and carriers. What to inspect, how to document defects, and building a culture of thorough pre-trip inspections.", type: "article" } };
 
 export default function Page() {
     return (

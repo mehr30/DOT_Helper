@@ -229,6 +229,7 @@
 
 .articleTitle {
     font-size: 2.5rem;
+  font-family: var(--font-display);
     font-weight: 800;
     color: var(--text-primary);
     letter-spacing: -0.025em;

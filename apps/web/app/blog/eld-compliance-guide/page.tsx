@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "ELD Compliance Guide: Requirements, Exemptions & Best Practices", description: "Complete ELD compliance guide for motor carriers. Covers the mandate, approved devices, exemptions, driver training, and troubleshooting common issues.", alternates: { canonical: "/blog/eld-compliance-guide" } };
+export const metadata: Metadata = { title: "ELD Compliance Guide: Requirements, Exemptions & Best Practices", description: "Complete ELD compliance guide for motor carriers. Covers the mandate, approved devices, exemptions, driver training, and troubleshooting common issues.", alternates: { canonical: "/blog/eld-compliance-guide" }, openGraph: { title: "ELD Compliance Guide: Requirements, Exemptions & Best Practices", description: "Complete ELD compliance guide for motor carriers. Covers the mandate, approved devices, exemptions, driver training, and troubleshooting common issues.", type: "article" } };
 
 export default function Page() {
     return (

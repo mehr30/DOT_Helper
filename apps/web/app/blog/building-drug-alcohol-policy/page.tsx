@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Building a DOT Drug & Alcohol Policy: Requirements & Template Guide", description: "How to create a compliant DOT drug and alcohol written policy. Required elements, distribution requirements, acknowledgment forms, and policy review.", alternates: { canonical: "/blog/building-drug-alcohol-policy" } };
+export const metadata: Metadata = { title: "Building a DOT Drug & Alcohol Policy: Requirements & Template Guide", description: "How to create a compliant DOT drug and alcohol written policy. Required elements, distribution requirements, acknowledgment forms, and policy review.", alternates: { canonical: "/blog/building-drug-alcohol-policy" }, openGraph: { title: "Building a DOT Drug & Alcohol Policy: Requirements & Template Guide", description: "How to create a compliant DOT drug and alcohol written policy. Required elements, distribution requirements, acknowledgment forms, and policy review.", type: "article" } };
 
 export default function Page() {
     return (

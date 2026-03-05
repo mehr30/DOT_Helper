@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "FMCSA Safety Ratings Explained: Satisfactory, Conditional & Unsatisfactory", description: "What FMCSA safety ratings mean for your carrier operation. How ratings are assigned, what triggers downgrades, and how to get upgraded from conditional.", alternates: { canonical: "/blog/fmcsa-safety-ratings" } };
+export const metadata: Metadata = { title: "FMCSA Safety Ratings Explained: Satisfactory, Conditional & Unsatisfactory", description: "What FMCSA safety ratings mean for your carrier operation. How ratings are assigned, what triggers downgrades, and how to get upgraded from conditional.", alternates: { canonical: "/blog/fmcsa-safety-ratings" }, openGraph: { title: "FMCSA Safety Ratings: Satisfactory, Conditional & Unsatisfactory", description: "What FMCSA safety ratings mean for your carrier operation. How ratings are assigned, what triggers downgrades, and how to get upgraded from conditional.", type: "article" } };
 
 export default function Page() {
     return (

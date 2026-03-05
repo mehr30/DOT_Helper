@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Trailer Maintenance Requirements: DOT Compliance for Trailers", description: "DOT maintenance requirements specific to trailers — annual inspections, lighting, brakes, tires, fifth wheel, and record keeping for trailer fleets.", alternates: { canonical: "/blog/trailer-maintenance-requirements" } };
+export const metadata: Metadata = { title: "Trailer Maintenance Requirements: DOT Compliance for Trailers", description: "DOT maintenance requirements specific to trailers — annual inspections, lighting, brakes, tires, fifth wheel, and record keeping for trailer fleets.", alternates: { canonical: "/blog/trailer-maintenance-requirements" }, openGraph: { title: "Trailer Maintenance Requirements: DOT Compliance for Trailers", description: "DOT maintenance requirements specific to trailers — annual inspections, lighting, brakes, tires, fifth wheel, and record keeping for trailer fleets.", type: "article" } };
 
 export default function Page() {
     return (

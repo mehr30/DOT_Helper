@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Hiring CDL Drivers: Compliance Checklist for the Onboarding Process", description: "Step-by-step compliance checklist for hiring CDL drivers. Pre-hire requirements, onboarding paperwork, and the documents you must collect before dispatch.", alternates: { canonical: "/blog/hiring-cdl-drivers-compliance" } };
+export const metadata: Metadata = { title: "Hiring CDL Drivers: Compliance Checklist for the Onboarding Process", description: "Step-by-step compliance checklist for hiring CDL drivers. Pre-hire requirements, onboarding paperwork, and the documents you must collect before dispatch.", alternates: { canonical: "/blog/hiring-cdl-drivers-compliance" }, openGraph: { title: "Hiring CDL Drivers: Compliance Checklist for the Onboarding Process", description: "Step-by-step compliance checklist for hiring CDL drivers. Pre-hire requirements, onboarding paperwork, and the documents you must collect before dispatch.", type: "article" } };
 
 export default function Page() {
     return (

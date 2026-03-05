@@ -1,6 +1,6 @@
 "use server";
 
-// Stripe Server Actions for DOT Helper SaaS
+// Stripe Server Actions for Greenlight DOT SaaS
 // These actions handle creating Checkout Sessions and Customer Portal sessions
 
 import Stripe from "stripe";

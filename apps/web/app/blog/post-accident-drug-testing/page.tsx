@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Post-Accident Drug & Alcohol Testing: When, How & Documentation", description: "Guide to DOT post-accident drug and alcohol testing. When it's required, testing windows, decision flowchart, and documentation requirements.", alternates: { canonical: "/blog/post-accident-drug-testing" } };
+export const metadata: Metadata = { title: "Post-Accident Drug & Alcohol Testing: When, How & Documentation", description: "Guide to DOT post-accident drug and alcohol testing. When it's required, testing windows, decision flowchart, and documentation requirements.", alternates: { canonical: "/blog/post-accident-drug-testing" }, openGraph: { title: "Post-Accident Drug & Alcohol Testing: When, How & Documentation", description: "Guide to DOT post-accident drug and alcohol testing. When it's required, testing windows, decision flowchart, and documentation requirements.", type: "article" } };
 
 export default function Page() {
     return (

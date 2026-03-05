@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "10 Most Common DOT Violations and How to Avoid Them", description: "The 10 most frequently cited DOT violations during roadside inspections and audits, with practical tips on how to prevent each one.", alternates: { canonical: "/blog/common-dot-violations" } };
+export const metadata: Metadata = { title: "10 Most Common DOT Violations and How to Avoid Them", description: "The 10 most frequently cited DOT violations during roadside inspections and audits, with practical tips on how to prevent each one.", alternates: { canonical: "/blog/common-dot-violations" }, openGraph: { title: "10 Most Common DOT Violations and How to Avoid Them", description: "The 10 most frequently cited DOT violations during roadside inspections and audits, with practical tips on how to prevent each one.", type: "article" } };
 
 export default function Page() {
     return (

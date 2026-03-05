@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "USDOT Vehicle Marking Requirements: Size, Color & Placement Rules", description: "Guide to USDOT vehicle marking requirements — display rules for USDOT numbers, company name, and GVW on commercial motor vehicles.", alternates: { canonical: "/blog/vehicle-marking-requirements" } };
+export const metadata: Metadata = { title: "USDOT Vehicle Marking Requirements: Size, Color & Placement Rules", description: "Guide to USDOT vehicle marking requirements — display rules for USDOT numbers, company name, and GVW on commercial motor vehicles.", alternates: { canonical: "/blog/vehicle-marking-requirements" }, openGraph: { title: "USDOT Vehicle Marking Requirements: Size, Color & Placement Rules", description: "Guide to USDOT vehicle marking requirements — display rules for USDOT numbers, company name, and GVW on commercial motor vehicles.", type: "article" } };
 
 export default function Page() {
     return (

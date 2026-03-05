@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -12,18 +11,16 @@ export const metadata: Metadata = {
 
 export default function DQFRequirementsPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}><div className={styles.logoIcon}><Truck size={22} /></div><span className={styles.logoText}>DOT Helper</span></Link>
-                <div className={styles.navLinks}><Link href="/blog" className={styles.navLink}>← Blog</Link><Link href="/pricing" className={styles.navLink}>Pricing</Link><Link href="/login" className={styles.loginBtn}>Sign In</Link></div>
-            </nav>
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Driver Management</div>
-                    <h1 className={styles.articleTitle}>Driver Qualification Files: What You Need on File for Every Driver</h1>
-                    <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 12, 2026</span><span>•</span><span>9 min read</span></div>
-                </header>
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Driver Management"
+            title="Driver Qualification Files: What You Need on File for Every Driver"
+            date="February 12, 2026"
+            readTime="9 min read"
+            relatedPosts={[
+                { slug: "annual-certificate-of-violations", title: "Annual Certificate of Violations" },
+                { slug: "mvr-guide-for-carriers", title: "MVR Guide for Carriers" },
+            ]}
+        >
                     <p>
                         Here&apos;s the reality: <strong>driver files are the #1 thing DOT auditors check</strong>, and they&apos;re where most companies get caught. Not because they&apos;re doing anything dangerous — but because they forgot to pull a driving record, or a medical card expired and nobody noticed.
                     </p>
@@ -103,14 +100,6 @@ export default function DQFRequirementsPost() {
                         <li>Do a <strong>quick internal audit</strong> of all files every quarter — catch issues before an auditor does</li>
                         <li>Keep files <strong>organized and accessible</strong> — if an auditor asks for a file, you should be able to pull it in minutes, not hours</li>
                     </ul>
-
-                    <div className={styles.articleCta}>
-                        <h3>Never Miss a Driver File Deadline</h3>
-                        <p>DOT Helper tracks every document in your driver files and alerts you before anything expires or goes missing.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>Start Your Free Trial <ArrowRight size={16} /></Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

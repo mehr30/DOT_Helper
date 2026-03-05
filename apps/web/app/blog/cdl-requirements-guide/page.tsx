@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "CDL Requirements for Commercial Drivers: Classes, Endorsements & Restrictions", description: "Guide to CDL requirements — license classes, endorsements, restrictions, testing requirements, and what carriers need to verify.", alternates: { canonical: "/blog/cdl-requirements-guide" } };
+export const metadata: Metadata = { title: "CDL Requirements for Commercial Drivers: Classes, Endorsements & Restrictions", description: "Guide to CDL requirements — license classes, endorsements, restrictions, testing requirements, and what carriers need to verify.", alternates: { canonical: "/blog/cdl-requirements-guide" }, openGraph: { title: "CDL Requirements: Classes, Endorsements & Restrictions", description: "Guide to CDL requirements — license classes, endorsements, restrictions, testing requirements, and what carriers need to verify.", type: "article" } };
 
 export default function Page() {
     return (

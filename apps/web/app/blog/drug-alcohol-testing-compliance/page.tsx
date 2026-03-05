@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -12,18 +12,16 @@ export const metadata: Metadata = {
 
 export default function DrugAlcoholTestingPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}><div className={styles.logoIcon}><Truck size={22} /></div><span className={styles.logoText}>DOT Helper</span></Link>
-                <div className={styles.navLinks}><Link href="/blog" className={styles.navLink}>← Blog</Link><Link href="/pricing" className={styles.navLink}>Pricing</Link><Link href="/login" className={styles.loginBtn}>Sign In</Link></div>
-            </nav>
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>Drug &amp; Alcohol • Complete Guide</div>
-                    <h1 className={styles.articleTitle}>DOT Drug &amp; Alcohol Testing Compliance: The Complete Guide for Fleet Owners</h1>
-                    <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 15, 2026</span><span>•</span><span>13 min read</span></div>
-                </header>
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="Drug & Alcohol"
+            title="DOT Drug & Alcohol Testing Compliance: The Complete Guide for Fleet Owners"
+            date="February 15, 2026"
+            readTime="13 min read"
+            relatedPosts={[
+                { slug: "random-drug-testing-requirements", title: "Random Drug Testing Requirements" },
+                { slug: "fmcsa-clearinghouse-guide", title: "FMCSA Clearinghouse Guide" },
+            ]}
+        >
                     <p><strong>FMCSA Part 382</strong> requires every motor carrier to implement a comprehensive <strong>drug and alcohol testing program</strong> for all CDL holders who operate commercial motor vehicles. Failing to have a compliant program is one of the most expensive violations — up to <strong>$16,864 per offense</strong> — and it&apos;s one of the first things auditors check.</p>
 
                     <h2>Types of Required Testing</h2>
@@ -96,14 +94,6 @@ export default function DrugAlcoholTestingPost() {
                         <li>Driver refusing a test: treated as a positive result</li>
                         <li>Failing to report to Clearinghouse: subject to enforcement action</li>
                     </ul>
-
-                    <div className={styles.articleCta}>
-                        <h3>Stay on Top of Drug &amp; Alcohol Compliance</h3>
-                        <p>DOT Helper tracks Clearinghouse queries, random pool dates, and testing schedules for every driver automatically.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>Start Your Free Trial <ArrowRight size={16} /></Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

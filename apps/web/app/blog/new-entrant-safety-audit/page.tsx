@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     title: "New Entrant Safety Audit: What to Expect & How to Prepare",
     description: "Your guide to the FMCSA new entrant safety audit. What it covers, when it happens, how to prepare, and what happens if you fail.",
     alternates: { canonical: "/blog/new-entrant-safety-audit" },
+    openGraph: { title: "New Entrant Safety Audit: What to Expect & How to Prepare", description: "Your guide to the FMCSA new entrant safety audit. What it covers, when it happens, how to prepare, and what happens if you fail.", type: "article" },
 };
 
 export default function Page() {

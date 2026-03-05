@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Truck,
   Shield,
   CheckCircle,
   Clock,
@@ -17,9 +16,11 @@ import {
   Menu,
   X,
   Check,
-  Quote
+  Quote,
+  Truck,
 } from "lucide-react";
 import Image from "next/image";
+import GreenlightLogo from "./components/GreenlightLogo";
 import styles from "./page.module.css";
 
 const showcaseTabs = [
@@ -59,7 +60,7 @@ function ProductShowcase() {
             Everything you need to stay compliant
           </h2>
           <p className={styles.showcaseSubtitle}>
-            Real screenshots from DOT Helper — no mockups, no filler.
+            Real screenshots from Greenlight DOT — no mockups, no filler.
           </p>
         </div>
 
@@ -146,14 +147,14 @@ const stats = [
 
 const testimonials = [
   {
-    quote: "DOT Helper saved us from a $12,000 fine by alerting us to an expiring medical card. This software pays for itself.",
+    quote: "Greenlight DOT saved us from a $12,000 fine by alerting us to an expiring medical card. This software pays for itself.",
     author: "Mike Rodriguez",
     role: "Owner, Rodriguez Trucking LLC",
     company: "8 Trucks • Texas",
     rating: 5
   },
   {
-    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. DOT Helper made it easy to get everything organized.",
+    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. Greenlight DOT made it easy to get everything organized.",
     author: "Sarah Chen",
     role: "Operations Manager, Chen Heating & Air",
     company: "12 Service Vans • California",
@@ -245,10 +246,8 @@ export default function HomePage() {
       <nav className={styles.nav}>
         <div className={styles.navContainer}>
           <Link href="/" className={styles.logo}>
-            <div className={styles.logoIcon}>
-              <Truck size={24} />
-            </div>
-            <span>DOT Helper</span>
+            <GreenlightLogo size={36} />
+            <span>Greenlight DOT</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -297,16 +296,15 @@ export default function HomePage() {
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
             <Zap size={14} />
-            <span>Trusted by 500+ trucking companies</span>
+            <span>DOT compliance, plain and simple.</span>
           </div>
           <h1 className={styles.heroTitle}>
-            Stay DOT Compliant,<br />
-            <span className={styles.heroGradient}>Without the Headache</span>
+            {"The DOT can fine you $11,000"}<br />
+            <span className={styles.heroGradient}>for one missing piece of paper.</span>
           </h1>
           <p className={styles.heroDescription}>
-            The all-in-one compliance management platform for any business with commercial vehicles.
-            From trucking fleets to HVAC, plumbing, electrical, and landscaping companies —
-            track driver qualifications, HOS, vehicle inspections, and never miss a deadline.
+            We make sure that never happens. Greenlight DOT tracks your driver files,
+            vehicle inspections, and deadlines — so you stay compliant without the headache.
           </p>
           <div className={styles.heroCta}>
             <Link href="/register" className={styles.ctaPrimary}>
@@ -477,7 +475,7 @@ export default function HomePage() {
       <section className={styles.benefits}>
         <div className={styles.benefitsContainer}>
           <div className={styles.benefitsContent}>
-            <span className={styles.benefitsLabel}>Why DOT Helper?</span>
+            <span className={styles.benefitsLabel}>Why Greenlight DOT?</span>
             <h2 className={styles.benefitsTitle}>
               Compliance made simple for small fleets
             </h2>
@@ -539,10 +537,10 @@ export default function HomePage() {
       <section className={styles.cta}>
         <div className={styles.ctaContainer}>
           <h2 className={styles.ctaTitle}>
-            Ready to simplify your DOT compliance?
+            You deserve a greenlight. Let&apos;s get you one.
           </h2>
           <p className={styles.ctaDescription}>
-            Join hundreds of businesses who trust DOT Helper for their fleet compliance. Start your free trial today.
+            Join hundreds of businesses who trust Greenlight DOT for their fleet compliance. Start your free trial today.
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/register" className={styles.ctaPrimaryLarge}>
@@ -562,13 +560,11 @@ export default function HomePage() {
         <div className={styles.footerContainer}>
           <div className={styles.footerBrand}>
             <Link href="/" className={styles.footerLogo}>
-              <div className={styles.logoIcon}>
-                <Truck size={20} />
-              </div>
-              <span>DOT Helper</span>
+              <GreenlightLogo size={32} />
+              <span>Greenlight DOT</span>
             </Link>
             <p className={styles.footerTagline}>
-              Simplifying DOT compliance for any business with commercial vehicles — trucking, home services, and beyond.
+              DOT compliance, plain and simple. For trucking, home services, and any business with commercial vehicles.
             </p>
           </div>
           <div className={styles.footerLinks}>
@@ -601,9 +597,9 @@ export default function HomePage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>&copy; {new Date().getFullYear()} DOT Helper. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Greenlight DOT. All rights reserved.</p>
           <div className={styles.footerSocial}>
-            <span>Made with ❤️ for trucking companies</span>
+            <span>DOT compliance, plain and simple.</span>
           </div>
         </div>
       </footer>

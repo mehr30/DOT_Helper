@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "BOC-3 Filing: What It Is and Why You Can't Operate Without It", description: "Guide to BOC-3 process agent filing requirements for motor carriers. What it is, how to file, costs, and what happens if your BOC-3 lapses.", alternates: { canonical: "/blog/boc-3-filing-guide" } };
+export const metadata: Metadata = { title: "BOC-3 Filing: What It Is and Why You Can't Operate Without It", description: "Guide to BOC-3 process agent filing requirements for motor carriers. What it is, how to file, costs, and what happens if your BOC-3 lapses.", alternates: { canonical: "/blog/boc-3-filing-guide" }, openGraph: { title: "BOC-3 Filing: What It Is & Why You Can't Operate Without It", description: "Guide to BOC-3 process agent filing requirements for motor carriers. What it is, how to file, costs, and what happens if your BOC-3 lapses.", type: "article" } };
 
 export default function Page() {
     return (

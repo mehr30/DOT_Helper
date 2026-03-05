@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "How to Build a DOT-Compliant Preventive Maintenance Program", description: "Step-by-step guide to building a preventive maintenance program that meets FMCSA Part 396 requirements. Includes PM intervals, checklists, and documentation.", alternates: { canonical: "/blog/preventive-maintenance-program-guide" } };
+export const metadata: Metadata = { title: "How to Build a DOT-Compliant Preventive Maintenance Program", description: "Step-by-step guide to building a preventive maintenance program that meets FMCSA Part 396 requirements. Includes PM intervals, checklists, and documentation.", alternates: { canonical: "/blog/preventive-maintenance-program-guide" }, openGraph: { title: "How to Build a DOT-Compliant Preventive Maintenance Program", description: "Step-by-step guide to building a preventive maintenance program that meets FMCSA Part 396 requirements. Includes PM intervals, checklists, and documentation.", type: "article" } };
 
 export default function Page() {
     return (

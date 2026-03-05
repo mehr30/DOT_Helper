@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "FMCSA Compliance Review Process: Step-by-Step Breakdown", description: "Detailed walkthrough of the FMCSA compliance review process. What triggers a review, what happens during one, timelines, and how to respond to findings.", alternates: { canonical: "/blog/fmcsa-compliance-review-process" } };
+export const metadata: Metadata = { title: "FMCSA Compliance Review Process: Step-by-Step Breakdown", description: "Detailed walkthrough of the FMCSA compliance review process. What triggers a review, what happens during one, timelines, and how to respond to findings.", alternates: { canonical: "/blog/fmcsa-compliance-review-process" }, openGraph: { title: "FMCSA Compliance Review Process: Step-by-Step Breakdown", description: "Detailed walkthrough of the FMCSA compliance review process. What triggers a review, what happens during one, timelines, and how to respond to findings.", type: "article" } };
 
 export default function Page() {
     return (

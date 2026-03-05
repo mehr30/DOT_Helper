@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Drug Testing Consortiums: What They Are, How to Choose, and What to Pay", description: "Guide to drug testing consortiums and TPAs for small fleets. How they work, what to look for, typical costs, and red flags.", alternates: { canonical: "/blog/drug-testing-consortium-guide" } };
+export const metadata: Metadata = { title: "Drug Testing Consortiums: What They Are, How to Choose, and What to Pay", description: "Guide to drug testing consortiums and TPAs for small fleets. How they work, what to look for, typical costs, and red flags.", alternates: { canonical: "/blog/drug-testing-consortium-guide" }, openGraph: { title: "Drug Testing Consortiums: What They Are, How to Choose & What to Pay", description: "Guide to drug testing consortiums and TPAs for small fleets. How they work, what to look for, typical costs, and red flags.", type: "article" } };
 
 export default function Page() {
     return (

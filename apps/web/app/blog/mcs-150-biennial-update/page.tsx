@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "MCS-150 Biennial Update: When, How & Why It Matters", description: "Guide to the FMCSA MCS-150 biennial update. How to file, when it's due, what information to update, and penalties for missing the deadline.", alternates: { canonical: "/blog/mcs-150-biennial-update" } };
+export const metadata: Metadata = { title: "MCS-150 Biennial Update: When, How & Why It Matters", description: "Guide to the FMCSA MCS-150 biennial update. How to file, when it's due, what information to update, and penalties for missing the deadline.", alternates: { canonical: "/blog/mcs-150-biennial-update" }, openGraph: { title: "MCS-150 Biennial Update: When, How & Why It Matters", description: "Guide to the FMCSA MCS-150 biennial update. How to file, when it's due, what information to update, and penalties for missing the deadline.", type: "article" } };
 
 export default function Page() {
     return (

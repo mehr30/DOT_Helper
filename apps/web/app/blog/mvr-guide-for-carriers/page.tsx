@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Motor Vehicle Records (MVR): What Carriers Need to Know", description: "Guide to MVR requirements for motor carriers — when to pull them, what to look for, how to handle bad records, and annual review obligations.", alternates: { canonical: "/blog/mvr-guide-for-carriers" } };
+export const metadata: Metadata = { title: "Motor Vehicle Records (MVR): What Carriers Need to Know", description: "Guide to MVR requirements for motor carriers — when to pull them, what to look for, how to handle bad records, and annual review obligations.", alternates: { canonical: "/blog/mvr-guide-for-carriers" }, openGraph: { title: "Motor Vehicle Records (MVR): What Carriers Need to Know", description: "Guide to MVR requirements for motor carriers — when to pull them, what to look for, how to handle bad records, and annual review obligations.", type: "article" } };
 
 export default function Page() {
     return (

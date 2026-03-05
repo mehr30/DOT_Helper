@@ -4,8 +4,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const APP_NAME = "DOT Helper";
-const FROM_EMAIL = process.env.EMAIL_FROM ?? "DOT Helper <noreply@dothelper.com>";
+const APP_NAME = "Greenlight DOT";
+const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight DOT <noreply@greenlightdot.com>";
 
 async function sendEmail(to: string, subject: string, html: string) {
     const apiKey = process.env.RESEND_API_KEY;
@@ -45,14 +45,14 @@ export const auth = betterAuth({
                         Hi ${user.name},<br><br>
                         We received a request to reset your password. Click the button below to choose a new one.
                     </p>
-                    <a href="${url}" style="display: inline-block; padding: 12px 32px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0;">
+                    <a href="${url}" style="display: inline-block; padding: 12px 32px; background: #1B5E35; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0;">
                         Reset Password
                     </a>
                     <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
                         If you didn't request this, you can safely ignore this email. The link expires in 1 hour.
                     </p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;" />
-                    <p style="color: #94a3b8; font-size: 12px;">${APP_NAME} — DOT Compliance Made Simple</p>
+                    <p style="color: #94a3b8; font-size: 12px;">${APP_NAME} — DOT compliance, plain and simple.</p>
                 </div>`,
             );
         },
@@ -70,14 +70,14 @@ export const auth = betterAuth({
                         Hi ${user.name},<br><br>
                         Thanks for signing up. Please verify your email to get started.
                     </p>
-                    <a href="${url}" style="display: inline-block; padding: 12px 32px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0;">
+                    <a href="${url}" style="display: inline-block; padding: 12px 32px; background: #1B5E35; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0;">
                         Verify Email
                     </a>
                     <p style="color: #94a3b8; font-size: 14px;">
                         If you didn't create an account, you can ignore this email.
                     </p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;" />
-                    <p style="color: #94a3b8; font-size: 12px;">${APP_NAME} — DOT Compliance Made Simple</p>
+                    <p style="color: #94a3b8; font-size: 12px;">${APP_NAME} — DOT compliance, plain and simple.</p>
                 </div>`,
             );
         },
@@ -91,6 +91,33 @@ export const auth = betterAuth({
         apple: {
             clientId: process.env.APPLE_CLIENT_ID ?? "",
             clientSecret: process.env.APPLE_CLIENT_SECRET ?? "",
+        },
+    },
+
+    databaseHooks: {
+        user: {
+            create: {
+                after: async (user) => {
+                    // Notify admin of every new signup
+                    await sendEmail(
+                        "scottmehr10@gmail.com",
+                        `${APP_NAME} — New Signup: ${user.email}`,
+                        `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+                            <h2 style="color: #1e293b; margin-bottom: 16px;">New User Signup</h2>
+                            <p style="color: #64748b; line-height: 1.6;">
+                                A new user just signed up for ${APP_NAME}:
+                            </p>
+                            <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+                                <tr><td style="padding: 8px; color: #94a3b8; font-size: 14px;">Name</td><td style="padding: 8px; color: #1e293b; font-weight: 600;">${user.name}</td></tr>
+                                <tr><td style="padding: 8px; color: #94a3b8; font-size: 14px;">Email</td><td style="padding: 8px; color: #1e293b; font-weight: 600;">${user.email}</td></tr>
+                                <tr><td style="padding: 8px; color: #94a3b8; font-size: 14px;">Time</td><td style="padding: 8px; color: #1e293b; font-weight: 600;">${new Date().toLocaleString("en-US", { timeZone: "America/Chicago" })}</td></tr>
+                            </table>
+                            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;" />
+                            <p style="color: #94a3b8; font-size: 12px;">${APP_NAME} — Admin Notification</p>
+                        </div>`,
+                    );
+                },
+            },
         },
     },
 

@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Truck, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import BlogPostLayout from "../BlogPostLayout";
 import styles from "../blog.module.css";
 
 export const metadata: Metadata = {
@@ -12,18 +11,16 @@ export const metadata: Metadata = {
 
 export default function HOSRulesExplainedPost() {
     return (
-        <div className={styles.blogLayout}>
-            <nav className={styles.nav}>
-                <Link href="/" className={styles.logoLink}><div className={styles.logoIcon}><Truck size={22} /></div><span className={styles.logoText}>DOT Helper</span></Link>
-                <div className={styles.navLinks}><Link href="/blog" className={styles.navLink}>← Blog</Link><Link href="/pricing" className={styles.navLink}>Pricing</Link><Link href="/login" className={styles.loginBtn}>Sign In</Link></div>
-            </nav>
-            <article className={styles.article}>
-                <header className={styles.articleHeader}>
-                    <div className={styles.articleCategory}>HOS</div>
-                    <h1 className={styles.articleTitle}>Hours of Service (HOS) Rules Explained: 2026 Complete Guide</h1>
-                    <div className={styles.articleMeta}><span>By DOT Helper Team</span><span>•</span><span>February 5, 2026</span><span>•</span><span>11 min read</span></div>
-                </header>
-                <div className={styles.articleContent}>
+        <BlogPostLayout
+            category="HOS"
+            title="Hours of Service (HOS) Rules Explained: 2026 Complete Guide"
+            date="February 5, 2026"
+            readTime="11 min read"
+            relatedPosts={[
+                { slug: "eld-compliance-guide", title: "ELD Compliance Guide" },
+                { slug: "short-haul-exemption-guide", title: "Short-Haul Exemption Guide" },
+            ]}
+        >
                     <p><strong>Hours of Service (HOS)</strong> regulations are among the most important — and most frequently violated — FMCSA rules. They exist to prevent fatigued driving, which is a leading cause of commercial vehicle accidents. Understanding these rules is critical for both drivers and carriers.</p>
 
                     <h2>The Four Duty Statuses</h2>
@@ -104,14 +101,6 @@ export default function HOSRulesExplainedPost() {
                         <li>Document corrective actions for any violations</li>
                         <li>Retain ELD records and supporting documents for <strong>6 months</strong></li>
                     </ul>
-
-                    <div className={styles.articleCta}>
-                        <h3>Track HOS Compliance Automatically</h3>
-                        <p>DOT Helper monitors your drivers&apos; hours in real-time and alerts you before they approach limits.</p>
-                        <Link href="/pricing" className={styles.articleCtaBtn}>Start Your Free Trial <ArrowRight size={16} /></Link>
-                    </div>
-                </div>
-            </article>
-        </div>
+        </BlogPostLayout>
     );
 }

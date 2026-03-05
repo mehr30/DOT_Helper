@@ -1,7 +1,7 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Annual Certificate of Violations: The Easy Filing Most Carriers Miss", description: "How to manage the annual certificate of violations for CDL drivers. What it is, when it's due, what to review, and how to stay compliant.", alternates: { canonical: "/blog/annual-certificate-of-violations" } };
+export const metadata: Metadata = { title: "Annual Certificate of Violations: The Easy Filing Most Carriers Miss", description: "How to manage the annual certificate of violations for CDL drivers. What it is, when it's due, what to review, and how to stay compliant.", alternates: { canonical: "/blog/annual-certificate-of-violations" }, openGraph: { title: "Annual Certificate of Violations: The Easy Filing Most Carriers Miss", description: "How to manage the annual certificate of violations for CDL drivers. What it is, when it's due, what to review, and how to stay compliant.", type: "article" } };
 
 export default function Page() {
     return (
