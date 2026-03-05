@@ -29,8 +29,16 @@ export default async function VehiclePage({
         include: {
             documents: {
                 orderBy: { createdAt: "desc" },
-                take: 10,
-                select: { id: true, name: true, documentType: true, expirationDate: true },
+                take: 50,
+                select: {
+                    id: true,
+                    name: true,
+                    documentType: true,
+                    expirationDate: true,
+                    fileUrl: true,
+                    mimeType: true,
+                    _count: { select: { signatures: true } },
+                },
             },
             inspections: {
                 orderBy: { inspectionDate: "desc" },
@@ -59,8 +67,13 @@ export default async function VehiclePage({
         lastPmDate: vehicle.lastPmDate?.toISOString() ?? null,
         nextPmDue: vehicle.nextPmDue?.toISOString() ?? null,
         documents: vehicle.documents.map(d => ({
-            ...d,
+            id: d.id,
+            name: d.name,
+            documentType: d.documentType,
             expirationDate: d.expirationDate?.toISOString() ?? null,
+            fileUrl: d.fileUrl,
+            mimeType: d.mimeType,
+            signatureCount: d._count.signatures,
         })),
         inspections: vehicle.inspections.map(i => ({
             ...i,

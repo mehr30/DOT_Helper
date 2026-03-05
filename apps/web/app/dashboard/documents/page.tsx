@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import {
     Search,
@@ -20,10 +20,16 @@ import {
     Edit3,
     Trash2,
     Package,
+    PenTool,
+    ExternalLink,
+    Loader2,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
 import { useDemoMode } from "../../components/DemoModeContext";
+import DocumentUpload from "../../components/DocumentUpload";
+import SignDocumentModal from "../../components/SignDocumentModal";
+import { getDocuments, deleteDocumentRecord, type DocumentData } from "../../actions/documents";
 
 // Document types and their categories
 const documentCategories = [
@@ -138,15 +144,60 @@ function getCategoryLabel(cat: string) {
 export default function DocumentsPage() {
     const { isDemoMode } = useDemoMode();
     const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([]);
+    const [realDocs, setRealDocs] = useState<DocumentData[]>([]);
+    const [loadingDocs, setLoadingDocs] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
+    const [isPending, startTransition] = useTransition();
+
+    const loadRealDocs = async () => {
+        setLoadingDocs(true);
+        try {
+            const docs = await getDocuments();
+            setRealDocs(docs);
+        } catch {
+            // silently fail — user might not be authenticated
+        }
+        setLoadingDocs(false);
+    };
 
     useEffect(() => {
         setSavedDocs(getSavedDocuments());
-    }, []);
+        if (!isDemoMode) {
+            loadRealDocs();
+        }
+    }, [isDemoMode]);
 
     const handleDeleteSavedDoc = (id: string) => {
         deleteDocument(id);
         setSavedDocs(getSavedDocuments());
     };
+
+    const handleDeleteRealDoc = (docId: string) => {
+        startTransition(async () => {
+            await deleteDocumentRecord(docId);
+            setRealDocs(prev => prev.filter(d => d.id !== docId));
+        });
+    };
+
+    const filteredRealDocs = realDocs.filter(doc => {
+        const matchesSearch = !searchQuery ||
+            doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doc.documentType.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = categoryFilter === "all" ||
+            (categoryFilter === "driver" && doc.driverId) ||
+            (categoryFilter === "vehicle" && doc.vehicleId) ||
+            (categoryFilter === "company" && doc.companyId);
+        return matchesSearch && matchesCategory;
+    });
+
+    const realDocCategories = [
+        { id: "all", name: "All Documents", count: realDocs.length },
+        { id: "driver", name: "Driver Files", count: realDocs.filter(d => d.driverId).length },
+        { id: "vehicle", name: "Vehicle Records", count: realDocs.filter(d => d.vehicleId).length },
+        { id: "company", name: "Company Documents", count: realDocs.filter(d => d.companyId).length },
+    ];
 
     return (
         <div className={styles.page}>
@@ -178,7 +229,7 @@ export default function DocumentsPage() {
                         Store, organize, and track all your compliance documents
                     </p>
                 </div>
-                <div style={{ display: "flex", gap: "0.75rem" }}>
+                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
                     <Link href="/dashboard/documents/wizard" className="btn btn-secondary" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.6rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0",
@@ -188,10 +239,9 @@ export default function DocumentsPage() {
                         <ClipboardList size={18} />
                         Fill a Form
                     </Link>
-                    <Link href="/dashboard/documents" className="btn btn-primary">
-                        <Upload size={18} />
-                        Upload Document
-                    </Link>
+                    {!isDemoMode && (
+                        <DocumentUpload onUploadComplete={() => loadRealDocs()} />
+                    )}
                 </div>
             </header>
 
@@ -311,6 +361,167 @@ export default function DocumentsPage() {
                 </section>
             )}
 
+            {/* Real Documents for authenticated users */}
+            {!isDemoMode && (
+                <>
+                    {/* Category Stats */}
+                    <div className={styles.statsRow}>
+                        {realDocCategories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                className={`${styles.categoryCard} ${categoryFilter === cat.id ? styles.active : ""}`}
+                                onClick={() => setCategoryFilter(cat.id)}
+                            >
+                                <FolderOpen size={20} />
+                                <span className={styles.categoryName}>{cat.name}</span>
+                                <span className={styles.categoryCount}>{cat.count}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search */}
+                    <div className={styles.toolbar}>
+                        <div className={styles.searchBox}>
+                            <Search size={18} className={styles.searchIcon} />
+                            <input
+                                type="text"
+                                placeholder="Search documents..."
+                                className={styles.searchInput}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Documents Table */}
+                    {loadingDocs ? (
+                        <div style={{
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            gap: "0.5rem", padding: "3rem", color: "#64748b",
+                        }}>
+                            <Loader2 size={20} className={styles.spinner} /> Loading documents...
+                        </div>
+                    ) : filteredRealDocs.length > 0 ? (
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Document</th>
+                                        <th>Type</th>
+                                        <th>Uploaded</th>
+                                        <th>Expires</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredRealDocs.map((doc) => {
+                                        const isExpired = doc.expirationDate && new Date(doc.expirationDate) < new Date();
+                                        const isExpiring = doc.expirationDate && !isExpired &&
+                                            (new Date(doc.expirationDate).getTime() - Date.now()) < 30 * 24 * 60 * 60 * 1000;
+                                        const status = isExpired ? "expired" : isExpiring ? "expiring" : "current";
+                                        const badge = getStatusBadge(status);
+                                        const BadgeIcon = badge.icon;
+
+                                        return (
+                                            <tr key={doc.id}>
+                                                <td>
+                                                    <div className={styles.docCell}>
+                                                        <div className={styles.docIcon}>
+                                                            <FileText size={20} />
+                                                        </div>
+                                                        <div className={styles.docInfo}>
+                                                            <span className={styles.docName}>{doc.name}</span>
+                                                            <span className={styles.docSize}>
+                                                                {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : "—"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className={styles.docType}>
+                                                        {doc.documentType.replace(/_/g, " ")}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span className={styles.docDate}>
+                                                        {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                                                            month: "short", day: "numeric", year: "numeric",
+                                                        })}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span className={styles.docDate}>
+                                                        {doc.expirationDate
+                                                            ? new Date(doc.expirationDate).toLocaleDateString("en-US", {
+                                                                month: "short", day: "numeric", year: "numeric",
+                                                            })
+                                                            : "—"}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span className={`${styles.statusBadge} ${styles[badge.class]}`}>
+                                                        <BadgeIcon size={14} />
+                                                        {badge.label}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.actions}>
+                                                        <button
+                                                            className={styles.actionBtn}
+                                                            title="Sign"
+                                                            onClick={() => setSigningDoc({
+                                                                id: doc.id,
+                                                                name: doc.name,
+                                                                url: doc.fileUrl,
+                                                            })}
+                                                        >
+                                                            <PenTool size={16} />
+                                                        </button>
+                                                        <a
+                                                            href={doc.fileUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className={styles.actionBtn}
+                                                            title="View / Download"
+                                                        >
+                                                            <ExternalLink size={16} />
+                                                        </a>
+                                                        <button
+                                                            className={styles.actionBtn}
+                                                            title="Delete"
+                                                            onClick={() => handleDeleteRealDoc(doc.id)}
+                                                            disabled={isPending}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div style={{
+                            textAlign: "center", padding: "3rem 2rem",
+                            background: "white", borderRadius: "12px", border: "1px solid #e2e8f0",
+                        }}>
+                            <FileText size={40} style={{ color: "#cbd5e1", marginBottom: "0.75rem" }} />
+                            <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "#1e293b", margin: "0 0 0.25rem" }}>
+                                {searchQuery || categoryFilter !== "all" ? "No documents match your filters" : "No documents uploaded yet"}
+                            </h3>
+                            <p style={{ fontSize: "0.85rem", color: "#64748b", margin: 0 }}>
+                                {searchQuery || categoryFilter !== "all"
+                                    ? "Try adjusting your search or filter."
+                                    : "Upload your first document using the button above, or go to a driver/vehicle page to upload documents there."}
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
+
             {isDemoMode && <>
                 {/* Stats */}
                 <div className={styles.statsRow}>
@@ -418,6 +629,20 @@ export default function DocumentsPage() {
                     </div>
                 </div>
             </>}
+
+            {signingDoc && (
+                <SignDocumentModal
+                    documentId={signingDoc.id}
+                    documentName={signingDoc.name}
+                    documentUrl={signingDoc.url}
+                    signerRole="owner"
+                    onClose={() => setSigningDoc(null)}
+                    onSigned={() => {
+                        setSigningDoc(null);
+                        loadRealDocs();
+                    }}
+                />
+            )}
         </div>
     );
 }

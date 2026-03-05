@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
     ArrowLeft,
@@ -10,7 +11,11 @@ import {
     CheckCircle,
     AlertTriangle,
     Calendar,
+    PenTool,
+    ExternalLink,
 } from "lucide-react";
+import DocumentUpload from "../../../components/DocumentUpload";
+import SignDocumentModal from "../../../components/SignDocumentModal";
 
 interface VehicleData {
     id: string;
@@ -31,6 +36,9 @@ interface VehicleData {
         name: string;
         documentType: string;
         expirationDate: string | null;
+        fileUrl: string;
+        mimeType: string | null;
+        signatureCount: number;
     }>;
     inspections: Array<{
         id: string;
@@ -56,6 +64,8 @@ function getDaysUntil(dateStr: string) {
 export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
     const vType = vehicle.vehicleType.toLowerCase().replace("_", " ");
     const inspDays = vehicle.annualInspectionDue ? getDaysUntil(vehicle.annualInspectionDue) : null;
+    const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     return (
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -179,27 +189,91 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
             </div>
 
             {/* Documents */}
-            {vehicle.documents.length > 0 && (
-                <div style={{
-                    background: "white", borderRadius: "12px", padding: "1.25rem",
-                    border: "1px solid #e2e8f0", marginBottom: "1.5rem",
-                }}>
-                    <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.75rem" }}>Documents</h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        {vehicle.documents.map(doc => (
-                            <div key={doc.id} style={{
-                                display: "flex", justifyContent: "space-between", alignItems: "center",
-                                padding: "0.5rem 0", borderBottom: "1px solid #f1f5f9",
-                            }}>
-                                <span style={{ fontSize: "0.875rem" }}>{doc.name}</span>
-                                <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                                    {doc.expirationDate ? formatDate(doc.expirationDate) : "No expiration"}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+            <div style={{
+                background: "white", borderRadius: "12px", padding: "1.25rem",
+                border: "1px solid #e2e8f0", marginBottom: "1.5rem",
+            }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                    <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Documents</h3>
+                    <DocumentUpload
+                        key={refreshKey}
+                        vehicleId={vehicle.id}
+                        onUploadComplete={() => setRefreshKey(k => k + 1)}
+                    />
                 </div>
-            )}
+                {vehicle.documents.length > 0 ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                        {vehicle.documents.map(doc => {
+                            const expDays = doc.expirationDate ? getDaysUntil(doc.expirationDate) : null;
+                            return (
+                                <div key={doc.id} style={{
+                                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                                    padding: "0.75rem 0.5rem", borderBottom: "1px solid #f1f5f9",
+                                    gap: "0.75rem",
+                                }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: 0 }}>
+                                        <FileText size={16} style={{ color: "#64748b", flexShrink: 0 }} />
+                                        <div style={{ minWidth: 0 }}>
+                                            <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{doc.name}</div>
+                                            <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                                                {doc.documentType.replace(/_/g, " ")}
+                                                {doc.expirationDate && (
+                                                    <span style={{
+                                                        marginLeft: "0.5rem",
+                                                        color: expDays !== null && expDays <= 30 ? "#dc2626" : "#94a3b8",
+                                                    }}>
+                                                        · Exp: {formatDate(doc.expirationDate)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                                        {doc.signatureCount > 0 && (
+                                            <span style={{
+                                                display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                                                fontSize: "0.7rem", color: "#16a34a", fontWeight: 600,
+                                                padding: "0.15rem 0.4rem", borderRadius: "4px",
+                                                background: "#dcfce7",
+                                            }}>
+                                                <CheckCircle size={10} /> Signed
+                                            </span>
+                                        )}
+                                        <button
+                                            onClick={() => setSigningDoc({ id: doc.id, name: doc.name, url: doc.fileUrl })}
+                                            title="Sign document"
+                                            style={{
+                                                display: "flex", alignItems: "center", padding: "0.35rem",
+                                                border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                background: "white", cursor: "pointer", color: "#64748b",
+                                            }}
+                                        >
+                                            <PenTool size={14} />
+                                        </button>
+                                        <a
+                                            href={doc.fileUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            title="Download / View"
+                                            style={{
+                                                display: "flex", alignItems: "center", padding: "0.35rem",
+                                                border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                background: "white", color: "#64748b",
+                                            }}
+                                        >
+                                            <ExternalLink size={14} />
+                                        </a>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>
+                        No documents uploaded yet. Use the upload button above.
+                    </p>
+                )}
+            </div>
 
             {/* Inspections */}
             {vehicle.inspections.length > 0 && (
@@ -229,6 +303,20 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                         ))}
                     </div>
                 </div>
+            )}
+
+            {signingDoc && (
+                <SignDocumentModal
+                    documentId={signingDoc.id}
+                    documentName={signingDoc.name}
+                    documentUrl={signingDoc.url}
+                    signerRole="owner"
+                    onClose={() => setSigningDoc(null)}
+                    onSigned={() => {
+                        setSigningDoc(null);
+                        setRefreshKey(k => k + 1);
+                    }}
+                />
             )}
         </div>
     );

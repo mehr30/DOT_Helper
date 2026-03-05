@@ -29,8 +29,16 @@ export default async function DriverPage({
         include: {
             documents: {
                 orderBy: { createdAt: "desc" },
-                take: 10,
-                select: { id: true, name: true, documentType: true, expirationDate: true },
+                take: 50,
+                select: {
+                    id: true,
+                    name: true,
+                    documentType: true,
+                    expirationDate: true,
+                    fileUrl: true,
+                    mimeType: true,
+                    _count: { select: { signatures: true } },
+                },
             },
             violations: {
                 orderBy: { violationDate: "desc" },
@@ -59,8 +67,13 @@ export default async function DriverPage({
         status: driver.status,
         endorsements: driver.endorsements,
         documents: driver.documents.map(d => ({
-            ...d,
+            id: d.id,
+            name: d.name,
+            documentType: d.documentType,
             expirationDate: d.expirationDate?.toISOString() ?? null,
+            fileUrl: d.fileUrl,
+            mimeType: d.mimeType,
+            signatureCount: d._count.signatures,
         })),
         violations: driver.violations.map(v => ({
             ...v,
