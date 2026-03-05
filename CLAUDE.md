@@ -10,24 +10,31 @@ DOT Helper is a SaaS platform designed to help small business fleet owners (1-50
 - **Deployment**: Vercel (Production URL: `https://dot-helper-web.vercel.app`).
 
 ## 2. Current State (As of Last Session)
-We just completed **Phase 1: Security & Auth Hardening** and **Pricing Updates**.
-- **Auth**: Fully functioning email/password signup, login, password reset (`/forgot-password`, `/reset-password`), and email verification workflows.
-- **Emails (Resend)**: Configured in `apps/web/lib/auth.ts`. We use a custom `sendEmail` lazy-loaded wrapper so the build doesn't crash if the env var is missing. **The user's Resend API key is `re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW`.** It MUST be set in Vercel.
-- **Production Login Bug Fix**: In `lib/auth.ts`, `baseURL` is heavily enforced. `trustHost: true` and explicit `trustedOrigins` have been added to fix CORS/Vercel proxy issues.
-- **Pricing**: $49/mo (Starter), $99/mo (Growth), $199/mo (Fleet). Flat-fee, not per-driver. Added $11,000 fine ROI conversion copy.
-- **Demo Mode**: `?demo=true` in the URL bypasses the `middleware.ts` auth check to allow taking marketing screenshots.
-- **Dashboard Data**: Currently, all dashboard components use *hardcoded/mock data* inside of their `page.tsx` or components files.
+**Phase 1 (COMPLETE):** Security & Auth Hardening + Pricing Updates.
+**Phase 2 (COMPLETE):** Wire Dashboard to Real Data.
+
+### Phase 2 Summary
+- **Session Utility** (`lib/session.ts`): `getServerSession()` and `requireCompanyUser()` for auth + multi-tenant scoping.
+- **Zod Validation** (`lib/validations/`): Shared schemas for company, driver, vehicle (used by server actions + react-hook-form).
+- **Company Onboarding** (`/dashboard/onboarding`): After signup, users create a Company record. Layout redirects users without a company to onboarding.
+- **Server Actions** (`app/actions/`): Full CRUD for companies, drivers, vehicles, and dashboard stats. All mutations use `requireCompanyUser()`.
+- **Dashboard Layout**: Converted to server component → `DashboardShell` client wrapper. Checks for company and redirects to onboarding if missing.
+- **Driver Pages**: Server component pages → `DriversTable`/`DriverDetail` client components. Forms wired to server actions via react-hook-form.
+- **Vehicle Pages**: Same pattern — server component pages → `VehiclesTable`/`VehicleDetail` client components.
+- **Dashboard Home**: Server component fetching real stats (driver/vehicle counts, upcoming expirations). `DashboardContent` client component shows "Get Started" when empty.
+- **CompanyProfileContext**: Loads from DB for authenticated users, falls back to localStorage for demo mode.
+- **Demo Mode**: Fully preserved. `isDemoMode` flag in client components falls back to mock data.
+
+### Key Architecture
+- **Auth**: Fully functioning email/password signup, login, password reset, email verification.
+- **Emails (Resend)**: `re_UiqEwxgZ_H5ZPoKczkmfuzAUm5WcKFbuW` — must be set in Vercel.
+- **Pricing**: $49/mo (Starter), $99/mo (Growth), $199/mo (Fleet). Flat-fee, not per-driver.
+- **Demo Mode**: `?demo=true` bypasses auth in middleware + shows mock data in all dashboard pages.
 
 ## 3. Immediate Next Steps & Full Roadmap
 Your primary objective when picking up this session is to begin **Phase 2**, but you should be aware of the full remaining roadmap.
 
-### Phase 2 — Wire Dashboard to Real Data (START HERE)
-1. **Company Onboarding**: After signup, a user must create/join a `Company` record. The `User` model has a relation to `Company`.
-2. **Driver & Vehicle CRUD**: Wire the `apps/web/app/dashboard/drivers` and `vehicles` pages to fetch and mutate real data from the Neon database via Server Actions or API routes.
-3. **Remove Mock Data**: Systematically replace the inline arrays in the dashboard components with real database fetch calls.
-*Note: Do not start Phase 3 until core CRUD functionality is wired.*
-
-### Phase 3 — Payments & Billing
+### Phase 3 — Payments & Billing (START HERE)
 - Stripe product/price setup (use the $49/$99/$199 pricing model).
 - Checkout flow & subscription management portal.
 - Free trial logic (14-day, no CC required) and feature gating by plan.
@@ -41,9 +48,12 @@ Your primary objective when picking up this session is to begin **Phase 2**, but
 ## 4. Key Files to Know
 - **`apps/web/lib/auth.ts`**: The `better-auth` configuration (database adapter, email sending handlers, security settings).
 - **`apps/web/lib/auth-client.ts`**: The React client export for `better-auth` (`signIn`, `signUp`, etc.).
-- **`apps/web/middleware.ts`**: Protects `/dashboard` routes. Checks for `better-auth.session_token` cookie.
-- **`packages/database/prisma/schema.prisma`**: The source of truth for the data model (contains User, Company, Driver, Vehicle, Document, Alert, etc.). Run `npx prisma db push` from `packages/database` to migrate Neon.
-- **`apps/web/app/page.tsx` & `apps/web/app/pricing/page.tsx`**: Marketing and pricing boundaries. Contains exact feature arrays and pricing math.
+- **`apps/web/lib/session.ts`**: Server-side session helpers — `getServerSession()` and `requireCompanyUser()`.
+- **`apps/web/lib/validations/`**: Zod schemas shared between server actions and react-hook-form.
+- **`apps/web/app/actions/`**: Server actions for company, drivers, vehicles, dashboard stats.
+- **`apps/web/middleware.ts`**: Protects `/dashboard` routes. Checks for `better-auth.session_token` cookie. Passes `x-pathname` header.
+- **`packages/database/prisma/schema.prisma`**: The source of truth for the data model. Run `npx prisma db push` from `packages/database` to migrate Neon.
+- **`apps/web/app/page.tsx` & `apps/web/app/pricing/page.tsx`**: Marketing and pricing boundaries.
 
 ## 5. Development Commands
 ```bash
