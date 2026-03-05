@@ -83,6 +83,19 @@ function getInspectionStatus(daysUntil: number) {
     return { label: "Current", class: "success" };
 }
 
+function vehicleTypeLabel(vType: string): string {
+    switch (vType) {
+        case "tractor": return "Semi-Truck";
+        case "straight_truck": return "Straight Truck";
+        case "pickup": return "Pickup";
+        case "van": return "Van";
+        case "suv": return "SUV";
+        case "trailer": return "Trailer";
+        case "bus": return "Bus";
+        default: return vType.replace("_", " ");
+    }
+}
+
 export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: VehicleRow[] }) {
     const { isDemoMode } = useDemoMode();
     const [searchTerm, setSearchTerm] = useState("");
@@ -101,7 +114,7 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
         return matchesSearch && matchesType;
     });
 
-    const tractors = allVehicles.filter(v => v.vehicleType.toUpperCase() === "TRACTOR");
+    const tractors = allVehicles.filter(v => v.vehicleType.toUpperCase() === "TRACTOR" || v.vehicleType.toUpperCase() === "STRAIGHT_TRUCK");
     const trailers = allVehicles.filter(v => v.vehicleType.toUpperCase() === "TRAILER");
     const inMaintenance = allVehicles.filter(v => v.status.toUpperCase() === "MAINTENANCE").length;
 
@@ -158,7 +171,7 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                     <Truck size={20} className={styles.statIcon} />
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{tractors.length}</span>
-                        <span className={styles.statLabel}>Tractors</span>
+                        <span className={styles.statLabel}>Trucks</span>
                     </div>
                 </div>
                 <div className={styles.statCard}>
@@ -198,8 +211,13 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                     }}
                 >
                     <option value="all">All Types</option>
-                    <option value="tractor">Tractors</option>
+                    <option value="tractor">Semi-Trucks</option>
+                    <option value="straight_truck">Straight Trucks</option>
+                    <option value="pickup">Pickups</option>
+                    <option value="van">Vans</option>
+                    <option value="suv">SUVs</option>
                     <option value="trailer">Trailers</option>
+                    <option value="bus">Buses</option>
                 </select>
             </div>
 
@@ -226,13 +244,13 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                                 <tr key={vehicle.id}>
                                     <td>
                                         <Link href={`/dashboard/vehicles/${vehicle.id}`} className={styles.vehicleLink}>
-                                            <div className={`${styles.vehicleIcon} ${vType === "tractor" ? styles.tractor : styles.trailer}`}>
+                                            <div className={`${styles.vehicleIcon} ${vType === "trailer" ? styles.trailer : styles.tractor}`}>
                                                 <Truck size={20} />
                                             </div>
                                             <div className={styles.vehicleUnit}>
                                                 <span className={styles.unitNumber}>{vehicle.unitNumber}</span>
                                                 <span className={styles.vehicleType}>
-                                                    {vType === "tractor" ? "Tractor" : vType === "trailer" ? "Trailer" : vType.replace("_", " ")}
+                                                    {vehicleTypeLabel(vType)}
                                                 </span>
                                             </div>
                                         </Link>

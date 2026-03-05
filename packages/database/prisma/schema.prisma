@@ -328,6 +328,9 @@ enum VehicleType {
   TRACTOR
   TRAILER
   STRAIGHT_TRUCK
+  PICKUP
+  VAN
+  SUV
   BUS
 }
 

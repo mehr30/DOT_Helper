@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const vehicleTypeEnum = z.enum(["TRACTOR", "TRAILER", "STRAIGHT_TRUCK", "BUS"]);
+const vehicleTypeEnum = z.enum(["TRACTOR", "TRAILER", "STRAIGHT_TRUCK", "PICKUP", "VAN", "SUV", "BUS"]);
 
 export const vehicleCreateSchema = z.object({
     unitNumber: z.string().min(1, "Unit number is required").max(30),

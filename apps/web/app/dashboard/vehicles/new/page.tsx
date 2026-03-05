@@ -71,11 +71,14 @@ export default function NewVehiclePage() {
                         <select {...register("vehicleType")} style={inputStyle}>
                             <option value="TRACTOR">Semi-Truck (Tractor) — pulls a trailer</option>
                             <option value="STRAIGHT_TRUCK">Straight Truck — box truck, no trailer</option>
+                            <option value="PICKUP">Pickup Truck — F-150, Ram, Silverado, etc.</option>
+                            <option value="VAN">Van — cargo van, sprinter, service van</option>
+                            <option value="SUV">SUV — Tahoe, Expedition, Suburban, etc.</option>
                             <option value="TRAILER">Trailer — pulled by a tractor</option>
                             <option value="BUS">Bus / Passenger Vehicle</option>
                         </select>
                         <span style={helpStyle}>
-                            Semi-trucks pull separate trailers. Straight trucks have the cargo area attached (box trucks, flatbeds).
+                            Semi-trucks pull separate trailers. Straight trucks have the cargo area attached (box trucks, flatbeds). Pick the type that best describes your vehicle.
                         </span>
                     </div>
                 </div>

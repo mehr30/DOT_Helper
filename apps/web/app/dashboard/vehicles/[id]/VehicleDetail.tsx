@@ -62,7 +62,11 @@ function getDaysUntil(dateStr: string) {
 }
 
 export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
-    const vType = vehicle.vehicleType.toLowerCase().replace("_", " ");
+    const vTypeMap: Record<string, string> = {
+        TRACTOR: "Semi-Truck", STRAIGHT_TRUCK: "Straight Truck", PICKUP: "Pickup",
+        VAN: "Van", SUV: "SUV", TRAILER: "Trailer", BUS: "Bus",
+    };
+    const vType = vTypeMap[vehicle.vehicleType] ?? vehicle.vehicleType.toLowerCase().replace("_", " ");
     const inspDays = vehicle.annualInspectionDue ? getDaysUntil(vehicle.annualInspectionDue) : null;
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
