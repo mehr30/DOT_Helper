@@ -4,7 +4,7 @@
 export interface FormField {
     id: string;
     label: string;
-    type: "text" | "date" | "select" | "checkbox" | "textarea" | "email" | "tel" | "number" | "ssn";
+    type: "text" | "date" | "select" | "checkbox" | "textarea" | "email" | "tel" | "number" | "ssn" | "signature";
     placeholder?: string;
     helpText?: string;
     required?: boolean;
@@ -433,10 +433,11 @@ export const dotForms: DOTForm[] = [
             },
             {
                 id: "certification",
-                title: "Certification",
+                title: "Certification & Signature",
                 fields: [
                     { id: "certify", label: "I certify that the information provided is true and complete to the best of my knowledge", type: "checkbox", required: true },
                     { id: "signDate", label: "Date", type: "date", required: true },
+                    { id: "applicantSignature", label: "Applicant Signature", type: "signature", required: true },
                 ],
             },
         ],
@@ -478,10 +479,11 @@ export const dotForms: DOTForm[] = [
             },
             {
                 id: "signature",
-                title: "Signature",
+                title: "Driver Signature",
                 fields: [
                     { id: "signDate", label: "Date Signed", type: "date", required: true },
                     { id: "certify", label: "I certify this information is true and complete", type: "checkbox", required: true },
+                    { id: "driverSignature", label: "Driver Signature", type: "signature", required: true },
                 ],
             },
         ],
@@ -554,6 +556,7 @@ export const dotForms: DOTForm[] = [
                 fields: [
                     { id: "certify", label: "I have conducted an inspection and reported all defects", type: "checkbox", required: true },
                     { id: "signDate", label: "Date/Time", type: "date", required: true },
+                    { id: "driverSignature", label: "Driver Signature", type: "signature", required: true },
                 ],
             },
         ],
@@ -632,10 +635,11 @@ export const dotForms: DOTForm[] = [
             },
             {
                 id: "signature",
-                title: "Signature",
+                title: "Employee Signature",
                 fields: [
                     { id: "signDate", label: "Date Signed", type: "date", required: true },
                     { id: "certify", label: "I certify I have read and understand the above acknowledgments", type: "checkbox", required: true },
+                    { id: "employeeSignature", label: "Employee Signature", type: "signature", required: true },
                 ],
             },
         ],
@@ -682,6 +686,7 @@ export const dotForms: DOTForm[] = [
                     { id: "examinerTitle", label: "Examiner Title", type: "text", required: true },
                     { id: "passed", label: "Driver has passed the road test and is qualified to operate the type of vehicle tested", type: "checkbox", required: true },
                     { id: "certDate", label: "Date of Certification", type: "date", required: true },
+                    { id: "examinerSignature", label: "Examiner Signature", type: "signature", required: true },
                 ],
             },
         ],

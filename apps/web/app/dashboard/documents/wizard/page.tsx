@@ -31,6 +31,7 @@ import {
 import { saveDocument, getDocumentByFormId, SavedDocument } from "../savedDocuments";
 import { useCompanyProfile } from "../../../components/CompanyProfileContext";
 import { saveWizardFormAsDocument } from "../../../actions/documents";
+import SignaturePad from "../../../components/SignaturePad";
 
 // Map wizard form IDs to database DocumentType values
 const formToDocumentType: Record<string, string> = {
@@ -358,7 +359,48 @@ function WizardContent() {
                         )}
                     </div>
                 )}
-                {field.type === "checkbox" ? (
+                {field.type === "signature" ? (
+                    <div style={{ marginTop: "0.25rem" }}>
+                        {value ? (
+                            <div style={{
+                                display: "flex", alignItems: "center", gap: "0.75rem",
+                                padding: "0.75rem 1rem", background: "#f0fdf4",
+                                border: "1px solid #86efac", borderRadius: "10px",
+                            }}>
+                                <img
+                                    src={value as string}
+                                    alt="Signature"
+                                    style={{ height: 48, borderRadius: "4px" }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#16a34a" }}>
+                                        Signature captured
+                                    </span>
+                                    <span style={{ fontSize: "0.7rem", color: "#64748b", display: "block" }}>
+                                        {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleFieldChange(field.id, "")}
+                                    style={{
+                                        padding: "0.3rem 0.6rem", fontSize: "0.7rem", fontWeight: 500,
+                                        border: "1px solid #e2e8f0", borderRadius: "6px",
+                                        background: "white", cursor: "pointer", color: "#64748b",
+                                    }}
+                                >
+                                    Re-sign
+                                </button>
+                            </div>
+                        ) : (
+                            <SignaturePad
+                                onSignature={(dataUrl) => handleFieldChange(field.id, dataUrl)}
+                                width={440}
+                                height={150}
+                            />
+                        )}
+                    </div>
+                ) : field.type === "checkbox" ? (
                     <label className={styles.checkboxLabel}>
                         <input
                             type="checkbox"

@@ -352,17 +352,21 @@ export default function DocumentsPage() {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             // Generate printable version of this single form
-                                            let content = `${doc.title}\n${doc.cfrReference}\n`;
-                                            content += "=".repeat(50) + "\n\n";
+                                            const fields: string[] = [];
+                                            const sigs: string[] = [];
                                             Object.entries(doc.data).forEach(([key, val]) => {
-                                                if (val) {
+                                                if (!val) return;
+                                                if (typeof val === "string" && val.startsWith("data:image")) {
                                                     const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
-                                                    content += `${label}: ${val === true ? "Yes" : val}\n`;
+                                                    sigs.push(`<div style="margin-top:1.5rem"><p style="font-weight:600;margin-bottom:0.25rem">${label}:</p><img src="${val}" style="height:60px;border-bottom:1px solid #333" /></div>`);
+                                                } else {
+                                                    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
+                                                    fields.push(`<tr><td style="padding:0.3rem 1rem 0.3rem 0;font-weight:500;color:#475569;white-space:nowrap">${label}</td><td style="padding:0.3rem 0">${val === true ? "Yes" : val}</td></tr>`);
                                                 }
                                             });
                                             const w = window.open("", "_blank");
                                             if (w) {
-                                                w.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:system-ui;padding:2rem;max-width:700px;margin:0 auto}h1{font-size:1.3rem}pre{white-space:pre-wrap;font-size:0.9rem;line-height:1.8}</style></head><body><h1>${doc.title}</h1><p style="color:#64748b">${doc.cfrReference}</p><pre>${content}</pre><script>window.print()</script></body></html>`);
+                                                w.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:system-ui;padding:2rem;max-width:700px;margin:0 auto}h1{font-size:1.3rem}table{border-collapse:collapse;width:100%}td{border-bottom:1px solid #eee;font-size:0.9rem}@media print{body{padding:0.5in}}</style></head><body><h1>${doc.title}</h1><p style="color:#64748b">${doc.cfrReference} &mdash; Generated ${new Date().toLocaleDateString()}</p><hr/><table>${fields.join("")}</table>${sigs.join("")}<script>window.print()</script></body></html>`);
                                                 w.document.close();
                                             }
                                         }}
