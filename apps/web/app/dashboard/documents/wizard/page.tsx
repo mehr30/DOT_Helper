@@ -329,7 +329,7 @@ function WizardContent() {
     };
 
     const handleFieldChange = (fieldId: string, value: string | boolean) => {
-        setFormData({ ...formData, [fieldId]: value });
+        setFormData(prev => ({ ...prev, [fieldId]: value }));
     };
 
     const toggleSection = (sectionId: string) => {

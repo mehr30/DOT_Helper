@@ -26,7 +26,8 @@ export const auth = betterAuth({
     trustedOrigins: [
         baseURL,
         "https://dot-helper-web.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
     ],
     database: prismaAdapter(prisma, {
         provider: "postgresql",
