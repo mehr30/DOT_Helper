@@ -10,12 +10,10 @@ import {
     CheckCircle,
     FolderOpen,
     ClipboardList,
-    Sparkles,
     ArrowRight,
     Edit3,
     Trash2,
     Package,
-    Printer,
     PenTool,
     Download,
     Loader2,
@@ -32,6 +30,7 @@ import { useDemoMode } from "../../components/DemoModeContext";
 import DocumentUpload from "../../components/DocumentUpload";
 import SignDocumentModal from "../../components/SignDocumentModal";
 import { getDocuments, deleteDocumentRecord, type DocumentData } from "../../actions/documents";
+import { downloadCompliancePacket, downloadFormPdf, type SavedFormData } from "../../../lib/pdf";
 
 function getStatusBadge(status: string) {
     switch (status) {
@@ -289,28 +288,7 @@ export default function DocumentsPage() {
                             onClick={() => {
                                 const docs = getSavedDocuments();
                                 if (docs.length === 0) return;
-                                let content = "DOT COMPLIANCE PACKET\n";
-                                content += `Generated: ${new Date().toLocaleDateString()}\n`;
-                                content += "=".repeat(50) + "\n\n";
-                                docs.forEach(doc => {
-                                    content += `${doc.title} (${doc.cfrReference})\n`;
-                                    content += `Status: ${doc.status === "completed" ? "Completed" : "Draft"} — ${doc.completedFields}/${doc.totalFields} fields\n`;
-                                    content += `-`.repeat(40) + "\n";
-                                    Object.entries(doc.data).forEach(([key, val]) => {
-                                        if (val) {
-                                            const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
-                                            content += `  ${label}: ${val === true ? "Yes" : val}\n`;
-                                        }
-                                    });
-                                    content += "\n";
-                                });
-                                const blob = new Blob([content], { type: "text/plain" });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement("a");
-                                a.href = url;
-                                a.download = `dot-compliance-packet-${new Date().toISOString().split("T")[0] ?? ""}.txt`;
-                                a.click();
-                                URL.revokeObjectURL(url);
+                                downloadCompliancePacket(docs as SavedFormData[]);
                             }}
                             style={{
                                 display: "flex", alignItems: "center", gap: "0.4rem",
@@ -371,42 +349,19 @@ export default function DocumentsPage() {
                                     >
                                         <Edit3 size={14} /> Edit
                                     </Link>
-                                    <Link
-                                        href={`/dashboard/documents/wizard?form=${doc.formId}`}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            const fields: string[] = [];
-                                            const sigs: string[] = [];
-                                            const signDate = (doc.data.signDate as string) || (doc.data.certDate as string) || "";
-                                            const sigTimestamp = signDate
-                                                ? new Date(signDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-                                                : new Date(doc.savedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-                                            Object.entries(doc.data).forEach(([key, val]) => {
-                                                if (!val) return;
-                                                if (typeof val === "string" && val.startsWith("data:image")) {
-                                                    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
-                                                    sigs.push(`<div style="margin-top:1.5rem"><p style="font-weight:600;margin-bottom:0.25rem">${label}:</p><img src="${val}" style="height:60px;border-bottom:1px solid #333" /><p style="font-size:0.8rem;color:#64748b;margin-top:0.25rem">Signed: ${sigTimestamp}</p></div>`);
-                                                } else {
-                                                    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
-                                                    fields.push(`<tr><td style="padding:0.3rem 1rem 0.3rem 0;font-weight:500;color:#475569;white-space:nowrap">${label}</td><td style="padding:0.3rem 0">${val === true ? "Yes" : val}</td></tr>`);
-                                                }
-                                            });
-                                            const w = window.open("", "_blank");
-                                            if (w) {
-                                                w.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:system-ui;padding:2rem;max-width:700px;margin:0 auto}h1{font-size:1.3rem}table{border-collapse:collapse;width:100%}td{border-bottom:1px solid #eee;font-size:0.9rem}@media print{body{padding:0.5in}}</style></head><body><h1>${doc.title}</h1><p style="color:#64748b">${doc.cfrReference} &mdash; Generated ${new Date().toLocaleDateString()}</p><hr/><table>${fields.join("")}</table>${sigs.join("")}<script>window.print()</script></body></html>`);
-                                                w.document.close();
-                                            }
-                                        }}
+                                    <button
+                                        onClick={() => downloadFormPdf(doc as SavedFormData)}
                                         style={{
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             gap: "0.3rem", padding: "0.5rem 0.75rem", borderRadius: "8px",
                                             border: "1px solid #e2e8f0", background: "white",
                                             color: "#475569", fontSize: "0.8rem", fontWeight: 500,
-                                            textDecoration: "none", cursor: "pointer",
+                                            cursor: "pointer",
                                         }}
+                                        title="Download PDF"
                                     >
-                                        <Printer size={14} />
-                                    </Link>
+                                        <Download size={14} />
+                                    </button>
                                     <button
                                         onClick={() => handleDeleteSavedDoc(doc.id)}
                                         style={{

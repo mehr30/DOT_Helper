@@ -28,6 +28,7 @@ import { useDemoMode } from "../../components/DemoModeContext";
 import EmptyState from "../../components/EmptyState";
 import type { ComplianceScores } from "../../actions/compliance";
 import { humanize, humanizeRegulation } from "../../../lib/plain-english";
+import { downloadComplianceReport } from "../../../lib/pdf";
 
 // --- Demo mock data ---
 const mockScores: ComplianceScores = {
@@ -316,31 +317,7 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                     </select>
                     <button
                         className={styles.downloadBtn}
-                        onClick={() => {
-                            let content = "DOT COMPLIANCE REPORT\n";
-                            content += `Generated: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
-                            content += `Overall Score: ${data.overall}%\n`;
-                            content += "=".repeat(60) + "\n\n";
-                            content += `Summary: ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need attention, ${data.summary.expired} expired\n\n`;
-                            data.categories.forEach(cat => {
-                                content += `${"─".repeat(50)}\n`;
-                                content += `${cat.name} — ${cat.score}%\n`;
-                                content += `${"─".repeat(50)}\n`;
-                                cat.items.forEach(item => {
-                                    const status = item.status === "compliant" ? "✓" : item.status === "expired" ? "✗" : "!";
-                                    content += `  [${status}] ${item.label}\n`;
-                                    content += `      ${item.detail} (${item.regulation})\n`;
-                                });
-                                content += "\n";
-                            });
-                            const blob = new Blob([content], { type: "text/plain" });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement("a");
-                            a.href = url;
-                            a.download = `compliance-report-${new Date().toISOString().split("T")[0]}.txt`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                        }}
+                        onClick={() => downloadComplianceReport(data)}
                     >
                         <Download size={16} /> Export Report
                     </button>

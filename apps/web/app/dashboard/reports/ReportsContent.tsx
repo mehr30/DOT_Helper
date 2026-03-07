@@ -18,6 +18,13 @@ import {
 import { useDemoMode } from "../../components/DemoModeContext";
 import EmptyState from "../../components/EmptyState";
 import type { ReportData } from "../../actions/reports";
+import {
+    downloadComplianceReport,
+    downloadDriverReport,
+    downloadVehicleReport,
+    downloadDocInventory,
+    type CompliancePdfData,
+} from "../../../lib/pdf";
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString("en-US", {
@@ -50,107 +57,57 @@ function getDaysLabel(days: number | null) {
     return `${days}d left`;
 }
 
-function generateDriverReport(data: ReportData): string {
-    let content = `DRIVER RECORDS REPORT\n`;
-    content += `${data.companyName}\n`;
-    content += `Generated: ${new Date(data.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
-    content += "=".repeat(60) + "\n\n";
-    content += `Total Active Drivers: ${data.drivers.length}\n`;
-    content += `Driver Records Compliance: ${data.complianceSummary.driverQualification}%\n\n`;
-
+/** Build a CompliancePdfData structure from ReportData for the PDF generator */
+function buildCompliancePdfData(data: ReportData): CompliancePdfData {
+    const urgentItems: CompliancePdfData["categories"][0]["items"] = [];
     data.drivers.forEach(d => {
-        content += `${"─".repeat(50)}\n`;
-        content += `${d.name}${d.cdlNumber ? ` (${d.cdlState ?? ""} ${d.cdlNumber})` : ""}\n`;
-        content += `${"─".repeat(50)}\n`;
-        content += `  Status: ${d.status}\n`;
-        content += `  Hire Date: ${formatDate(d.hireDate)}\n`;
-        content += `  License Expires: ${d.cdlExpiration ? formatDate(d.cdlExpiration) : "Not set"}\n`;
-        content += `  DOT Physical Expires: ${d.medicalExpiration ? formatDate(d.medicalExpiration) : "Not set"}\n`;
-        content += `  Documents on File: ${d.documentCount}\n`;
-        if (d.missingDocs.length > 0) {
-            content += `  MISSING DOCUMENTS:\n`;
-            d.missingDocs.forEach(doc => { content += `    - ${doc}\n`; });
+        if (d.cdlDaysLeft !== null && d.cdlDaysLeft <= 30) {
+            urgentItems.push({
+                label: `${d.name} — License`,
+                regulation: "49 CFR 391.11",
+                status: d.cdlDaysLeft <= 0 ? "expired" : "action_needed",
+                detail: d.cdlDaysLeft <= 0 ? `Expired ${Math.abs(d.cdlDaysLeft)} days ago` : `${d.cdlDaysLeft} days left`,
+            });
         }
-        content += "\n";
-    });
-    return content;
-}
-
-function generateVehicleReport(data: ReportData): string {
-    let content = `VEHICLE MAINTENANCE REPORT\n`;
-    content += `${data.companyName}\n`;
-    content += `Generated: ${new Date(data.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
-    content += "=".repeat(60) + "\n\n";
-    content += `Total Active Vehicles: ${data.vehicles.length}\n`;
-    content += `Vehicle Compliance: ${data.complianceSummary.vehicleMaintenance}%\n\n`;
-
-    data.vehicles.forEach(v => {
-        content += `${"─".repeat(50)}\n`;
-        content += `Unit ${v.unitNumber} — ${v.yearMakeModel}\n`;
-        content += `${"─".repeat(50)}\n`;
-        content += `  VIN: ${v.vin || "Not set"}\n`;
-        content += `  Status: ${v.status}\n`;
-        content += `  Annual Inspection Due: ${v.inspectionDue ? formatDate(v.inspectionDue) : "Not set"}\n`;
-        content += `  Next PM Due: ${v.nextPmDue ? formatDate(v.nextPmDue) : "Not set"}\n`;
-        content += `  Documents on File: ${v.documentCount}\n`;
-        if (v.missingDocs.length > 0) {
-            content += `  MISSING DOCUMENTS:\n`;
-            v.missingDocs.forEach(doc => { content += `    - ${doc}\n`; });
+        if (d.medicalDaysLeft !== null && d.medicalDaysLeft <= 30) {
+            urgentItems.push({
+                label: `${d.name} — DOT Physical`,
+                regulation: "49 CFR 391.43",
+                status: d.medicalDaysLeft <= 0 ? "expired" : "action_needed",
+                detail: d.medicalDaysLeft <= 0 ? `Expired ${Math.abs(d.medicalDaysLeft)} days ago` : `${d.medicalDaysLeft} days left`,
+            });
         }
-        content += "\n";
-    });
-    return content;
-}
-
-function generateComplianceSummary(data: ReportData): string {
-    let content = `COMPLIANCE SUMMARY REPORT\n`;
-    content += `${data.companyName}\n`;
-    content += `Generated: ${new Date(data.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
-    content += "=".repeat(60) + "\n\n";
-    content += `OVERALL COMPLIANCE SCORE: ${data.complianceSummary.overall}%\n\n`;
-    content += `Category Scores:\n`;
-    content += `  Driver Records:        ${data.complianceSummary.driverQualification}%\n`;
-    content += `  Vehicle Maintenance:   ${data.complianceSummary.vehicleMaintenance}%\n`;
-    content += `  Drug & Alcohol Testing:${data.complianceSummary.drugAlcohol}%\n`;
-    content += `  Business Filings:      ${data.complianceSummary.companyAuthority}%\n\n`;
-    content += `Fleet Summary:\n`;
-    content += `  Active Drivers:  ${data.drivers.length}\n`;
-    content += `  Active Vehicles: ${data.vehicles.length}\n`;
-    content += `  Total Documents: ${data.documentCounts.total}\n`;
-    content += `  Expiring Soon:   ${data.documentCounts.expiringSoon}\n`;
-    content += `  Expired:         ${data.documentCounts.expired}\n\n`;
-
-    // Urgent items
-    const urgentItems: string[] = [];
-    data.drivers.forEach(d => {
-        if (d.cdlDaysLeft !== null && d.cdlDaysLeft <= 0) urgentItems.push(`[EXPIRED] ${d.name} — License expired ${Math.abs(d.cdlDaysLeft)} days ago`);
-        else if (d.cdlDaysLeft !== null && d.cdlDaysLeft <= 30) urgentItems.push(`[URGENT] ${d.name} — License expires in ${d.cdlDaysLeft} days`);
-        if (d.medicalDaysLeft !== null && d.medicalDaysLeft <= 0) urgentItems.push(`[EXPIRED] ${d.name} — DOT physical expired ${Math.abs(d.medicalDaysLeft)} days ago`);
-        else if (d.medicalDaysLeft !== null && d.medicalDaysLeft <= 30) urgentItems.push(`[URGENT] ${d.name} — DOT physical expires in ${d.medicalDaysLeft} days`);
     });
     data.vehicles.forEach(v => {
-        if (v.inspectionDaysLeft !== null && v.inspectionDaysLeft <= 0) urgentItems.push(`[EXPIRED] Unit ${v.unitNumber} — Annual inspection overdue by ${Math.abs(v.inspectionDaysLeft)} days`);
-        else if (v.inspectionDaysLeft !== null && v.inspectionDaysLeft <= 30) urgentItems.push(`[URGENT] Unit ${v.unitNumber} — Annual inspection due in ${v.inspectionDaysLeft} days`);
+        if (v.inspectionDaysLeft !== null && v.inspectionDaysLeft <= 30) {
+            urgentItems.push({
+                label: `Unit ${v.unitNumber} — Annual Inspection`,
+                regulation: "49 CFR 396.17",
+                status: v.inspectionDaysLeft <= 0 ? "expired" : "action_needed",
+                detail: v.inspectionDaysLeft <= 0 ? `Overdue ${Math.abs(v.inspectionDaysLeft)} days` : `${v.inspectionDaysLeft} days left`,
+            });
+        }
     });
 
-    if (urgentItems.length > 0) {
-        content += `ITEMS REQUIRING IMMEDIATE ACTION:\n`;
-        urgentItems.forEach(item => { content += `  ${item}\n`; });
-    } else {
-        content += `No items require immediate action.\n`;
-    }
+    const compliantCount = urgentItems.filter(i => i.status === "compliant").length;
+    const actionCount = urgentItems.filter(i => i.status === "action_needed").length;
+    const expiredCount = urgentItems.filter(i => i.status === "expired").length;
 
-    return content;
-}
-
-function downloadText(content: string, filename: string) {
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+    return {
+        overall: data.complianceSummary.overall,
+        categories: [
+            { name: "Driver Records", score: data.complianceSummary.driverQualification, items: urgentItems.filter(i => i.regulation.includes("391")) },
+            { name: "Vehicle Maintenance", score: data.complianceSummary.vehicleMaintenance, items: urgentItems.filter(i => i.regulation.includes("396")) },
+            { name: "Drug & Alcohol Testing", score: data.complianceSummary.drugAlcohol, items: [] },
+            { name: "Business Filings", score: data.complianceSummary.companyAuthority, items: [] },
+        ],
+        summary: {
+            totalItems: urgentItems.length,
+            compliant: compliantCount,
+            actionNeeded: actionCount,
+            expired: expiredCount,
+        },
+    };
 }
 
 export default function ReportsContent({ data }: { data: ReportData | null }) {
@@ -273,7 +230,7 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
                     icon={Shield}
                     expanded={expandedReport === "compliance"}
                     onToggle={() => toggle("compliance")}
-                    onDownload={() => downloadText(generateComplianceSummary(reportData), `compliance-summary-${dateStamp}.txt`)}
+                    onDownload={() => downloadComplianceReport(buildCompliancePdfData(reportData))}
                 >
                     <div style={{ padding: "1rem" }}>
                         {/* Urgent items */}
@@ -325,7 +282,11 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
                     icon={Users}
                     expanded={expandedReport === "drivers"}
                     onToggle={() => toggle("drivers")}
-                    onDownload={() => downloadText(generateDriverReport(reportData), `driver-qualification-report-${dateStamp}.txt`)}
+                    onDownload={() => downloadDriverReport({
+                        companyName: reportData.companyName,
+                        drivers: reportData.drivers,
+                        complianceScore: reportData.complianceSummary.driverQualification,
+                    })}
                 >
                     {reportData.drivers.length > 0 ? (
                         <div style={{ overflowX: "auto" }}>
@@ -387,7 +348,11 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
                     icon={Truck}
                     expanded={expandedReport === "vehicles"}
                     onToggle={() => toggle("vehicles")}
-                    onDownload={() => downloadText(generateVehicleReport(reportData), `vehicle-maintenance-report-${dateStamp}.txt`)}
+                    onDownload={() => downloadVehicleReport({
+                        companyName: reportData.companyName,
+                        vehicles: reportData.vehicles,
+                        complianceScore: reportData.complianceSummary.vehicleMaintenance,
+                    })}
                 >
                     {reportData.vehicles.length > 0 ? (
                         <div style={{ overflowX: "auto" }}>
@@ -449,16 +414,10 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
                     icon={FileText}
                     expanded={expandedReport === "documents"}
                     onToggle={() => toggle("documents")}
-                    onDownload={() => {
-                        let content = `DOCUMENT INVENTORY\n${reportData.companyName}\nGenerated: ${new Date().toLocaleDateString()}\n${"=".repeat(50)}\n\n`;
-                        content += `Total Documents: ${reportData.documentCounts.total}\n`;
-                        content += `  Driver Documents: ${reportData.documentCounts.driverDocs}\n`;
-                        content += `  Vehicle Documents: ${reportData.documentCounts.vehicleDocs}\n`;
-                        content += `  Company Documents: ${reportData.documentCounts.companyDocs}\n`;
-                        content += `  Expiring Soon: ${reportData.documentCounts.expiringSoon}\n`;
-                        content += `  Expired: ${reportData.documentCounts.expired}\n`;
-                        downloadText(content, `document-inventory-${dateStamp}.txt`);
-                    }}
+                    onDownload={() => downloadDocInventory({
+                        companyName: reportData.companyName,
+                        ...reportData.documentCounts,
+                    })}
                 >
                     <div style={{ padding: "1rem" }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem" }}>
