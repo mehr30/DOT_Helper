@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Shield,
   CheckCircle,
@@ -18,10 +18,112 @@ import {
   Check,
   Quote,
   Truck,
+  Search,
 } from "lucide-react";
 import Image from "next/image";
 import GreenlightLogo from "./components/GreenlightLogo";
 import styles from "./page.module.css";
+
+// Searchable compliance topics (from blog index)
+const complianceTopics = [
+  { slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist", category: "Compliance" },
+  { slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide for Small Fleets", category: "Regulations" },
+  { slug: "driver-qualification-file-requirements", title: "Driver Qualification File Requirements", category: "Driver Management" },
+  { slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance & Inspection Guide", category: "Vehicle Compliance" },
+  { slug: "drug-alcohol-testing-compliance", title: "Drug & Alcohol Testing Compliance Guide", category: "Drug & Alcohol" },
+  { slug: "how-to-pass-dot-audit", title: "How to Pass a DOT Audit", category: "Audit Prep" },
+  { slug: "hos-rules-explained", title: "Hours of Service (HOS) Rules Explained", category: "HOS" },
+  { slug: "fmcsa-clearinghouse-guide", title: "FMCSA Clearinghouse Guide for Employers", category: "Driver Management" },
+  { slug: "cdl-requirements-guide", title: "CDL Requirements: Classes & Endorsements", category: "Driver Management" },
+  { slug: "dot-medical-card-requirements", title: "DOT Medical Card Requirements", category: "Driver Management" },
+  { slug: "common-dot-violations", title: "10 Most Common DOT Violations", category: "Compliance" },
+  { slug: "annual-dot-inspection-guide", title: "Annual DOT Inspection Deep Dive", category: "Vehicle Compliance" },
+  { slug: "random-drug-testing-requirements", title: "Random Drug Testing Requirements", category: "Drug & Alcohol" },
+  { slug: "eld-compliance-guide", title: "ELD Compliance Guide", category: "Driver Management" },
+  { slug: "usdot-number-requirements", title: "USDOT Number: Who Needs One & How to Get It", category: "Compliance" },
+  { slug: "dot-insurance-requirements", title: "DOT Insurance Requirements & Minimums", category: "Regulations" },
+  { slug: "roadside-inspection-guide", title: "Roadside Inspections: How to Prepare", category: "Vehicle Compliance" },
+  { slug: "csa-scores-explained", title: "CSA Scores Explained", category: "Regulations" },
+  { slug: "preventive-maintenance-program-guide", title: "Building a Preventive Maintenance Program", category: "Vehicle Compliance" },
+  { slug: "dot-compliance-costs-fines", title: "DOT Compliance Costs & Fines", category: "Business" },
+  { slug: "post-accident-drug-testing", title: "Post-Accident Drug Testing Requirements", category: "Drug & Alcohol" },
+  { slug: "brake-compliance-guide", title: "Brake Compliance Guide", category: "Vehicle Compliance" },
+  { slug: "dvir-best-practices", title: "DVIR Best Practices", category: "Vehicle Compliance" },
+  { slug: "hiring-cdl-drivers-compliance", title: "Hiring CDL Drivers: Compliance Steps", category: "Driver Management" },
+  { slug: "mcs-150-biennial-update", title: "MCS-150 Biennial Update Guide", category: "Compliance" },
+];
+
+function HeroSearch() {
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const results = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.toLowerCase();
+    return complianceTopics
+      .filter(t => t.title.toLowerCase().includes(q) || t.category.toLowerCase().includes(q))
+      .slice(0, 5);
+  }, [query]);
+
+  const showDropdown = focused && query.trim().length > 0;
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className={styles.heroSearch} ref={ref}>
+      <Search size={18} className={styles.heroSearchIcon} />
+      <input
+        type="text"
+        className={styles.heroSearchInput}
+        placeholder="Search any DOT requirement..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => setFocused(true)}
+      />
+      {showDropdown && (
+        <div className={styles.heroSearchDropdown}>
+          {results.length === 0 ? (
+            <div className={styles.heroSearchEmpty}>
+              No guides found for &ldquo;{query}&rdquo;
+              <Link href="/blog" className={styles.heroSearchBrowse} onClick={() => { setQuery(""); setFocused(false); }}>
+                Browse all guides <ArrowRight size={14} />
+              </Link>
+            </div>
+          ) : (
+            <>
+              {results.map((r) => (
+                <Link
+                  key={r.slug}
+                  href={`/blog/${r.slug}`}
+                  className={styles.heroSearchResult}
+                  onClick={() => { setQuery(""); setFocused(false); }}
+                >
+                  <FileText size={16} className={styles.heroSearchResultIcon} />
+                  <div>
+                    <span className={styles.heroSearchResultTitle}>{r.title}</span>
+                    <span className={styles.heroSearchResultCat}>{r.category}</span>
+                  </div>
+                </Link>
+              ))}
+              <Link href="/blog" className={styles.heroSearchAll} onClick={() => { setQuery(""); setFocused(false); }}>
+                Browse all compliance guides <ArrowRight size={14} />
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const showcaseTabs = [
   {
@@ -317,6 +419,7 @@ export default function HomePage() {
               See Features
             </Link>
           </div>
+          <HeroSearch />
           <div className={styles.heroStats}>
             {stats.map((stat) => (
               <div key={stat.label} className={styles.heroStat}>

@@ -255,6 +255,147 @@
   background: var(--bg-tertiary);
 }
 
+/* Hero Search */
+.heroSearch {
+  position: relative;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto var(--space-10);
+}
+
+.heroSearchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heroSearchInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.heroSearchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.heroSearchInput:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), var(--shadow-md);
+}
+
+.heroSearchDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.heroSearchEmpty {
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.heroSearchBrowse {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-primary-600);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.heroSearchBrowse:hover {
+  color: var(--color-primary-700);
+}
+
+.heroSearchResult {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--transition-fast);
+}
+
+.heroSearchResult:hover {
+  background: var(--bg-secondary);
+}
+
+.heroSearchResult + .heroSearchResult {
+  border-top: 1px solid var(--border-color);
+}
+
+.heroSearchResultIcon {
+  color: var(--color-primary-500);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.heroSearchResultTitle {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.heroSearchResultCat {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.heroSearchAll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.6rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--color-primary-600);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.heroSearchAll:hover {
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 768px) {
+  .heroSearch {
+    max-width: 100%;
+  }
+}
+
 .heroStats {
   display: flex;
   justify-content: center;
