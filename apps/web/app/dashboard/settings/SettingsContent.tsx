@@ -2,12 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-    Settings as SettingsIcon,
-    User,
     Users,
-    Bell,
-    Shield,
-    CreditCard,
     Building2,
     Link2,
     CheckCircle,
@@ -43,12 +38,8 @@ interface CompanyData {
 
 /* ─── Account Settings Sections ─── */
 const settingsSections = [
-    { name: "Profile", description: "Your name, email, and account details", icon: User },
     { name: "Company", description: "Company name, USDOT number, and address", icon: Building2 },
     { name: "Team", description: "Manage team members and invitations", icon: Users, href: "/dashboard/settings/team" },
-    { name: "Notifications", description: "Email and SMS alert preferences", icon: Bell },
-    { name: "Security", description: "Password, two-factor authentication", icon: Shield },
-    { name: "Billing", description: "Subscription plan, payment methods, invoices", icon: CreditCard },
 ];
 
 /* ─── Integration Definitions ─── */
@@ -498,30 +489,6 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
         </div>
     );
 
-    const renderPlaceholderModal = () => (
-        <div style={{
-            position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex",
-            alignItems: "center", justifyContent: "center", zIndex: 1000,
-        }} onClick={() => setSettingsModal(null)}>
-            <div onClick={(e) => e.stopPropagation()} style={{
-                background: "white", borderRadius: "16px", padding: "2rem", width: "90%", maxWidth: 500,
-                boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-            }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-                    <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>{settingsModal} Settings</h3>
-                    <button onClick={() => setSettingsModal(null)} style={{ border: "none", background: "none", cursor: "pointer", color: "#64748b" }}><X size={20} /></button>
-                </div>
-                <p style={{ color: "#64748b", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                    {settingsModal} management will be fully available in the production release. This will include editing your {settingsModal?.toLowerCase()} information, managing preferences, and saving changes to your account.
-                </p>
-                <button onClick={() => setSettingsModal(null)} style={{
-                    marginTop: "1.5rem", padding: "0.6rem 1.25rem", borderRadius: "8px",
-                    border: "none", background: "#22c55e", color: "white", fontWeight: 600, cursor: "pointer",
-                }}>Got it</button>
-            </div>
-        </div>
-    );
-
     return (
         <div style={{ padding: "2rem", maxWidth: 850 }}>
             <header style={{ marginBottom: "2rem" }}>
@@ -570,7 +537,6 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
 
             {/* ─── Settings Modal ─── */}
             {settingsModal === "Company" && renderCompanyModal()}
-            {settingsModal && settingsModal !== "Company" && renderPlaceholderModal()}
 
             {/* ─── Integrations ─── */}
             <div style={{ marginBottom: "2rem" }}>

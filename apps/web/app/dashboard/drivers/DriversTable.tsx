@@ -277,11 +277,6 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                                                 border: "1px solid #e2e8f0", minWidth: 160,
                                                 zIndex: 10, overflow: "hidden",
                                             }}>
-                                                <Link href={`/dashboard/drivers/${driver.id}`} style={{
-                                                    display: "block", padding: "0.5rem 0.75rem",
-                                                    fontSize: "0.85rem", color: "#334155",
-                                                    textDecoration: "none",
-                                                }} onClick={() => setOpenMenu(null)}>View Profile</Link>
                                                 {!isDemoMode && (
                                                     <button style={{
                                                         display: "block", width: "100%", textAlign: "left" as const,

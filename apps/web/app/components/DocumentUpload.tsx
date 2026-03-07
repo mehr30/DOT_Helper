@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useTransition } from "react";
-import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import { createDocumentRecord } from "../actions/documents";
 import styles from "./DocumentUpload.module.css";
 
@@ -38,14 +39,22 @@ const COMPANY_DOCUMENT_TYPES = [
 interface DocumentUploadProps {
     driverId?: string;
     vehicleId?: string;
+    defaultDocType?: string;
+    autoOpen?: boolean;
     onUploadComplete?: () => void;
 }
 
-export default function DocumentUpload({ driverId, vehicleId, onUploadComplete }: DocumentUploadProps) {
+const ALL_DOC_TYPES = [...DRIVER_DOCUMENT_TYPES, ...VEHICLE_DOCUMENT_TYPES, ...COMPANY_DOCUMENT_TYPES];
+
+export default function DocumentUpload({ driverId, vehicleId, defaultDocType, autoOpen, onUploadComplete }: DocumentUploadProps) {
     const docTypes = driverId ? DRIVER_DOCUMENT_TYPES : vehicleId ? VEHICLE_DOCUMENT_TYPES : COMPANY_DOCUMENT_TYPES;
-    const [isOpen, setIsOpen] = useState(false);
+    const resolvedDefault = defaultDocType && docTypes.some(t => t.value === defaultDocType)
+        ? defaultDocType
+        : docTypes[0]?.value || "OTHER";
+    const [isOpen, setIsOpen] = useState(autoOpen ?? false);
     const [file, setFile] = useState<File | null>(null);
-    const [docType, setDocType] = useState(docTypes[0]?.value || "OTHER");
+    const [docType, setDocType] = useState(resolvedDefault);
+    const cameFromCompliance = !!defaultDocType;
     const [docName, setDocName] = useState("");
     const [expirationDate, setExpirationDate] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -110,17 +119,19 @@ export default function DocumentUpload({ driverId, vehicleId, onUploadComplete }
 
                 setSuccess(true);
                 setUploading(false);
+                onUploadComplete?.();
 
-                // Reset after 2s
-                setTimeout(() => {
-                    setFile(null);
-                    setDocName("");
-                    setDocType("OTHER");
-                    setExpirationDate("");
-                    setSuccess(false);
-                    setIsOpen(false);
-                    onUploadComplete?.();
-                }, 1500);
+                // Don't auto-close when user came from compliance — let them click "Return"
+                if (!cameFromCompliance) {
+                    setTimeout(() => {
+                        setFile(null);
+                        setDocName("");
+                        setDocType(resolvedDefault);
+                        setExpirationDate("");
+                        setSuccess(false);
+                        setIsOpen(false);
+                    }, 1500);
+                }
             });
         } catch {
             setError("Upload failed. Please try again.");
@@ -150,9 +161,41 @@ export default function DocumentUpload({ driverId, vehicleId, onUploadComplete }
                 <div className={styles.successState}>
                     <CheckCircle size={32} />
                     <span>Document uploaded successfully!</span>
+                    {cameFromCompliance && (
+                        <Link
+                            href="/dashboard/compliance"
+                            style={{
+                                display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                                marginTop: "0.75rem", padding: "0.5rem 1rem", borderRadius: "8px",
+                                background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0",
+                                fontSize: "0.82rem", fontWeight: 600, textDecoration: "none",
+                            }}
+                        >
+                            <ArrowLeft size={14} /> Return to Compliance Checklist
+                        </Link>
+                    )}
                 </div>
             ) : (
                 <>
+                    {/* Context banner when arriving from compliance */}
+                    {cameFromCompliance && (() => {
+                        const docInfo = ALL_DOC_TYPES.find(t => t.value === defaultDocType);
+                        return docInfo ? (
+                            <div style={{
+                                display: "flex", alignItems: "flex-start", gap: "0.5rem",
+                                padding: "0.75rem 1rem", borderRadius: "8px",
+                                background: "#eff6ff", border: "1px solid #bfdbfe",
+                                marginBottom: "0.75rem", fontSize: "0.82rem", color: "#1e40af",
+                            }}>
+                                <FileText size={16} style={{ flexShrink: 0, marginTop: "1px" }} />
+                                <div>
+                                    <strong>Upload: {docInfo.label}</strong>
+                                    {docInfo.hint && <div style={{ color: "#3b82f6", marginTop: "0.15rem" }}>{docInfo.hint}</div>}
+                                </div>
+                            </div>
+                        ) : null;
+                    })()}
+
                     {/* Drop zone */}
                     <div
                         className={`${styles.dropZone} ${file ? styles.hasFile : ""}`}

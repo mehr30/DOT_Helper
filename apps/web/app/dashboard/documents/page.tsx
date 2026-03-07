@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useTransition, useCallback } from "react";
+import { useState, useEffect, useTransition, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     Search,
@@ -81,8 +82,11 @@ const wizardForms = [
     { id: "boc3", label: "Legal Agent Designation", category: "Company" },
 ];
 
-export default function DocumentsPage() {
+function DocumentsPageInner() {
     const { isDemoMode } = useDemoMode();
+    const searchParams = useSearchParams();
+    const uploadDocType = searchParams.get("upload") || undefined;
+    const uploadDriverId = searchParams.get("driver") || undefined;
     const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([]);
     const [realDocs, setRealDocs] = useState<DocumentData[]>([]);
     const [loadingDocs, setLoadingDocs] = useState(false);
@@ -269,7 +273,12 @@ export default function DocumentsPage() {
             {/* Upload section */}
             {!isDemoMode && (
                 <div style={{ marginBottom: "0.25rem" }}>
-                    <DocumentUpload onUploadComplete={() => loadRealDocs()} />
+                    <DocumentUpload
+                        driverId={uploadDriverId}
+                        defaultDocType={uploadDocType}
+                        autoOpen={!!uploadDocType}
+                        onUploadComplete={() => loadRealDocs()}
+                    />
                 </div>
             )}
 
@@ -717,5 +726,13 @@ export default function DocumentsPage() {
                 />
             )}
         </div>
+    );
+}
+
+export default function DocumentsPage() {
+    return (
+        <Suspense>
+            <DocumentsPageInner />
+        </Suspense>
     );
 }

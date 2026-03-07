@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
     Bell,
     AlertTriangle,
@@ -178,7 +179,7 @@ export default function AlertsContent({ alerts: serverAlerts }: { alerts: AlertD
                 </div>
                 <div className={styles.headerActions}>
                     <button className={styles.markAllBtn} onClick={handleMarkAllRead}>
-                        <Check size={16} /> Mark All Read
+                        <Check size={16} /> Dismiss All
                     </button>
                 </div>
             </div>
@@ -235,12 +236,25 @@ export default function AlertsContent({ alerts: serverAlerts }: { alerts: AlertD
                                     </div>
                                     <p className={styles.alertMessage}>{alert.message}</p>
                                     <div className={styles.alertMeta}>
-                                        {alert.entityType && (
-                                            <span className={styles.alertMetaItem}>
-                                                {getEntityIcon(alert.entityType)}
-                                                {alert.entityType}
-                                            </span>
-                                        )}
+                                        {alert.entityType && (() => {
+                                            const entityHref = alert.entityId
+                                                ? alert.entityType === "driver"
+                                                    ? `/dashboard/drivers/${alert.entityId}`
+                                                    : `/dashboard/vehicles/${alert.entityId}`
+                                                : null;
+                                            const label = alert.entityType === "driver" ? "Driver" : "Vehicle";
+                                            return entityHref ? (
+                                                <Link href={entityHref} className={styles.alertMetaItem} style={{ color: "#3b82f6", textDecoration: "none" }}>
+                                                    {getEntityIcon(alert.entityType)}
+                                                    View {label}
+                                                </Link>
+                                            ) : (
+                                                <span className={styles.alertMetaItem}>
+                                                    {getEntityIcon(alert.entityType)}
+                                                    {label}
+                                                </span>
+                                            );
+                                        })()}
                                         <span className={styles.alertMetaItem}>
                                             <Calendar size={12} />
                                             {formatDate(alert.createdAt)}
@@ -257,16 +271,16 @@ export default function AlertsContent({ alerts: serverAlerts }: { alerts: AlertD
                                     <button
                                         className={`${styles.alertActionBtn} ${styles.resolve}`}
                                         onClick={() => handleResolve(alert.id)}
-                                        title="Resolve"
+                                        title="Mark as resolved"
                                     >
-                                        <Check size={16} />
+                                        <Check size={14} /> Resolve
                                     </button>
                                     <button
                                         className={`${styles.alertActionBtn} ${styles.dismiss}`}
                                         onClick={() => handleDismiss(alert.id)}
-                                        title="Dismiss"
+                                        title="Dismiss this alert"
                                     >
-                                        <X size={16} />
+                                        <X size={14} /> Dismiss
                                     </button>
                                 </div>
                             </div>

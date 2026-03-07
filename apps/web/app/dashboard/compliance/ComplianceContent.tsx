@@ -154,9 +154,11 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
         return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out Form" };
     }
 
-    // Drug test — upload the result
+    // Drug test — upload the result with driver context
     if (lower.includes("pre-employment test") || lower.includes("drug test")) {
-        return { href: "/dashboard/documents", label: "Upload Result" };
+        const params = new URLSearchParams({ upload: "DRUG_TEST_RESULT" });
+        if (item.driverId) params.set("driver", item.driverId);
+        return { href: `/dashboard/documents?${params.toString()}`, label: "Upload Result" };
     }
 
     // Vehicle items — link to specific vehicle page to set dates
@@ -170,16 +172,24 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
         return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
 
-    // Company docs — link to wizard for fillable forms, or documents page for uploads
+    // Company docs — link to wizard for fillable forms, or documents page for uploads with specific type
     if (lower.includes("mcs-150") || lower.includes("federal business update")) {
         return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out Form" };
     }
     if (lower.includes("boc-3") || lower.includes("legal agent")) {
         return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out Form" };
     }
-    if (lower.includes("operating authority") || lower.includes("ucr") || lower.includes("federal registration") ||
-        lower.includes("insurance") || lower.includes("ifta") || lower.includes("fuel tax")) {
-        return { href: "/dashboard/documents", label: "Upload Doc" };
+    if (lower.includes("operating authority")) {
+        return { href: "/dashboard/documents?upload=OPERATING_AUTHORITY", label: "Upload Doc" };
+    }
+    if (lower.includes("ucr") || lower.includes("federal registration")) {
+        return { href: "/dashboard/documents?upload=UCR", label: "Upload Doc" };
+    }
+    if (lower.includes("insurance")) {
+        return { href: "/dashboard/documents?upload=INSURANCE_POLICY", label: "Upload Doc" };
+    }
+    if (lower.includes("ifta") || lower.includes("fuel tax")) {
+        return { href: "/dashboard/documents?upload=IFTA_LICENSE", label: "Upload Doc" };
     }
 
     return { href: "/dashboard/documents", label: "Take Action" };

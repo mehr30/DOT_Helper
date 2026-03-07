@@ -11,8 +11,6 @@ import {
     Moon,
     Coffee,
     TrendingUp,
-    Calendar,
-    Filter,
     Search,
     Info,
 } from "lucide-react";
@@ -165,10 +163,6 @@ export default function HOSPage() {
                     </p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className="btn btn-secondary" onClick={() => alert("Log viewer will display detailed electronic logbook data in the production release.")}>
-                        <Calendar size={18} />
-                        View Logs
-                    </button>
                     <Link href="/dashboard/reports" className="btn btn-primary">
                         <TrendingUp size={18} />
                         Run Report

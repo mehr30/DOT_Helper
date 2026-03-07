@@ -390,12 +390,6 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                         ))}
                     </div>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1.25rem" }}>
-                        <button onClick={() => setEditing(false)} style={{
-                            padding: "0.5rem 1rem", border: "1px solid #e2e8f0", borderRadius: "8px",
-                            background: "white", cursor: "pointer", fontSize: "0.85rem", color: "#64748b",
-                        }}>
-                            Cancel
-                        </button>
                         <button onClick={handleSaveEdit} disabled={saving} style={{
                             display: "flex", alignItems: "center", gap: "0.35rem",
                             padding: "0.5rem 1.25rem", border: "none", borderRadius: "8px",

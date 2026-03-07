@@ -319,11 +319,6 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                                                 border: "1px solid #e2e8f0", minWidth: 160,
                                                 zIndex: 10, overflow: "hidden",
                                             }}>
-                                                <Link href={`/dashboard/vehicles/${vehicle.id}`} style={{
-                                                    display: "block", padding: "0.5rem 0.75rem",
-                                                    fontSize: "0.85rem", color: "#334155",
-                                                    textDecoration: "none",
-                                                }} onClick={() => setOpenMenu(null)}>View Details</Link>
                                                 {!isDemoMode && (
                                                     <button style={{
                                                         display: "block", width: "100%", textAlign: "left" as const,
