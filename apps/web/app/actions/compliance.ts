@@ -109,7 +109,8 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     for (const d of drivers) {
         const name = `${d.firstName} ${d.lastName}`;
 
-        // CDL / License validity
+        // CDL / License validity — check driver record date OR uploaded document
+        const hasCDLDoc = hasDoc("CDL", { driverId: d.id });
         if (d.cdlExpiration) {
             const cdlDays = daysUntil(d.cdlExpiration);
             dqItems.push({
@@ -119,9 +120,18 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 detail: cdlDays <= 0 ? `Expired ${Math.abs(cdlDays)} days ago` : `${cdlDays} days remaining`,
                 driverId: d.id,
             });
+        } else {
+            dqItems.push({
+                label: `License Current — ${name}`,
+                regulation: "49 CFR 391.11",
+                status: hasCDLDoc ? "compliant" : "action_needed",
+                detail: hasCDLDoc ? "On file" : "Missing — set expiration on driver profile or upload CDL copy",
+                driverId: d.id,
+            });
         }
 
-        // Medical certificate
+        // Medical certificate — check driver record date OR uploaded document
+        const hasMedDoc = hasDoc("MEDICAL_CERTIFICATE", { driverId: d.id });
         if (d.medicalCardExpiration) {
             const medDays = daysUntil(d.medicalCardExpiration);
             dqItems.push({
@@ -129,6 +139,14 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.43",
                 status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
                 detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
+                driverId: d.id,
+            });
+        } else {
+            dqItems.push({
+                label: `Medical Certificate — ${name}`,
+                regulation: "49 CFR 391.43",
+                status: hasMedDoc ? "compliant" : "action_needed",
+                detail: hasMedDoc ? "On file" : "Missing — set expiration on driver profile or upload DOT physical card",
                 driverId: d.id,
             });
         }
