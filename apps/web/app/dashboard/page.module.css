@@ -1,44 +1,505 @@
-/* Dashboard Page Styles */
+/* Dashboard Page Styles — Redesigned Layout */
+
 .dashboard {
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: var(--space-6);
 }
 
-/* Header */
-.header {
+/* ---- 1. Greeting Header ---- */
+.greeting {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: flex-end;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-2);
 }
 
-.title {
-    font-size: 1.875rem;
+.greetingName {
+    font-size: 1.625rem;
     font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
-.subtitle {
+.greetingDate {
+    font-size: 0.85rem;
     color: var(--text-secondary);
     margin-top: var(--space-1);
 }
 
-.dateDisplay {
+/* ---- Demo Banner ---- */
+.demoBanner {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+/* ---- 2. Compliance Health Bar (Hero) ---- */
+.healthBarLink {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.healthBar {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    color: white;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.healthBarLink:hover .healthBar {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.35);
+}
+
+.healthBarEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-6) 0;
+    text-align: center;
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.healthBarContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-10);
+}
+
+.healthBarLeft {
+    flex-shrink: 0;
+}
+
+/* Score donut — reuses existing approach */
+.scoreCircle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--score-color, #22c55e) calc(var(--score) * 1%),
+        rgba(255, 255, 255, 0.1) calc(var(--score) * 1%)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.scoreInner {
+    width: 112px;
+    height: 112px;
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.scoreValue {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.scoreLabel {
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.7;
+    margin-top: 0.35rem;
+}
+
+.healthBarRight {
+    flex: 1;
+    min-width: 0;
+}
+
+.healthBarTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.01em;
+}
+
+/* Category mini-bars */
+.categoryBars {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-2);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+}
+
+.catBarRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.catBarLabel {
+    font-size: 0.78rem;
+    min-width: 140px;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.catBarTrack {
+    flex: 1;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.catBarFill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease;
+}
+
+.catBarValue {
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+}
+
+.healthBarSummary {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: var(--space-4);
+    font-size: 0.82rem;
+    opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+    .healthBar {
+        padding: var(--space-6);
+    }
+    .healthBarContent {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-6);
+    }
+    .catBarLabel {
+        min-width: 100px;
+    }
+    .healthBarSummary {
+        justify-content: center;
+    }
+}
+
+/* ---- 3. Stat Cards (3-column) ---- */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 540px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.statCard {
     background: var(--bg-primary);
-    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.statCard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color, #3b82f6);
+}
+
+.statIcon {
+    width: 44px;
+    height: 44px;
     border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.statCard.primary .statIcon {
+    background: var(--color-primary-100);
+    color: var(--color-primary-600);
+}
+
+.statCard.success .statIcon {
+    background: var(--color-success-100);
+    color: var(--color-success-600);
+}
+
+.statCard.warning .statIcon {
+    background: var(--color-warning-100);
+    color: var(--color-warning-600);
+}
+
+.statCard.danger .statIcon {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+}
+
+.statContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: 1.625rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+}
+
+.statAlert {
+    font-size: 0.72rem;
+    color: var(--color-warning-600);
+    margin-top: var(--space-1);
+    font-weight: 500;
+}
+
+.statArrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    color: #94a3b8;
+    opacity: 0.4;
+}
+
+/* ---- 4. What Needs Attention ---- */
+.attentionPanel {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     border: 1px solid var(--border-color);
 }
 
-/* Compliance Score Section */
+.panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.sectionTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.viewAll {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.8rem;
+    color: var(--color-primary-600);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.viewAll:hover {
+    color: var(--color-primary-700);
+}
+
+.viewAllBottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    padding-top: var(--space-4);
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.82rem;
+    color: var(--color-primary-600);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.viewAllBottom:hover {
+    color: var(--color-primary-700);
+}
+
+.allClear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-8) 0;
+    color: #16a34a;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.attentionList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.attentionItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    background: var(--bg-secondary);
+    transition: background var(--transition-fast);
+}
+
+.attentionItem:hover {
+    background: var(--bg-tertiary);
+}
+
+.attentionIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.attentionIcon.urgent {
+    background: var(--color-danger-100);
+    color: var(--color-danger-500);
+}
+
+.attentionIcon.warning {
+    background: var(--color-warning-100);
+    color: var(--color-warning-500);
+}
+
+.attentionIcon.info {
+    background: var(--color-primary-100);
+    color: var(--color-primary-500);
+}
+
+.attentionContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.attentionTitle {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.attentionDetail {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.daysBadge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.daysBadge.urgent {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+}
+
+.daysBadge.warning {
+    background: var(--color-warning-100);
+    color: var(--color-warning-600);
+}
+
+.daysBadge.info {
+    background: var(--color-primary-100);
+    color: var(--color-primary-600);
+}
+
+/* ---- 5. Quick Actions (slim pills) ---- */
+.quickActionsSlim {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pillButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid var(--border-color);
+}
+
+.pillButton:hover {
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+    border-color: var(--color-primary-200);
+}
+
+/* ---- Legacy classes kept for other pages that may reference them ---- */
 .scoreSection {
     margin-top: calc(-1 * var(--space-4));
 }
@@ -55,44 +516,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-10);
-}
-
-.scoreCircle {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    background: conic-gradient(#22c55e calc(var(--score) * 1%),
-            rgba(255, 255, 255, 0.1) calc(var(--score) * 1%));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.scoreInner {
-    width: 130px;
-    height: 130px;
-    background: linear-gradient(135deg, #1e3a5f, #0f172a);
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.scoreValue {
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.scoreLabel {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    opacity: 0.7;
-    margin-top: var(--space-1);
 }
 
 .scoreDetails {
@@ -151,358 +574,4 @@
     font-size: 0.8125rem;
     font-weight: 600;
     min-width: 40px;
-}
-
-@media (max-width: 768px) {
-    .scoreContent {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .scoreBreakdown {
-        align-items: center;
-    }
-
-    .breakdownItem {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .scoreDescription {
-        max-width: 100%;
-    }
-}
-
-/* Stats Grid */
-.statsGrid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-6);
-}
-
-@media (max-width: 1200px) {
-    .statsGrid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 640px) {
-    .statsGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.statCard {
-    background: var(--bg-primary);
-    border-radius: var(--radius-xl);
-    padding: var(--space-5);
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-4);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-fast);
-    position: relative;
-    cursor: pointer;
-}
-
-.statCard:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-color, #3b82f6);
-}
-
-.statIcon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.statCard.primary .statIcon {
-    background: var(--color-primary-100);
-    color: var(--color-primary-600);
-}
-
-.statCard.success .statIcon {
-    background: var(--color-success-100);
-    color: var(--color-success-600);
-}
-
-.statCard.warning .statIcon {
-    background: var(--color-warning-100);
-    color: var(--color-warning-600);
-}
-
-.statCard.danger .statIcon {
-    background: var(--color-danger-100);
-    color: var(--color-danger-600);
-}
-
-.statContent {
-    display: flex;
-    flex-direction: column;
-}
-
-.statValue {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1;
-}
-
-.statLabel {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-top: var(--space-1);
-}
-
-.statChange {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: var(--space-2);
-}
-
-/* Quick Actions */
-.quickActions {
-    background: var(--bg-primary);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    border: 1px solid var(--border-color);
-}
-
-.sectionTitle {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--space-4);
-}
-
-.actionButtons {
-    display: flex;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-}
-
-.actionButton {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-5);
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border-radius: var(--radius-lg);
-    font-weight: 500;
-    font-size: 0.875rem;
-    text-decoration: none;
-    transition: all var(--transition-fast);
-    border: 1px solid var(--border-color);
-}
-
-.actionButton:hover {
-    background: var(--color-primary-50);
-    color: var(--color-primary-700);
-    border-color: var(--color-primary-200);
-}
-
-/* Two Column Layout */
-.twoColumn {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
-}
-
-@media (max-width: 1024px) {
-    .twoColumn {
-        grid-template-columns: 1fr;
-    }
-}
-
-.panel {
-    background: var(--bg-primary);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    border: 1px solid var(--border-color);
-}
-
-.panelHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-4);
-}
-
-.panelHeader .sectionTitle {
-    margin-bottom: 0;
-}
-
-.viewAll {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-size: 0.8125rem;
-    color: var(--color-primary-600);
-    font-weight: 500;
-}
-
-.viewAll:hover {
-    color: var(--color-primary-700);
-}
-
-/* Deadline List */
-.deadlineList {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
-
-.deadlineItem {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    transition: background var(--transition-fast);
-}
-
-.deadlineItem:hover {
-    background: var(--bg-tertiary);
-}
-
-.deadlineIndicator {
-    width: 4px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    flex-shrink: 0;
-}
-
-.deadlineIndicator.urgent {
-    background: var(--color-danger-500);
-}
-
-.deadlineIndicator.warning {
-    background: var(--color-warning-500);
-}
-
-.deadlineIndicator.info {
-    background: var(--color-primary-500);
-}
-
-.deadlineContent {
-    flex: 1;
-    min-width: 0;
-}
-
-.deadlineTitle {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.deadlineDate {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: var(--space-1);
-}
-
-.daysLeft {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-md);
-    white-space: nowrap;
-}
-
-.daysLeft.urgent {
-    background: var(--color-danger-100);
-    color: var(--color-danger-600);
-}
-
-.daysLeft.warning {
-    background: var(--color-warning-100);
-    color: var(--color-warning-600);
-}
-
-.daysLeft.info {
-    background: var(--color-primary-100);
-    color: var(--color-primary-600);
-}
-
-/* Alert List */
-.alertList {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
-
-.alertItem {
-    display: flex;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    border-radius: var(--radius-lg);
-    background: var(--bg-secondary);
-    transition: background var(--transition-fast);
-}
-
-.alertItem:hover {
-    background: var(--bg-tertiary);
-}
-
-.alertIcon {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.alertItem.danger .alertIcon {
-    background: var(--color-danger-100);
-    color: var(--color-danger-500);
-}
-
-.alertItem.warning .alertIcon {
-    background: var(--color-warning-100);
-    color: var(--color-warning-500);
-}
-
-.alertItem.success .alertIcon {
-    background: var(--color-success-100);
-    color: var(--color-success-500);
-}
-
-.alertContent {
-    flex: 1;
-    min-width: 0;
-}
-
-.alertTitle {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.alertMessage {
-    display: block;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin-top: var(--space-1);
-}
-
-.alertTime {
-    display: block;
-    font-size: 0.6875rem;
-    color: var(--text-muted);
-    margin-top: var(--space-1);
 }

@@ -102,5 +102,10 @@ export default async function DashboardPage() {
 
     const hasCompany = !!session?.user && stats !== null;
 
-    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} />;
+    // Extract user display name for greeting
+    const userName = session?.user?.name
+        || session?.user?.email?.split("@")[0]
+        || "there";
+
+    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} userName={userName} />;
 }
