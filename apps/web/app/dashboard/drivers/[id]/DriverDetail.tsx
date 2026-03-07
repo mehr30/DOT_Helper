@@ -144,7 +144,10 @@ function getDriverActionItems(driver: DriverData): ActionItem[] {
 
 export default function DriverDetail({ driver }: { driver: DriverData }) {
     const cdlDays = driver.cdlExpiration ? getDaysUntil(driver.cdlExpiration) : null;
-    const medDays = driver.medicalCardExpiration ? getDaysUntil(driver.medicalCardExpiration) : null;
+    // Check for medical certificate: prefer driver record date, fall back to uploaded doc expiration
+    const medCertDoc = driver.documents.find(d => d.documentType === "MEDICAL_CERTIFICATE");
+    const effectiveMedExpiration = driver.medicalCardExpiration ?? medCertDoc?.expirationDate ?? null;
+    const medDays = effectiveMedExpiration ? getDaysUntil(effectiveMedExpiration) : null;
     const isCDL = driver.licenseType === "CDL";
     const actionItems = getDriverActionItems(driver);
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
@@ -469,7 +472,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                         <FileText size={18} />
                         <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>DOT Physical</span>
                     </div>
-                    {driver.medicalCardExpiration ? (
+                    {effectiveMedExpiration ? (
                         <>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Expires</span>
@@ -477,7 +480,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                     fontWeight: 500,
                                     color: medDays !== null && medDays <= 30 ? "#dc2626" : medDays !== null && medDays <= 60 ? "#d97706" : "#0f172a",
                                 }}>
-                                    {formatDate(driver.medicalCardExpiration)}
+                                    {formatDate(effectiveMedExpiration)}
                                 </span>
                             </div>
                             {medDays !== null && (
