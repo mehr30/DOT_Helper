@@ -341,8 +341,35 @@ function WizardContent() {
         });
     };
 
+    const getRequiredMissing = () => {
+        if (!activeForm) return [];
+        const missing: string[] = [];
+        for (const section of activeForm.sections) {
+            for (const field of section.fields) {
+                if (!field.required) continue;
+                const val = formData[field.id];
+                if (field.type === "checkbox") {
+                    // Checkboxes only required if explicitly marked (skip for MVR red flags)
+                    if (!val) missing.push(field.label);
+                } else if (field.type === "signature") {
+                    if (!val) missing.push(field.label);
+                } else {
+                    if (!val || (typeof val === "string" && !val.trim())) missing.push(field.label);
+                }
+            }
+        }
+        return missing;
+    };
+
     const handleSaveForm = async () => {
         if (activeForm) {
+            // Validate required fields before saving
+            const missing = getRequiredMissing();
+            if (missing.length > 0) {
+                alert(`Please fill out these required fields before saving:\n\n• ${missing.join("\n• ")}`);
+                return;
+            }
+
             const totalFields = activeForm.sections.reduce((acc, s) => acc + s.fields.length, 0);
             const completedFields = activeForm.sections.reduce((acc, s) => acc + getFilledCount(s), 0);
             const isComplete = completedFields >= totalFields * 0.8; // 80%+ = completed
@@ -1083,7 +1110,14 @@ function WizardContent() {
                             <button className={styles.saveButton} onClick={handleSaveForm}>
                                 <Save size={16} /> Save to Documents
                             </button>
-                            <button className={styles.downloadButton} onClick={() => window.print()}>
+                            <button className={styles.downloadButton} onClick={() => {
+                                const missing = getRequiredMissing();
+                                if (missing.length > 0) {
+                                    alert(`Please fill out these required fields before printing:\n\n• ${missing.join("\n• ")}`);
+                                    return;
+                                }
+                                window.print();
+                            }}>
                                 <Printer size={16} /> Print / Save as PDF
                             </button>
                             {(activeForm.category === "driver" || activeForm.category === "safety") && (

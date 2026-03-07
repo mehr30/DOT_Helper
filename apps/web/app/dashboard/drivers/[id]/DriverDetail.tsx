@@ -47,6 +47,7 @@ interface DriverData {
         documentType: string;
         expirationDate: string | null;
         fileUrl: string;
+        fileName: string;
         mimeType: string | null;
         signatureCount: number;
     }>;
@@ -443,19 +444,33 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                         >
                                             <PenTool size={14} />
                                         </button>
-                                        <a
-                                            href={doc.fileUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            title="Download / View"
-                                            style={{
-                                                display: "flex", alignItems: "center", padding: "0.35rem",
-                                                border: "1px solid #e2e8f0", borderRadius: "6px",
-                                                background: "white", color: "#64748b",
-                                            }}
-                                        >
-                                            <ExternalLink size={14} />
-                                        </a>
+                                        {doc.fileUrl ? (
+                                            <a
+                                                href={doc.fileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title="Download / View"
+                                                style={{
+                                                    display: "flex", alignItems: "center", padding: "0.35rem",
+                                                    border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                    background: "white", color: "#64748b",
+                                                }}
+                                            >
+                                                <Download size={14} />
+                                            </a>
+                                        ) : (
+                                            <Link
+                                                href={`/dashboard/documents/wizard?form=${doc.fileName?.replace(/^wizard_/, "").replace(/_d_.*|_v_.*/, "") || ""}`}
+                                                title="Open in wizard"
+                                                style={{
+                                                    display: "flex", alignItems: "center", padding: "0.35rem",
+                                                    border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                    background: "white", color: "#16a34a",
+                                                }}
+                                            >
+                                                <FileText size={14} />
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             );
