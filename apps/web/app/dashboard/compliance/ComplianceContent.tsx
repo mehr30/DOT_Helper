@@ -14,12 +14,8 @@ import {
     Circle,
     ChevronDown,
     Download,
-    MapPin,
     Activity,
     ArrowRight,
-    Upload,
-    UserPlus,
-    Wrench,
     ClipboardList,
     Info,
 } from "lucide-react";
@@ -103,27 +99,6 @@ const categoryIconClasses: Record<string, string> = {
     "Company & Authority": "federal",
 };
 
-const stateRequirements = [
-    { name: "State DOT Registration", description: "State intrastate registration", status: "done" as const },
-    { name: "Oversize/Overweight Permits", description: "Annual blanket permit if applicable", status: "done" as const },
-    { name: "Emissions Compliance", description: "Required in certain states/counties", status: "todo" as const },
-    { name: "State Sales Tax Filing", description: "Quarterly motor fuel tax reporting", status: "done" as const },
-    { name: "State Annual Inspection", description: "Annual vehicle safety inspection", status: "done" as const },
-    { name: "Intrastate Hours Rules", description: "State-specific driving hour rules", status: "done" as const },
-];
-
-const states = [
-    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
-    "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho",
-    "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana",
-    "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota",
-    "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
-    "New Hampshire", "New Jersey", "New Mexico", "New York",
-    "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon",
-    "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
-    "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington",
-    "West Virginia", "Wisconsin", "Wyoming",
-];
 
 function getStatusIcon(status: string) {
     switch (status) {
@@ -147,20 +122,6 @@ function statusToCss(s: string): string {
     return s;
 }
 
-// Map 2-letter state codes to full names
-const stateCodeToName: Record<string, string> = {
-    AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
-    CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
-    HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
-    KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-    MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi",
-    MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire",
-    NJ: "New Jersey", NM: "New Mexico", NY: "New York", NC: "North Carolina",
-    ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania",
-    RI: "Rhode Island", SC: "South Carolina", SD: "South Dakota", TN: "Tennessee",
-    TX: "Texas", UT: "Utah", VT: "Vermont", VA: "Virginia", WA: "Washington",
-    WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
-};
 
 // Determine the action link for a compliance item based on its label
 function getActionForItem(item: { label: string; status: string; driverId?: string; vehicleId?: string }): { href: string; label: string } | null {
@@ -236,13 +197,10 @@ function friendlyLabel(label: string): string {
         .replace("IFTA License", "Fuel Tax License");
 }
 
-export default function ComplianceContent({ scores, companyState }: { scores: ComplianceScores | null; companyState?: string | null }) {
+export default function ComplianceContent({ scores }: { scores: ComplianceScores | null }) {
     const { isDemoMode } = useDemoMode();
     const data = isDemoMode ? mockScores : scores;
 
-    // Default to company's state, or "Texas" for demo
-    const defaultState = companyState ? (stateCodeToName[companyState.toUpperCase()] ?? "Texas") : "Texas";
-    const [selectedState, setSelectedState] = useState(defaultState);
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Driver Qualification", "Vehicle Maintenance"]));
 
     if (!data || (!isDemoMode && data.summary.totalItems === 0)) {
@@ -306,15 +264,6 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                         <ClipboardList size={16} />
                         Run Compliance Assessment
                     </Link>
-                    <select
-                        className={styles.stateSelector}
-                        value={selectedState}
-                        onChange={(e) => setSelectedState(e.target.value)}
-                    >
-                        {states.map((state) => (
-                            <option key={state} value={state}>{state}</option>
-                        ))}
-                    </select>
                     <button
                         className={styles.downloadBtn}
                         onClick={() => downloadComplianceReport(data)}
@@ -461,29 +410,6 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                 </div>
             </div>
 
-            {/* State-Specific Requirements */}
-            <div className={styles.stateSection}>
-                <h2 className={styles.stateSectionTitle}>
-                    <MapPin size={18} style={{ display: "inline", verticalAlign: "text-bottom", marginRight: 8 }} />
-                    {selectedState} State Requirements
-                </h2>
-                <p className={styles.stateSectionSubtitle}>
-                    State-specific DOT compliance requirements for operations in {selectedState}
-                </p>
-                <div className={styles.stateGrid}>
-                    {stateRequirements.map((req, idx) => (
-                        <div key={idx} className={styles.stateItem}>
-                            <div className={`${styles.stateItemIcon} ${styles[req.status === "done" ? "done" : "todo"]}`}>
-                                {req.status === "done" ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
-                            </div>
-                            <div className={styles.stateItemInfo}>
-                                <div className={styles.stateItemName}>{req.name}</div>
-                                <div className={styles.stateItemDesc}>{req.description}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
         </div>
     );
 }

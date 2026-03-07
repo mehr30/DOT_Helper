@@ -42,7 +42,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     const { companyId } = await requireCompanyUser();
     const now = new Date();
 
-    const [drivers, vehicles, documents, company] = await Promise.all([
+    const [drivers, vehicles, documents, company, companyRecord] = await Promise.all([
         prisma.driver.findMany({
             where: { companyId, status: "ACTIVE" },
             select: {
@@ -82,7 +82,13 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             where: { id: companyId },
             select: { mcs150DueDate: true, ucrDueDate: true, ifta: true, hazmat: true },
         }),
+        prisma.company.findUnique({
+            where: { id: companyId },
+            select: { createdAt: true },
+        }),
     ]);
+
+    const companyCreatedAt = companyRecord?.createdAt ?? now;
 
     // Helper: check if a document type exists for a specific entity
     const hasDoc = (type: string, opts?: { driverId?: string; vehicleId?: string }) => {
@@ -238,15 +244,34 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     for (const d of drivers) {
         const name = `${d.firstName} ${d.lastName}`;
 
-        // Pre-employment test
+        // Pre-employment test — distinguish new hires from existing employees
         const hasPreEmployment = hasDoc("DRUG_TEST_RESULT", { driverId: d.id });
-        daItems.push({
-            label: `Pre-Employment Test — ${name}`,
-            regulation: "49 CFR 382.301",
-            status: hasPreEmployment ? "compliant" : "action_needed",
-            detail: hasPreEmployment ? "On file" : "Missing pre-employment drug test result",
-            driverId: d.id,
-        });
+        const isExistingEmployee = d.hireDate && d.hireDate < companyCreatedAt;
+        if (hasPreEmployment) {
+            daItems.push({
+                label: `Pre-Employment Test — ${name}`,
+                regulation: "49 CFR 382.301",
+                status: "compliant",
+                detail: "On file",
+                driverId: d.id,
+            });
+        } else if (isExistingEmployee) {
+            daItems.push({
+                label: `Pre-Employment Test — ${name}`,
+                regulation: "49 CFR 382.301",
+                status: "compliant",
+                detail: "Existing employee — upload if available",
+                driverId: d.id,
+            });
+        } else {
+            daItems.push({
+                label: `Pre-Employment Test — ${name}`,
+                regulation: "49 CFR 382.301",
+                status: "action_needed",
+                detail: "Missing pre-employment drug test result",
+                driverId: d.id,
+            });
+        }
 
         // Clearinghouse consent
         const hasConsent = hasDoc("CLEARINGHOUSE_CONSENT", { driverId: d.id });
