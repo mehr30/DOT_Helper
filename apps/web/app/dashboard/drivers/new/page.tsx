@@ -9,6 +9,7 @@ import { ArrowLeft, Save, Loader2, HelpCircle } from "lucide-react";
 import { driverCreateSchema, type DriverCreateInput } from "../../../../lib/validations/driver";
 import { createDriver } from "../../../actions/drivers";
 import { useCompanyProfile } from "../../../components/CompanyProfileContext";
+import { formatPhone } from "../../../../lib/formatPhone";
 
 export default function NewDriverPage() {
     const router = useRouter();
@@ -99,7 +100,7 @@ export default function NewDriverPage() {
                     </div>
                     <div>
                         <label style={labelStyle}>Phone</label>
-                        <input {...register("phone")} type="tel" placeholder="(555) 123-4567" style={inputStyle} />
+                        <input {...register("phone", { onChange: (e) => setValue("phone", formatPhone(e.target.value)) })} type="tel" placeholder="(555) 123-4567" style={inputStyle} />
                     </div>
                 </div>
 
@@ -198,11 +199,10 @@ export default function NewDriverPage() {
                                 {errors.cdlExpiration && <span style={errorStyle}>{errors.cdlExpiration.message}</span>}
                             </div>
                             <div>
-                                <label style={labelStyle}>Medical Card Expiration *</label>
+                                <label style={labelStyle}>Medical Card Expiration</label>
                                 <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
-                                {errors.medicalCardExpiration && <span style={errorStyle}>{errors.medicalCardExpiration.message}</span>}
                                 <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
-                                    DOT medical certificate — usually valid for 2 years
+                                    DOT medical certificate — usually valid for 2 years. Leave blank if not yet obtained.
                                 </span>
                             </div>
                         </div>

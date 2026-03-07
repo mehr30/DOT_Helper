@@ -27,9 +27,7 @@ export const driverCreateSchema = z.object({
         if (!data.cdlExpiration) {
             ctx.addIssue({ code: "custom", message: "License expiration is required for CDL drivers", path: ["cdlExpiration"] });
         }
-        if (!data.medicalCardExpiration) {
-            ctx.addIssue({ code: "custom", message: "Medical card expiration is required for CDL drivers", path: ["medicalCardExpiration"] });
-        }
+        // Medical card is tracked but not required at creation — compliance engine flags it if missing
     }
 });
 

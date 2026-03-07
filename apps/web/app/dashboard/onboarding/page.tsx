@@ -14,6 +14,7 @@ import {
 } from "../../../lib/validations/company";
 import { createCompany } from "../../actions/company";
 import GreenlightLogo from "../../components/GreenlightLogo";
+import { formatPhone } from "../../../lib/formatPhone";
 import styles from "./page.module.css";
 
 type FormData = OnboardingStep1Input & OnboardingStep2Input & Partial<OnboardingStep3Input>;
@@ -347,7 +348,7 @@ function Step3({
     onSkip: () => void;
     onBack: () => void;
 }) {
-    const { register, handleSubmit, formState: { errors } } = useForm<OnboardingStep3Input>({
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<OnboardingStep3Input>({
         resolver: zodResolver(onboardingStep3Schema),
         defaultValues: {
             mcNumber: defaultValues.mcNumber ?? "",
@@ -416,7 +417,7 @@ function Step3({
                 <div className={`${styles.fieldRow} ${styles.fieldRow2}`}>
                     <div>
                         <label className={styles.label}>Phone</label>
-                        <input {...register("phone")} placeholder="(555) 123-4567" className={styles.input} />
+                        <input {...register("phone", { onChange: (e) => setValue("phone", formatPhone(e.target.value)) })} type="tel" placeholder="(555) 123-4567" className={styles.input} />
                         {errors.phone && <span className={styles.fieldError}>{errors.phone.message}</span>}
                     </div>
                     <div>

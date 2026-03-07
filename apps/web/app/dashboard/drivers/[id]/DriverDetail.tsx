@@ -24,6 +24,7 @@ import {
 import DocumentUpload from "../../../components/DocumentUpload";
 import SignDocumentModal from "../../../components/SignDocumentModal";
 import { updateDriver } from "../../../actions/drivers";
+import { formatPhone } from "../../../../lib/formatPhone";
 
 interface DriverData {
     id: string;
@@ -214,7 +215,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                 <input
                                     type={type}
                                     value={editData[key as keyof typeof editData]}
-                                    onChange={(e) => setEditData(prev => ({ ...prev, [key]: e.target.value }))}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, [key]: type === "tel" ? formatPhone(e.target.value) : e.target.value }))}
                                     style={{
                                         width: "100%", padding: "0.5rem 0.75rem",
                                         border: "1px solid #e2e8f0", borderRadius: "8px",

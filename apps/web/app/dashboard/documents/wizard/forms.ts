@@ -697,7 +697,7 @@ export const dotForms: DOTForm[] = [
         shortTitle: "Annual MVR Review",
         cfrReference: "49 CFR §391.25",
         category: "driver",
-        description: "Each motor carrier must annually review the driving record (MVR) of each driver it employs and document whether the driver meets minimum requirements.",
+        description: "Every year you must pull each driver's MVR (their official driving record from the state DMV) and check it for problems. This form walks you through exactly what to look for — just check each box as you go.",
         estimatedTime: "5 min",
         sections: [
             {
@@ -710,30 +710,51 @@ export const dotForms: DOTForm[] = [
                 ],
             },
             {
-                id: "reviewDetails",
-                title: "Review Details",
+                id: "mvrSource",
+                title: "Where Did You Get the MVR?",
+                description: "An MVR (Motor Vehicle Record) is your driver's official driving history from the state. You can order one from your state's DMV website — usually costs $5-15 and takes minutes. Some states let you pull it online instantly.",
                 fields: [
-                    { id: "reviewDate", label: "Date of Review", type: "date", required: true },
-                    { id: "mvrObtainedDate", label: "Date MVR Was Obtained", type: "date", required: true },
-                    {
-                        id: "violationsFound", label: "Were any violations found?", type: "select", required: true, options: [
-                            { value: "", label: "Select..." },
-                            { value: "no", label: "No violations found" },
-                            { value: "minor", label: "Minor violations (not disqualifying)" },
-                            { value: "major", label: "Major violations — review needed" },
-                        ]
-                    },
-                    { id: "violationDetails", label: "Violation Details (if any)", type: "textarea", placeholder: "List any violations found on the MVR" },
+                    { id: "reviewDate", label: "Today's Date (Date of This Review)", type: "date", required: true, halfWidth: true },
+                    { id: "mvrObtainedDate", label: "Date You Pulled the MVR", type: "date", required: true, halfWidth: true, helpText: "When did you actually order/download the MVR from the DMV?" },
+                ],
+            },
+            {
+                id: "disqualifying",
+                title: "Check the MVR for These Red Flags",
+                description: "Go through the MVR line by line. For each item below, confirm it does NOT appear on the driving record. If you cannot honestly check a box, that driver CANNOT legally drive for you until the issue is resolved.",
+                fields: [
+                    { id: "noDUI", label: "No DUI / DWI found on the MVR", type: "checkbox", required: true, helpText: "Look for: DUI, DWI, OUI, OWI, or any alcohol/drug-related driving charge. For commercial drivers, the legal limit is 0.04% BAC (half the normal limit)." },
+                    { id: "noHitAndRun", label: "No hit-and-run or leaving the scene of an accident", type: "checkbox", required: true, helpText: "Look for: \"leaving the scene,\" \"hit and run,\" or \"failure to stop after accident.\"" },
+                    { id: "noFelony", label: "No felony involving a motor vehicle", type: "checkbox", required: true, helpText: "Look for any felony conviction that involved driving — vehicular manslaughter, using a vehicle in a crime, etc." },
+                    { id: "noSuspension", label: "Driver's license is currently valid — not suspended, revoked, or canceled", type: "checkbox", required: true, helpText: "The MVR status section should say \"VALID\" or \"ACTIVE.\" If it says suspended, revoked, or canceled — stop here." },
+                    { id: "noFatality", label: "No fatality caused by negligent driving", type: "checkbox", required: true, helpText: "Look for any charge related to causing a death while operating a vehicle." },
+                    { id: "noMultipleSerious", label: "No two or more serious traffic violations in the past 3 years", type: "checkbox", required: true, helpText: "\"Serious\" means: speeding 15+ mph over the limit, reckless driving, improper/erratic lane change, following too closely, texting while driving, or any traffic violation in connection with a fatal crash. One is okay (note it below). Two or more in 3 years = disqualifying." },
+                ],
+            },
+            {
+                id: "minorViolations",
+                title: "Any Minor Violations?",
+                description: "Regular speeding tickets (under 15 mph over), parking tickets, or minor infractions do NOT disqualify the driver — but you should still note them here for your records. If the MVR is totally clean, just skip this section.",
+                fields: [
+                    { id: "hasMinorViolations", label: "Were there any minor (non-disqualifying) violations?", type: "select", options: [
+                        { value: "", label: "Select..." },
+                        { value: "none", label: "No — MVR is clean, no violations at all" },
+                        { value: "yes", label: "Yes — minor stuff (listed below)" },
+                    ]},
+                    { id: "minorViolationDetails", label: "List any minor violations", type: "textarea", placeholder: "Example:\n- Speeding 10 mph over, March 15 2025, $150 fine\n- Expired registration, Jan 2025, dismissed" },
+                    { id: "correctiveAction", label: "Any action you're taking? (optional)", type: "textarea", placeholder: "Example: Reminded driver about company speed policy" },
                 ],
             },
             {
                 id: "determination",
-                title: "Reviewer's Determination",
+                title: "Your Determination",
+                description: "If you checked ALL six boxes above (confirming no red flags), this driver PASSES and can keep driving. If you could NOT check one or more boxes, this driver FAILS — you must pull them from driving duties immediately and consult with a DOT compliance specialist or attorney before letting them drive again.",
                 fields: [
-                    { id: "meetsRequirements", label: "Driver meets minimum requirements to operate a commercial motor vehicle per 49 CFR §391", type: "checkbox", required: true },
-                    { id: "reviewerName", label: "Reviewer Name", type: "text", required: true },
-                    { id: "reviewerTitle", label: "Reviewer Title", type: "text", required: true },
-                    { id: "certDate", label: "Date", type: "date", required: true },
+                    { id: "meetsRequirements", label: "I have reviewed this driver's MVR and confirm the driver PASSES — no disqualifying offenses were found", type: "checkbox", required: true, helpText: "Only check this if you checked ALL six red-flag boxes above. If you couldn't check even one, do NOT check this box — the driver does not pass." },
+                    { id: "reviewerName", label: "Your Name (Reviewer)", type: "text", required: true, halfWidth: true },
+                    { id: "reviewerTitle", label: "Your Title", type: "text", required: true, halfWidth: true, placeholder: "e.g., Owner, Safety Manager, Fleet Manager" },
+                    { id: "certDate", label: "Date", type: "date", required: true, halfWidth: true },
+                    { id: "reviewerSignature", label: "Your Signature", type: "signature", required: true },
                 ],
             },
         ],

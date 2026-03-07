@@ -22,6 +22,7 @@ import {
     MapPin,
 } from "lucide-react";
 import { updateCompany } from "../../actions/company";
+import { formatPhone } from "../../../lib/formatPhone";
 
 /* ─── Company Data Type ─── */
 interface CompanyData {
@@ -434,7 +435,8 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                             <label style={labelStyle}>Phone</label>
                             <input
                                 value={companyForm.phone}
-                                onChange={(e) => setCompanyForm(p => ({ ...p, phone: e.target.value }))}
+                                onChange={(e) => setCompanyForm(p => ({ ...p, phone: formatPhone(e.target.value) }))}
+                                type="tel"
                                 placeholder="(555) 123-4567"
                                 style={inputStyle}
                                 disabled={!company}

@@ -45,6 +45,7 @@ import {
 } from "../../../actions/documents";
 import { createSigningRequest } from "../../../actions/signing";
 import SignaturePad from "../../../components/SignaturePad";
+import { formatPhone } from "../../../../lib/formatPhone";
 
 // Map wizard form IDs to database DocumentType values
 const formToDocumentType: Record<string, string> = {
@@ -192,7 +193,7 @@ function WizardContent() {
                 setEntityLoaded(true);
                 setFormData(initialData);
                 setActiveForm(form);
-                setExpandedSections(new Set([form.sections[0]?.id || ""]));
+                setExpandedSections(new Set(form.sections.map(s => s.id)));
                 setStep("fillForm");
             }
         }
@@ -313,7 +314,7 @@ function WizardContent() {
 
         setActiveForm(form);
         setFormData(initialData);
-        setExpandedSections(new Set([form.sections[0]?.id || ""]));
+        setExpandedSections(new Set(form.sections.map(s => s.id)));
         setStep("fillForm");
     };
 
@@ -393,6 +394,24 @@ function WizardContent() {
 
     const handleSendForSignature = async () => {
         if (!activeForm) return;
+
+        // Validate required text/date/select fields are filled (checkboxes + signatures are excluded since the driver fills those)
+        const missingFields: string[] = [];
+        for (const section of activeForm.sections) {
+            for (const field of section.fields) {
+                if (!field.required) continue;
+                if (field.type === "checkbox" || field.type === "signature") continue; // driver fills these
+                const val = formData[field.id];
+                if (!val || (typeof val === "string" && !val.trim())) {
+                    missingFields.push(field.label);
+                }
+            }
+        }
+        if (missingFields.length > 0) {
+            alert(`Please fill out the following required fields before sending:\n\n• ${missingFields.join("\n• ")}`);
+            return;
+        }
+
         setSigningLinkSending(true);
 
         // Find the driver's email for auto-sending
@@ -634,8 +653,8 @@ function WizardContent() {
                     <input
                         type={field.type === "ssn" ? "password" : field.type}
                         value={(value as string) || ""}
-                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                        placeholder={field.placeholder}
+                        onChange={(e) => handleFieldChange(field.id, field.type === "tel" ? formatPhone(e.target.value) : e.target.value)}
+                        placeholder={field.type === "tel" ? "(555) 123-4567" : field.placeholder}
                         className={styles.fieldInput}
                     />
                 )}
