@@ -139,10 +139,10 @@ const features = [
 ];
 
 const stats = [
-  { value: "$16,864", label: "Max fine per DOT violation" },
-  { value: "7", label: "BASIC categories scored" },
+  { value: "$16,864", label: "Max fine per violation" },
+  { value: "900+", label: "Pages of federal rules" },
   { value: "12+", label: "Documents per driver" },
-  { value: "24/7", label: "Compliance monitoring" }
+  { value: "5 min", label: "Setup time" }
 ];
 
 const testimonials = [
@@ -296,17 +296,17 @@ export default function HomePage() {
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
             <Zap size={14} />
-            <span>Built for fleets of 1–50 trucks</span>
+            <span>For any business with commercial vehicles</span>
           </div>
           <h1 className={styles.heroTitle}>
-            {"You got into trucking to move freight."}<br />
-            <span className={styles.heroGradient}>Not to track expiration dates.</span>
+            {"You started your business to do the work."}<br />
+            <span className={styles.heroGradient}>Not to drown in DOT paperwork.</span>
           </h1>
           <p className={styles.heroDescription}>
-            CDLs, medical cards, inspections, drug tests — one missed deadline
-            can cost you $16,000. Greenlight DOT watches all of it for you.
-            We tell you what&apos;s due, what&apos;s missing, and what to do next.
-            Plain English. Zero guesswork.
+            Trucking, HVAC, plumbing, landscaping — if you have commercial vehicles,
+            the DOT has rules for you. Miss one deadline and it&apos;s a $16,000 fine.
+            Greenlight DOT tracks every expiration, every document, every requirement.
+            We tell you exactly what needs attention. Plain English. Zero guesswork.
           </p>
           <div className={styles.heroCta}>
             <Link href="/register" className={styles.ctaPrimary}>
@@ -331,12 +331,12 @@ export default function HomePage() {
       {/* Social Proof Bar */}
       <section className={styles.socialProof}>
         <div className={styles.socialProofContent}>
-          <span className={styles.socialProofLabel}>Helping businesses across America stay DOT compliant</span>
+          <span className={styles.socialProofLabel}>Trusted by small businesses across America</span>
           <div className={styles.socialProofLogos}>
-            <span>🚛 500+ Businesses</span>
-            <span>🛡️ 10,000+ Drivers</span>
-            <span>🔧 HVAC • Plumbing • Electrical</span>
-            <span>⭐ 4.9/5 Rating</span>
+            <span>🚛 Trucking & Freight</span>
+            <span>🔧 HVAC & Plumbing</span>
+            <span>🌿 Landscaping & Construction</span>
+            <span>⚡ Electrical & Home Services</span>
           </div>
         </div>
       </section>
