@@ -162,11 +162,16 @@ function WizardContent() {
                 const existingDoc = getDocumentByFormId(formId);
                 const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
 
-                // Auto-fill company fields
+                // Auto-fill company fields and today's date
+                const today = new Date().toISOString().split("T")[0] ?? "";
                 const autoFillMap: Record<string, string> = {
                     usdotNumber: profile.usdotNumber,
                     carrierName: profile.companyName,
                     companyName: profile.companyName,
+                    certDate: today,
+                    reviewDate: today,
+                    signDate: today,
+                    serviceDate: today,
                 };
                 for (const [fieldId, value] of Object.entries(autoFillMap)) {
                     if (value && !initialData[fieldId]) initialData[fieldId] = value;
@@ -280,13 +285,18 @@ function WizardContent() {
         const existingDoc = getDocumentByFormId(form.id);
         const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
 
-        // Auto-fill company fields from saved profile (only if not already filled)
+        // Auto-fill company fields and today's date for common date fields
+        const today = new Date().toISOString().split("T")[0] ?? "";
         const autoFillMap: Record<string, string> = {
             usdotNumber: profile.usdotNumber,
             carrierName: profile.companyName,
             companyName: profile.companyName,
             phone: profile.phone,
             email: profile.email,
+            certDate: today,
+            reviewDate: today,
+            signDate: today,
+            serviceDate: today,
         };
         for (const [fieldId, value] of Object.entries(autoFillMap)) {
             if (value && !initialData[fieldId]) {
@@ -593,11 +603,15 @@ function WizardContent() {
                                     </span>
                                     <span className="sig-timestamp" style={{ fontSize: "0.7rem", color: "#64748b", display: "block" }}>
                                         Signed: {(() => {
+                                            const ts = formData[`${field.id}_timestamp`];
+                                            if (ts && typeof ts === "string") {
+                                                return new Date(ts).toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+                                            }
                                             const sd = formData["signDate"] || formData["certDate"];
                                             if (sd && typeof sd === "string") {
                                                 return new Date(sd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
                                             }
-                                            return new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+                                            return new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
                                         })()}
                                     </span>
                                 </div>
@@ -615,7 +629,11 @@ function WizardContent() {
                             </div>
                         ) : (
                             <SignaturePad
-                                onSignature={(dataUrl) => handleFieldChange(field.id, dataUrl)}
+                                onSignature={(dataUrl) => {
+                                    handleFieldChange(field.id, dataUrl);
+                                    // Capture exact timestamp when signature is drawn
+                                    handleFieldChange(`${field.id}_timestamp`, new Date().toISOString());
+                                }}
                                 width={440}
                                 height={150}
                             />
