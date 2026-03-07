@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeft,
@@ -15,9 +16,14 @@ import {
     PenTool,
     CheckCircle,
     ExternalLink,
+    Edit3,
+    Save,
+    X,
+    Loader2,
 } from "lucide-react";
 import DocumentUpload from "../../../components/DocumentUpload";
 import SignDocumentModal from "../../../components/SignDocumentModal";
+import { updateDriver } from "../../../actions/drivers";
 
 interface DriverData {
     id: string;
@@ -70,6 +76,37 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
     const isCDL = driver.licenseType === "CDL";
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
+    const router = useRouter();
+
+    // Inline edit state
+    const [editing, setEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [editData, setEditData] = useState({
+        firstName: driver.firstName,
+        lastName: driver.lastName,
+        email: driver.email || "",
+        phone: driver.phone || "",
+        cdlNumber: driver.cdlNumber || "",
+        cdlState: driver.cdlState || "",
+        cdlClass: driver.cdlClass || "",
+        cdlExpiration: driver.cdlExpiration?.split("T")[0] || "",
+        medicalCardExpiration: driver.medicalCardExpiration?.split("T")[0] || "",
+        hireDate: driver.hireDate.split("T")[0],
+    });
+    const [editError, setEditError] = useState<string | null>(null);
+
+    const handleSaveEdit = async () => {
+        setSaving(true);
+        setEditError(null);
+        const result = await updateDriver({ id: driver.id, ...editData });
+        setSaving(false);
+        if (result.error) {
+            setEditError(result.error);
+        } else {
+            setEditing(false);
+            router.refresh();
+        }
+    };
 
     return (
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -111,14 +148,106 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                         )}
                     </div>
                 </div>
-                <div style={{ marginLeft: "auto" }}>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <span className={`badge ${driver.status === "ACTIVE" ? "badge-success" : "badge-neutral"}`}>
                         {driver.status.toLowerCase()}
                     </span>
+                    {!editing && (
+                        <button
+                            onClick={() => setEditing(true)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                padding: "0.45rem 0.85rem", borderRadius: "8px",
+                                border: "1px solid #e2e8f0", background: "white",
+                                cursor: "pointer", fontSize: "0.85rem", fontWeight: 500,
+                                color: "#475569",
+                            }}
+                        >
+                            <Edit3 size={14} /> Edit
+                        </button>
+                    )}
                 </div>
             </div>
 
+            {/* Edit Form */}
+            {editing && (
+                <div style={{
+                    background: "white", borderRadius: "12px", padding: "1.5rem",
+                    border: "1px solid #e2e8f0", marginBottom: "2rem",
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                        <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Edit Driver</h3>
+                        <button onClick={() => setEditing(false)} style={{
+                            display: "flex", alignItems: "center", gap: "0.3rem",
+                            padding: "0.35rem 0.7rem", border: "1px solid #e2e8f0", borderRadius: "6px",
+                            background: "white", cursor: "pointer", fontSize: "0.8rem", color: "#64748b",
+                        }}>
+                            <X size={14} /> Cancel
+                        </button>
+                    </div>
+                    {editError && (
+                        <div style={{
+                            padding: "0.5rem 0.75rem", marginBottom: "1rem",
+                            background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px",
+                            color: "#dc2626", fontSize: "0.85rem",
+                        }}>
+                            {editError}
+                        </div>
+                    )}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                        {[
+                            { key: "firstName", label: "First Name", type: "text" },
+                            { key: "lastName", label: "Last Name", type: "text" },
+                            { key: "email", label: "Email", type: "email" },
+                            { key: "phone", label: "Phone", type: "tel" },
+                            { key: "cdlNumber", label: "License Number", type: "text" },
+                            { key: "cdlState", label: "Issuing State", type: "text" },
+                            { key: "cdlClass", label: "CDL Class", type: "text" },
+                            { key: "cdlExpiration", label: "License Expiration", type: "date" },
+                            { key: "medicalCardExpiration", label: "Medical Card Expiration", type: "date" },
+                            { key: "hireDate", label: "Hire Date", type: "date" },
+                        ].map(({ key, label, type }) => (
+                            <div key={key}>
+                                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
+                                    {label}
+                                </label>
+                                <input
+                                    type={type}
+                                    value={editData[key as keyof typeof editData]}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, [key]: e.target.value }))}
+                                    style={{
+                                        width: "100%", padding: "0.5rem 0.75rem",
+                                        border: "1px solid #e2e8f0", borderRadius: "8px",
+                                        fontSize: "0.875rem",
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1.25rem" }}>
+                        <button onClick={() => setEditing(false)} style={{
+                            padding: "0.5rem 1rem", border: "1px solid #e2e8f0", borderRadius: "8px",
+                            background: "white", cursor: "pointer", fontSize: "0.85rem", color: "#64748b",
+                        }}>
+                            Cancel
+                        </button>
+                        <button onClick={handleSaveEdit} disabled={saving} style={{
+                            display: "flex", alignItems: "center", gap: "0.35rem",
+                            padding: "0.5rem 1.25rem", border: "none", borderRadius: "8px",
+                            background: "#16a34a", cursor: "pointer", fontSize: "0.85rem",
+                            fontWeight: 600, color: "white",
+                            opacity: saving ? 0.7 : 1,
+                        }}>
+                            {saving ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Save size={14} />}
+                            {saving ? "Saving..." : "Save Changes"}
+                        </button>
+                    </div>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+                </div>
+            )}
+
             {/* Info Cards */}
+            {!editing && (
             <div style={{
                 display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                 gap: "1rem", marginBottom: "2rem",
@@ -242,6 +371,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                     </div>
                 </div>
             </div>
+            )}
 
             {/* Documents */}
             <div style={{

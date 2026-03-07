@@ -64,7 +64,7 @@ type WizardStep = "assessment" | "results" | "fillForm";
 
 function WizardContent() {
     const searchParams = useSearchParams();
-    const [step, setStep] = useState<WizardStep>("assessment");
+    const [step, setStep] = useState<WizardStep>(() => searchParams.get("form") ? "fillForm" : "assessment");
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
     const [recommendedForms, setRecommendedForms] = useState<DOTForm[]>([]);
@@ -887,6 +887,15 @@ function WizardContent() {
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {/* Loading state when jumping to a form via URL */}
+            {step === "fillForm" && !activeForm && (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "4rem 0", color: "#64748b" }}>
+                    <Loader2 size={24} style={{ animation: "spin 1s linear infinite", marginRight: "0.5rem" }} />
+                    <span>Loading form...</span>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
                 </div>
             )}
 
