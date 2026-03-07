@@ -20,11 +20,14 @@ import {
     Upload,
     UserPlus,
     Wrench,
+    ClipboardList,
+    Info,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../../components/DemoModeContext";
 import EmptyState from "../../components/EmptyState";
 import type { ComplianceScores } from "../../actions/compliance";
+import { humanize, humanizeRegulation } from "../../../lib/plain-english";
 
 // --- Demo mock data ---
 const mockScores: ComplianceScores = {
@@ -33,12 +36,12 @@ const mockScores: ComplianceScores = {
         {
             name: "Driver Qualification", score: 92,
             items: [
-                { label: "CDL Current — John Smith", regulation: "49 CFR 391.11", status: "compliant", detail: "45 days remaining" },
+                { label: "License Current — John Smith", regulation: "49 CFR 391.11", status: "compliant", detail: "45 days remaining" },
                 { label: "Medical Certificate — John Smith", regulation: "49 CFR 391.43", status: "compliant", detail: "120 days remaining" },
                 { label: "MVR on File — John Smith", regulation: "49 CFR 391.25", status: "compliant", detail: "On file" },
-                { label: "CDL Current — Sarah Wilson", regulation: "49 CFR 391.11", status: "compliant", detail: "90 days remaining" },
+                { label: "License Current — Sarah Wilson", regulation: "49 CFR 391.11", status: "compliant", detail: "90 days remaining" },
                 { label: "Medical Certificate — Sarah Wilson", regulation: "49 CFR 391.43", status: "action_needed", detail: "28 days remaining" },
-                { label: "MVR on File — Sarah Wilson", regulation: "49 CFR 391.25", status: "action_needed", detail: "Missing — annual MVR required" },
+                { label: "MVR on File — Sarah Wilson", regulation: "49 CFR 391.25", status: "action_needed", detail: "Missing — annual driving record required" },
                 { label: "Clearinghouse Query — Mike Johnson", regulation: "49 CFR 382.701", status: "compliant", detail: "200 days until next required" },
                 { label: "Employment Application — Emily Brown", regulation: "49 CFR 391.21", status: "compliant", detail: "On file" },
             ],
@@ -57,24 +60,32 @@ const mockScores: ComplianceScores = {
             name: "Drug & Alcohol", score: 100,
             items: [
                 { label: "Pre-Employment Test — John Smith", regulation: "49 CFR 382.301", status: "compliant", detail: "On file" },
-                { label: "Clearinghouse Consent — John Smith", regulation: "49 CFR 382.703", status: "compliant", detail: "On file" },
+                { label: "Drug Testing Authorization — John Smith", regulation: "49 CFR 382.703", status: "compliant", detail: "On file" },
                 { label: "Pre-Employment Test — Sarah Wilson", regulation: "49 CFR 382.301", status: "compliant", detail: "On file" },
-                { label: "Clearinghouse Consent — Sarah Wilson", regulation: "49 CFR 382.703", status: "compliant", detail: "On file" },
+                { label: "Drug Testing Authorization — Sarah Wilson", regulation: "49 CFR 382.703", status: "compliant", detail: "On file" },
             ],
         },
         {
             name: "Company & Authority", score: 85,
             items: [
                 { label: "Operating Authority on File", regulation: "49 CFR 365", status: "compliant", detail: "On file" },
-                { label: "BOC-3 Process Agent", regulation: "49 CFR 366", status: "compliant", detail: "On file" },
-                { label: "MCS-150 Biennial Update", regulation: "49 CFR 390.19", status: "action_needed", detail: "Due in 45 days" },
-                { label: "Unified Carrier Registration (UCR)", regulation: "49 CFR 367", status: "compliant", detail: "Current" },
+                { label: "Legal Agent Designation", regulation: "49 CFR 366", status: "compliant", detail: "On file" },
+                { label: "Federal Business Update", regulation: "49 CFR 390.19", status: "action_needed", detail: "Due in 45 days" },
+                { label: "Annual Federal Registration", regulation: "49 CFR 367", status: "compliant", detail: "Current" },
                 { label: "Insurance Policy on File", regulation: "49 CFR 387", status: "compliant", detail: "On file" },
-                { label: "IFTA License", regulation: "IFTA Agreement", status: "compliant", detail: "On file" },
+                { label: "Fuel Tax License", regulation: "IFTA Agreement", status: "compliant", detail: "On file" },
             ],
         },
     ],
     summary: { totalItems: 23, compliant: 19, actionNeeded: 3, expired: 1 },
+};
+
+// Map category names to friendly display names
+const categoryDisplayNames: Record<string, string> = {
+    "Driver Qualification": "Driver Records",
+    "Company & Authority": "Business Filings",
+    "Drug & Alcohol": "Drug & Alcohol Testing",
+    "Vehicle Maintenance": "Vehicle Maintenance",
 };
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -97,7 +108,7 @@ const stateRequirements = [
     { name: "Emissions Compliance", description: "Required in certain states/counties", status: "todo" as const },
     { name: "State Sales Tax Filing", description: "Quarterly motor fuel tax reporting", status: "done" as const },
     { name: "State Annual Inspection", description: "Annual vehicle safety inspection", status: "done" as const },
-    { name: "Intrastate HOS Rules", description: "State-specific driving hour rules", status: "done" as const },
+    { name: "Intrastate Hours Rules", description: "State-specific driving hour rules", status: "done" as const },
 ];
 
 const states = [
@@ -166,16 +177,16 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     }
 
     // Clearinghouse — link to wizard consent form for consent, documents page for query results
-    if (lower.includes("clearinghouse query")) {
+    if (lower.includes("clearinghouse query") || lower.includes("drug testing database check")) {
         return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Run Query" };
     }
-    if (lower.includes("clearinghouse consent")) {
+    if (lower.includes("clearinghouse consent") || lower.includes("drug testing authorization")) {
         return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Get Consent" };
     }
 
     // MVR / Employment app — link to wizard for filling out with driver pre-selected
-    if (lower.includes("mvr")) {
-        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out MVR" };
+    if (lower.includes("mvr") || lower.includes("driving record")) {
+        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out Form" };
     }
     if (lower.includes("employment application")) {
         return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out Form" };
@@ -198,18 +209,30 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     }
 
     // Company docs — link to wizard for fillable forms, or documents page for uploads
-    if (lower.includes("mcs-150")) {
+    if (lower.includes("mcs-150") || lower.includes("federal business update")) {
         return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out Form" };
     }
-    if (lower.includes("boc-3")) {
+    if (lower.includes("boc-3") || lower.includes("legal agent")) {
         return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out Form" };
     }
-    if (lower.includes("operating authority") || lower.includes("ucr") ||
-        lower.includes("insurance") || lower.includes("ifta")) {
+    if (lower.includes("operating authority") || lower.includes("ucr") || lower.includes("federal registration") ||
+        lower.includes("insurance") || lower.includes("ifta") || lower.includes("fuel tax")) {
         return { href: "/dashboard/documents", label: "Upload Doc" };
     }
 
     return { href: "/dashboard/documents", label: "Take Action" };
+}
+
+/** De-jargon an item label: replace known terms inline */
+function friendlyLabel(label: string): string {
+    return label
+        .replace("MVR on File", "Driving Record on File")
+        .replace("Clearinghouse Consent", "Drug Testing Authorization")
+        .replace("Clearinghouse Query", "Drug Testing Database Check")
+        .replace("BOC-3 Process Agent", "Legal Agent Designation")
+        .replace("MCS-150 Biennial Update", "Federal Business Update")
+        .replace("Unified Carrier Registration (UCR)", "Annual Federal Registration")
+        .replace("IFTA License", "Fuel Tax License");
 }
 
 export default function ComplianceContent({ scores, companyState }: { scores: ComplianceScores | null; companyState?: string | null }) {
@@ -231,9 +254,9 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                 <EmptyState
                     icon={Shield}
                     title="No compliance data yet"
-                    description="Add drivers and vehicles to see your real compliance scores. Each driver and vehicle is automatically checked against FMCSA regulations."
-                    primaryAction={{ label: "Add Drivers", href: "/dashboard/drivers/new" }}
-                    secondaryAction={{ label: "Add Vehicles", href: "/dashboard/vehicles/new" }}
+                    description="Add drivers and vehicles to see your real compliance scores. Each driver and vehicle is automatically checked against federal regulations."
+                    primaryAction={{ label: "Start Compliance Assessment", href: "/dashboard/documents/wizard" }}
+                    secondaryAction={{ label: "Add Drivers", href: "/dashboard/drivers/new" }}
                 />
             </div>
         );
@@ -251,6 +274,7 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
     // Build score overview cards from categories
     const scoreCards = data.categories.map((cat) => ({
         name: cat.name,
+        displayName: categoryDisplayNames[cat.name] ?? cat.name,
         score: cat.score,
         status: cat.score >= 90 ? "compliant" as const : cat.score >= 50 ? "attention" as const : "critical" as const,
     }));
@@ -263,10 +287,24 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                     <p className={styles.subtitle}>
                         {isDemoMode
                             ? "Federal & state DOT compliance requirements for your fleet"
-                            : `Overall compliance: ${data.overall}% — ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need action, ${data.summary.expired} expired`}
+                            : `Overall compliance: ${data.overall}% — ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need attention, ${data.summary.expired} expired`}
                     </p>
                 </div>
                 <div className={styles.headerActions}>
+                    <Link
+                        href="/dashboard/documents/wizard"
+                        style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                            padding: "0.55rem 0.9rem", borderRadius: "8px",
+                            background: "linear-gradient(135deg, #165C30, #0F2E1A)",
+                            color: "white", fontWeight: 600, fontSize: "0.8rem",
+                            textDecoration: "none", whiteSpace: "nowrap",
+                            boxShadow: "0 4px 14px rgba(15, 46, 26, 0.35)",
+                        }}
+                    >
+                        <ClipboardList size={16} />
+                        Run Compliance Assessment
+                    </Link>
                     <select
                         className={styles.stateSelector}
                         value={selectedState}
@@ -283,7 +321,7 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                             content += `Generated: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
                             content += `Overall Score: ${data.overall}%\n`;
                             content += "=".repeat(60) + "\n\n";
-                            content += `Summary: ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need action, ${data.summary.expired} expired\n\n`;
+                            content += `Summary: ${data.summary.compliant} compliant, ${data.summary.actionNeeded} need attention, ${data.summary.expired} expired\n\n`;
                             data.categories.forEach(cat => {
                                 content += `${"─".repeat(50)}\n`;
                                 content += `${cat.name} — ${cat.score}%\n`;
@@ -309,120 +347,141 @@ export default function ComplianceContent({ scores, companyState }: { scores: Co
                 </div>
             </div>
 
+            {/* Demo data banner */}
+            {isDemoMode && (
+                <div style={{
+                    display: "flex", alignItems: "center", gap: "0.5rem",
+                    padding: "0.6rem 1rem", borderRadius: "8px",
+                    background: "#f1f5f9", border: "1px dashed #cbd5e1",
+                    color: "#64748b", fontSize: "0.82rem", marginBottom: "0.75rem",
+                }}>
+                    <Info size={16} />
+                    You&apos;re viewing sample data. Add your drivers and vehicles to see real compliance info.
+                </div>
+            )}
+
             {/* Score Overview Cards */}
-            <div className={styles.scoreOverview}>
-                {scoreCards.map((cat) => {
-                    const scoreClass = getScoreClass(cat.score);
-                    return (
-                        <div key={cat.name} className={styles.scoreCard}>
-                            <div
-                                className={`${styles.scoreCircle} ${styles[scoreClass]}`}
-                                style={{ "--pct": cat.score } as React.CSSProperties}
-                            >
-                                <div className={styles.scoreInner}>{cat.score}%</div>
-                            </div>
-                            <div className={styles.scoreInfo}>
-                                <div className={styles.scoreName}>{cat.name}</div>
-                                <div className={`${styles.scoreStatus} ${styles[cat.status]}`}>
-                                    {cat.status === "compliant" ? "Compliant" :
-                                        cat.status === "attention" ? "Needs Attention" : "Critical"}
+            <div className={isDemoMode ? "demoWrapper" : ""} style={isDemoMode ? { marginBottom: "1rem" } : {}}>
+                <div className={styles.scoreOverview}>
+                    {scoreCards.map((cat) => {
+                        const scoreClass = getScoreClass(cat.score);
+                        return (
+                            <div key={cat.name} className={styles.scoreCard}>
+                                <div
+                                    className={`${styles.scoreCircle} ${styles[scoreClass]}`}
+                                    style={{ "--pct": cat.score } as React.CSSProperties}
+                                >
+                                    <div className={styles.scoreInner}>{cat.score}%</div>
+                                </div>
+                                <div className={styles.scoreInfo}>
+                                    <div className={styles.scoreName}>{cat.displayName}</div>
+                                    <div className={`${styles.scoreStatus} ${styles[cat.status]}`}>
+                                        {cat.status === "compliant" ? "Compliant" :
+                                            cat.status === "attention" ? "Needs Attention" : "Critical"}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Federal Requirements */}
-            <div className={styles.categorySection}>
-                {data.categories.map((category) => {
-                    const isExpanded = expandedCategories.has(category.name);
-                    const Icon = categoryIcons[category.name] ?? Shield;
-                    const iconClass = categoryIconClasses[category.name] ?? "federal";
+            <div className={isDemoMode ? "demoWrapper" : ""}>
+                <div className={styles.categorySection}>
+                    {data.categories.map((category) => {
+                        const isExpanded = expandedCategories.has(category.name);
+                        const Icon = categoryIcons[category.name] ?? Shield;
+                        const iconClass = categoryIconClasses[category.name] ?? "federal";
+                        const displayName = categoryDisplayNames[category.name] ?? category.name;
 
-                    return (
-                        <div key={category.name} className={styles.category}>
-                            <div className={styles.categoryHeader} onClick={() => toggleCategory(category.name)}>
-                                <div className={styles.categoryLeft}>
-                                    <div className={`${styles.categoryIcon} ${styles[iconClass]}`}>
-                                        <Icon size={22} />
-                                    </div>
-                                    <div>
-                                        <div className={styles.categoryName}>{category.name}</div>
-                                        <div className={styles.categoryDesc}>
-                                            {category.items.filter((i) => i.status === "compliant").length} of {category.items.filter((i) => i.status !== "not_applicable").length} items compliant
+                        return (
+                            <div key={category.name} className={styles.category}>
+                                <div className={styles.categoryHeader} onClick={() => toggleCategory(category.name)}>
+                                    <div className={styles.categoryLeft}>
+                                        <div className={`${styles.categoryIcon} ${styles[iconClass]}`}>
+                                            <Icon size={22} />
+                                        </div>
+                                        <div>
+                                            <div className={styles.categoryName}>{displayName}</div>
+                                            <div className={styles.categoryDesc}>
+                                                {category.items.filter((i) => i.status === "compliant").length} of {category.items.filter((i) => i.status !== "not_applicable").length} items compliant
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className={styles.categoryRight}>
-                                    <div className={styles.categoryProgress}>
-                                        <div className={styles.progressBar}>
-                                            <div
-                                                className={`${styles.progressFill} ${styles[getScoreClass(category.score)]}`}
-                                                style={{ width: `${category.score}%` }}
-                                            />
+                                    <div className={styles.categoryRight}>
+                                        <div className={styles.categoryProgress}>
+                                            <div className={styles.progressBar}>
+                                                <div
+                                                    className={`${styles.progressFill} ${styles[getScoreClass(category.score)]}`}
+                                                    style={{ width: `${category.score}%` }}
+                                                />
+                                            </div>
+                                            <span>{category.score}%</span>
                                         </div>
-                                        <span>{category.score}%</span>
+                                        <ChevronDown
+                                            size={18}
+                                            className={`${styles.chevron} ${isExpanded ? styles.rotated : ""}`}
+                                        />
                                     </div>
-                                    <ChevronDown
-                                        size={18}
-                                        className={`${styles.chevron} ${isExpanded ? styles.rotated : ""}`}
-                                    />
                                 </div>
-                            </div>
 
-                            {isExpanded && (
-                                <div className={styles.categoryItems}>
-                                    {category.items.map((item, idx) => {
-                                        const cssStatus = statusToCss(item.status);
-                                        const action = getActionForItem(item);
-                                        return (
-                                            <div key={idx} className={styles.checklistItem}>
-                                                <div className={`${styles.itemIcon} ${styles[cssStatus]}`}>
-                                                    {getStatusIcon(item.status)}
-                                                </div>
-                                                <div className={styles.itemContent}>
-                                                    <div className={styles.itemName}>{item.label}</div>
-                                                    <div className={styles.itemDetail}>
-                                                        {item.detail}
-                                                        {item.regulation && (
-                                                            <span style={{ marginLeft: "0.5rem", color: "#94a3b8", fontSize: "0.75rem" }}>
-                                                                ({item.regulation})
-                                                            </span>
+                                {isExpanded && (
+                                    <div className={styles.categoryItems}>
+                                        {category.items.map((item, idx) => {
+                                            const cssStatus = statusToCss(item.status);
+                                            const action = getActionForItem(item);
+                                            return (
+                                                <div key={idx} className={styles.checklistItem}>
+                                                    <div className={`${styles.itemIcon} ${styles[cssStatus]}`}>
+                                                        {getStatusIcon(item.status)}
+                                                    </div>
+                                                    <div className={styles.itemContent}>
+                                                        <div className={styles.itemName}>{friendlyLabel(item.label)}</div>
+                                                        <div className={styles.itemDetail}>
+                                                            {item.detail}
+                                                            {item.regulation && (
+                                                                <span
+                                                                    title={item.regulation}
+                                                                    style={{ marginLeft: "0.5rem", color: "#cbd5e1", fontSize: "0.7rem", cursor: "help" }}
+                                                                >
+                                                                    {humanizeRegulation(item.regulation)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                                                        <span className={`${styles.itemBadge} ${styles[cssStatus]}`}>
+                                                            {item.status === "compliant" ? "Compliant" :
+                                                                item.status === "action_needed" ? "Needs Attention" :
+                                                                    item.status === "expired" ? "Expired" : "N/A"}
+                                                        </span>
+                                                        {action && (
+                                                            <Link
+                                                                href={action.href}
+                                                                style={{
+                                                                    display: "inline-flex", alignItems: "center", gap: "0.25rem",
+                                                                    padding: "0.3rem 0.6rem", borderRadius: "6px",
+                                                                    background: item.status === "expired" ? "#fef2f2" : "#fffbeb",
+                                                                    color: item.status === "expired" ? "#dc2626" : "#92400e",
+                                                                    fontSize: "0.7rem", fontWeight: 600, textDecoration: "none",
+                                                                    border: `1px solid ${item.status === "expired" ? "#fecaca" : "#fef3c7"}`,
+                                                                    whiteSpace: "nowrap" as const,
+                                                                }}
+                                                            >
+                                                                {action.label} <ArrowRight size={10} />
+                                                            </Link>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-                                                    <span className={`${styles.itemBadge} ${styles[cssStatus]}`}>
-                                                        {item.status === "compliant" ? "Compliant" :
-                                                            item.status === "action_needed" ? "Action Needed" :
-                                                                item.status === "expired" ? "Expired" : "N/A"}
-                                                    </span>
-                                                    {action && (
-                                                        <Link
-                                                            href={action.href}
-                                                            style={{
-                                                                display: "inline-flex", alignItems: "center", gap: "0.25rem",
-                                                                padding: "0.3rem 0.6rem", borderRadius: "6px",
-                                                                background: item.status === "expired" ? "#fef2f2" : "#fffbeb",
-                                                                color: item.status === "expired" ? "#dc2626" : "#92400e",
-                                                                fontSize: "0.7rem", fontWeight: 600, textDecoration: "none",
-                                                                border: `1px solid ${item.status === "expired" ? "#fecaca" : "#fef3c7"}`,
-                                                                whiteSpace: "nowrap" as const,
-                                                            }}
-                                                        >
-                                                            {action.label} <ArrowRight size={10} />
-                                                        </Link>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* State-Specific Requirements */}

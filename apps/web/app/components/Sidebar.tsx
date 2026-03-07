@@ -40,11 +40,11 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Home", href: "/dashboard", icon: LayoutDashboard },
     { name: "Compliance", href: "/dashboard/compliance", icon: Shield },
     { name: "Drivers", href: "/dashboard/drivers", icon: Users },
     { name: "Vehicles", href: "/dashboard/vehicles", icon: Truck },
-    { name: "Hours of Service", href: "/dashboard/hos", icon: Clock },
+    { name: "Driver Hours", href: "/dashboard/hos", icon: Clock },
     { name: "Documents", href: "/dashboard/documents", icon: FileText },
     { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
 ];
@@ -55,15 +55,10 @@ export default function Sidebar() {
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const [activeOrg, setActiveOrg] = useState(organizations[0]!);
     const { isDemoMode, exitDemo } = useDemoMode();
-    const { needsHOS, profile } = useCompanyProfile();
+    const { profile } = useCompanyProfile();
 
-    // Filter navigation: only show HOS if fleet needs it or in demo mode
-    const visibleNavigation = navigation.filter(item => {
-        if (item.href === "/dashboard/hos") {
-            return isDemoMode || needsHOS;
-        }
-        return true;
-    });
+    // Always show all nav items — let users discover Driver Hours even if they don't need it yet
+    const visibleNavigation = navigation;
 
     // During onboarding, show a minimal sidebar (no nav links)
     const isOnboarding = pathname.startsWith("/dashboard/onboarding");

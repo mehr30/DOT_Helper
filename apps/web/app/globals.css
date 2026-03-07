@@ -464,3 +464,27 @@ a:hover {
   box-shadow: 0 6px 20px rgba(27, 94, 53, 0.15) !important;
   border-color: var(--color-primary-500) !important;
 }
+
+/* Demo / Sample Data wrapper — makes mock data visually distinct */
+.demoWrapper {
+  position: relative;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 1rem;
+  opacity: 0.75;
+}
+
+.demoWrapper::before {
+  content: "Sample Data";
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

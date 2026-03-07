@@ -3,10 +3,12 @@ import { prisma } from "@repo/database";
 import DashboardContent from "./DashboardContent";
 import type { DashboardStats } from "../actions/dashboard";
 import { generateAlerts } from "../actions/alerts";
+import { getComplianceScores, type ComplianceScores } from "../actions/compliance";
 
 export default async function DashboardPage() {
     const session = await getServerSession();
     let stats: DashboardStats | null = null;
+    let complianceScores: ComplianceScores | null = null;
 
     if (session?.user) {
         const user = await prisma.user.findUnique({
@@ -59,7 +61,7 @@ export default async function DashboardPage() {
                     const cdlDays = Math.ceil((d.cdlExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
                     if (cdlDays <= 60) {
                         upcomingExpirations.push({
-                            id: `cdl-${d.id}`, title: `CDL Expiration — ${d.firstName} ${d.lastName}`,
+                            id: `cdl-${d.id}`, title: `License Expiration — ${d.firstName} ${d.lastName}`,
                             date: d.cdlExpiration.toISOString(), type: "driver", daysLeft: cdlDays,
                         });
                     }
@@ -88,10 +90,17 @@ export default async function DashboardPage() {
             upcomingExpirations.sort((a, b) => a.daysLeft - b.daysLeft);
 
             stats = { driverCount, vehicleCount, activeAlerts, upcomingExpirations };
+
+            // Fetch compliance scores for the dashboard snapshot
+            try {
+                complianceScores = await getComplianceScores();
+            } catch {
+                // ok — compliance data may not be available yet
+            }
         }
     }
 
     const hasCompany = !!session?.user && stats !== null;
 
-    return <DashboardContent stats={stats} hasCompany={hasCompany} />;
+    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} />;
 }

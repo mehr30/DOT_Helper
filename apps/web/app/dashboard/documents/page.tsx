@@ -49,7 +49,7 @@ function getCategoryLabel(cat: string) {
         case "driver": return "Driver Files";
         case "vehicle": return "Vehicle Records";
         case "company": return "Company Filing";
-        case "safety": return "Safety Program";
+        case "safety": return "Safety & Training";
         default: return cat;
     }
 }
@@ -68,18 +68,18 @@ function getEntityIcon(doc: DocumentData) {
     return null;
 }
 
-// Wizard form options for the "Fill a Form" dropdown
+// Wizard form options for the "New Form" dropdown
 const wizardForms = [
     { id: "driverApp", label: "Driver Employment Application", category: "Driver" },
-    { id: "annualMVRReview", label: "Annual MVR Review", category: "Driver" },
+    { id: "annualMVRReview", label: "Annual Driving Record Review", category: "Driver" },
     { id: "roadTestCert", label: "Road Test Certificate", category: "Driver" },
     { id: "annualCertViolations", label: "Annual Certification of Violations", category: "Driver" },
     { id: "drugAlcoholPolicy", label: "Drug & Alcohol Policy Acknowledgment", category: "Driver" },
-    { id: "dvir", label: "Driver Vehicle Inspection Report (DVIR)", category: "Vehicle" },
+    { id: "dvir", label: "Vehicle Inspection Report", category: "Vehicle" },
     { id: "vehicleMaintRecord", label: "Vehicle Maintenance Record", category: "Vehicle" },
     { id: "accidentRegister", label: "Accident Register", category: "Company" },
-    { id: "mcs150", label: "MCS-150 Biennial Update", category: "Company" },
-    { id: "boc3", label: "BOC-3 Process Agent Designation", category: "Company" },
+    { id: "mcs150", label: "Federal Business Update", category: "Company" },
+    { id: "boc3", label: "Legal Agent Designation", category: "Company" },
 ];
 
 export default function DocumentsPage() {
@@ -184,28 +184,6 @@ export default function DocumentsPage() {
 
     return (
         <div className={styles.page}>
-            {/* Compliance Setup Banner — only when no docs exist */}
-            {!hasAnyDocs && !loadingDocs && !isDemoMode && (
-                <div className={styles.wizardBanner}>
-                    <div className={styles.wizardBannerIcon}>
-                        <Sparkles size={24} />
-                    </div>
-                    <div className={styles.wizardBannerContent}>
-                        <h3>Set up your DOT compliance profile</h3>
-                        <p>
-                            Answer a few questions about your business, vehicles, and operations.
-                            We&apos;ll figure out exactly which DOT requirements apply to you and
-                            set up everything you need — no jargon, no guesswork.
-                        </p>
-                    </div>
-                    <Link href="/dashboard/documents/wizard" className={styles.wizardBannerButton}>
-                        <ClipboardList size={18} />
-                        Start Compliance Setup
-                        <ArrowRight size={16} />
-                    </Link>
-                </div>
-            )}
-
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.headerContent}>
@@ -227,7 +205,7 @@ export default function DocumentsPage() {
                             }}
                         >
                             <ClipboardList size={16} />
-                            Fill a Form
+                            New Form
                             <ChevronDown size={14} />
                         </button>
                         {showFormPicker && (
@@ -273,23 +251,6 @@ export default function DocumentsPage() {
                                             </div>
                                         );
                                     })}
-                                    <div style={{ borderTop: "1px solid #e2e8f0" }}>
-                                        <Link
-                                            href="/dashboard/documents/wizard"
-                                            onClick={() => setShowFormPicker(false)}
-                                            style={{
-                                                display: "flex", alignItems: "center", gap: "0.4rem",
-                                                padding: "0.6rem 0.75rem", fontSize: "0.82rem",
-                                                color: "#3b82f6", fontWeight: 600, textDecoration: "none",
-                                            }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
-                                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                                        >
-                                            <Sparkles size={14} />
-                                            Compliance Assessment
-                                            <ArrowRight size={12} />
-                                        </Link>
-                                    </div>
                                 </div>
                             </>
                         )}
@@ -351,7 +312,7 @@ export default function DocumentsPage() {
                             }}
                         >
                             <Package size={16} />
-                            Download Compliance Packet
+                            Download All Forms
                         </button>
                     </div>
                     <div style={{
@@ -380,8 +341,8 @@ export default function DocumentsPage() {
                                 <h4 style={{ fontSize: "0.925rem", fontWeight: 600, color: "#0f172a", margin: 0 }}>
                                     {doc.shortTitle}
                                 </h4>
-                                <p style={{ fontSize: "0.8rem", color: "#64748b", margin: 0 }}>
-                                    {doc.cfrReference} · {doc.completedFields}/{doc.totalFields} fields filled
+                                <p style={{ fontSize: "0.8rem", color: "#64748b", margin: 0 }} title={doc.cfrReference}>
+                                    {doc.completedFields}/{doc.totalFields} fields filled
                                 </p>
                                 <p style={{ fontSize: "0.75rem", color: "#94a3b8", margin: 0 }}>
                                     Saved {new Date(doc.savedAt).toLocaleDateString("en-US", {
@@ -673,7 +634,7 @@ export default function DocumentsPage() {
             )}
 
             {/* Demo mode content */}
-            {isDemoMode && <>
+            {isDemoMode && <div className="demoWrapper">
                 <div className={styles.statsRow}>
                     {[
                         { id: "all", name: "All Documents", count: 47 },
@@ -718,13 +679,13 @@ export default function DocumentsPage() {
                         </thead>
                         <tbody>
                             {[
-                                { name: "CDL Copy", type: "CDL", entity: "John Smith", entityIcon: "driver", uploaded: "Jan 15, 2026", expires: "Feb 15, 2026", status: "expiring" },
+                                { name: "License Copy", type: "Commercial License", entity: "John Smith", entityIcon: "driver", uploaded: "Jan 15, 2026", expires: "Feb 15, 2026", status: "expiring" },
                                 { name: "DOT Physical Card", type: "Medical Certificate", entity: "Sarah Wilson", entityIcon: "driver", uploaded: "Dec 10, 2025", expires: "Apr 14, 2026", status: "current" },
                                 { name: "Annual Inspection Report", type: "Annual Inspection", entity: "Unit 103", entityIcon: "vehicle", uploaded: "Feb 22, 2025", expires: "Feb 22, 2026", status: "expiring" },
                                 { name: "Insurance Certificate", type: "Insurance", entity: "Company", entityIcon: "company", uploaded: "Jan 01, 2026", expires: "Jan 01, 2027", status: "current" },
-                                { name: "Annual MVR Review", type: "MVR", entity: "Mike Johnson", entityIcon: "driver", uploaded: "Nov 20, 2025", expires: "Nov 20, 2026", status: "current" },
+                                { name: "Annual Driving Record Review", type: "Driving Record", entity: "Mike Johnson", entityIcon: "driver", uploaded: "Nov 20, 2025", expires: "Nov 20, 2026", status: "current" },
                                 { name: "Pre-Employment Drug Test", type: "Drug Test", entity: "Emily Brown", entityIcon: "driver", uploaded: "Jan 25, 2026", expires: null, status: "current" },
-                                { name: "MCS-150 Filing", type: "FMCSA Filing", entity: "Company", entityIcon: "company", uploaded: "Mar 15, 2024", expires: "Mar 15, 2026", status: "expiring" },
+                                { name: "Federal Business Update", type: "Federal Filing", entity: "Company", entityIcon: "company", uploaded: "Mar 15, 2024", expires: "Mar 15, 2026", status: "expiring" },
                             ].map((doc, i) => {
                                 const badge = getStatusBadge(doc.status);
                                 const BadgeIcon = badge.icon;
@@ -765,7 +726,7 @@ export default function DocumentsPage() {
                         </tbody>
                     </table>
                 </div>
-            </>}
+            </div>}
 
             {signingDoc && (
                 <SignDocumentModal

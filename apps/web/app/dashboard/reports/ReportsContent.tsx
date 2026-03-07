@@ -51,12 +51,12 @@ function getDaysLabel(days: number | null) {
 }
 
 function generateDriverReport(data: ReportData): string {
-    let content = `DRIVER QUALIFICATION FILE REPORT\n`;
+    let content = `DRIVER RECORDS REPORT\n`;
     content += `${data.companyName}\n`;
     content += `Generated: ${new Date(data.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}\n`;
     content += "=".repeat(60) + "\n\n";
     content += `Total Active Drivers: ${data.drivers.length}\n`;
-    content += `DQ File Compliance: ${data.complianceSummary.driverQualification}%\n\n`;
+    content += `Driver Records Compliance: ${data.complianceSummary.driverQualification}%\n\n`;
 
     data.drivers.forEach(d => {
         content += `${"─".repeat(50)}\n`;
@@ -109,10 +109,10 @@ function generateComplianceSummary(data: ReportData): string {
     content += "=".repeat(60) + "\n\n";
     content += `OVERALL COMPLIANCE SCORE: ${data.complianceSummary.overall}%\n\n`;
     content += `Category Scores:\n`;
-    content += `  Driver Qualification: ${data.complianceSummary.driverQualification}%\n`;
-    content += `  Vehicle Maintenance:  ${data.complianceSummary.vehicleMaintenance}%\n`;
-    content += `  Drug & Alcohol:       ${data.complianceSummary.drugAlcohol}%\n`;
-    content += `  Company & Authority:  ${data.complianceSummary.companyAuthority}%\n\n`;
+    content += `  Driver Records:        ${data.complianceSummary.driverQualification}%\n`;
+    content += `  Vehicle Maintenance:   ${data.complianceSummary.vehicleMaintenance}%\n`;
+    content += `  Drug & Alcohol Testing:${data.complianceSummary.drugAlcohol}%\n`;
+    content += `  Business Filings:      ${data.complianceSummary.companyAuthority}%\n\n`;
     content += `Fleet Summary:\n`;
     content += `  Active Drivers:  ${data.drivers.length}\n`;
     content += `  Active Vehicles: ${data.vehicles.length}\n`;
@@ -181,7 +181,7 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
         generatedAt: new Date().toISOString(),
         drivers: [
             { id: "1", name: "John Smith", status: "ACTIVE", cdlNumber: "D1234567", cdlState: "TX", cdlExpiration: "2026-02-15T00:00:00Z", cdlDaysLeft: -19, medicalExpiration: "2026-06-01T00:00:00Z", medicalDaysLeft: 87, hireDate: "2024-03-01T00:00:00Z", documentCount: 5, missingDocs: [] },
-            { id: "2", name: "Sarah Wilson", status: "ACTIVE", cdlNumber: "D7654321", cdlState: "TX", cdlExpiration: "2026-09-15T00:00:00Z", cdlDaysLeft: 193, medicalExpiration: "2026-04-14T00:00:00Z", medicalDaysLeft: 39, hireDate: "2023-11-15T00:00:00Z", documentCount: 3, missingDocs: ["MVR / Driving record"] },
+            { id: "2", name: "Sarah Wilson", status: "ACTIVE", cdlNumber: "D7654321", cdlState: "TX", cdlExpiration: "2026-09-15T00:00:00Z", cdlDaysLeft: 193, medicalExpiration: "2026-04-14T00:00:00Z", medicalDaysLeft: 39, hireDate: "2023-11-15T00:00:00Z", documentCount: 3, missingDocs: ["Driving Record"] },
             { id: "3", name: "Mike Johnson", status: "ACTIVE", cdlNumber: "D9876543", cdlState: "KS", cdlExpiration: "2027-01-01T00:00:00Z", cdlDaysLeft: 301, medicalExpiration: "2026-03-01T00:00:00Z", medicalDaysLeft: -5, hireDate: "2025-06-01T00:00:00Z", documentCount: 2, missingDocs: ["Employment application", "Drug test result"] },
         ],
         vehicles: [
@@ -215,7 +215,7 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
             }}>
                 {[
                     { label: "Overall", score: reportData.complianceSummary.overall, icon: Shield },
-                    { label: "Driver DQ", score: reportData.complianceSummary.driverQualification, icon: Users },
+                    { label: "Driver Records", score: reportData.complianceSummary.driverQualification, icon: Users },
                     { label: "Vehicles", score: reportData.complianceSummary.vehicleMaintenance, icon: Truck },
                     { label: "Documents", score: Math.round(((reportData.documentCounts.total - reportData.documentCounts.expired) / Math.max(reportData.documentCounts.total, 1)) * 100), icon: FileText },
                 ].map(item => {
@@ -320,8 +320,8 @@ export default function ReportsContent({ data }: { data: ReportData | null }) {
 
                 {/* Driver Qualification */}
                 <ReportCard
-                    title="Driver Qualification Files"
-                    description={`DQ file status for ${reportData.drivers.length} active driver${reportData.drivers.length !== 1 ? "s" : ""}`}
+                    title="Driver Records"
+                    description={`Driver file status for ${reportData.drivers.length} active driver${reportData.drivers.length !== 1 ? "s" : ""}`}
                     icon={Users}
                     expanded={expandedReport === "drivers"}
                     onToggle={() => toggle("drivers")}
