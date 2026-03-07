@@ -199,7 +199,7 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                         <tr>
                             <th>Driver</th>
                             <th>License</th>
-                            <th>Medical Card</th>
+                            <th>DOT Physical</th>
                             <th>Status</th>
                             <th></th>
                         </tr>
@@ -256,7 +256,7 @@ export default function DriversTable({ drivers: realDrivers }: { drivers: Driver
                                                     </span>
                                                 </>
                                             ) : (
-                                                <span style={{ color: "#94a3b8", fontSize: "0.8rem" }}>—</span>
+                                                <span style={{ color: "#f59e0b", fontSize: "0.75rem" }}>Needs DOT physical</span>
                                             )}
                                         </div>
                                     </td>

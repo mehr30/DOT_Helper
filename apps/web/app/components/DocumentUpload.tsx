@@ -5,26 +5,34 @@ import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from "lucide-r
 import { createDocumentRecord } from "../actions/documents";
 import styles from "./DocumentUpload.module.css";
 
-const DOCUMENT_TYPES = [
-    { value: "CDL", label: "CDL Copy" },
-    { value: "MEDICAL_CERTIFICATE", label: "Medical Certificate" },
-    { value: "MVR", label: "Motor Vehicle Record (MVR)" },
-    { value: "ROAD_TEST_CERTIFICATE", label: "Road Test Certificate" },
-    { value: "EMPLOYMENT_APPLICATION", label: "Employment Application" },
-    { value: "DRUG_TEST_RESULT", label: "Drug Test Result" },
-    { value: "TRAINING_CERTIFICATE", label: "Training Certificate" },
-    { value: "CLEARINGHOUSE_CONSENT", label: "Clearinghouse Consent" },
-    { value: "REGISTRATION", label: "Registration" },
-    { value: "INSURANCE", label: "Insurance" },
-    { value: "ANNUAL_INSPECTION", label: "Annual Inspection Report" },
-    { value: "LEASE_AGREEMENT", label: "Lease Agreement" },
-    { value: "TITLE", label: "Title" },
-    { value: "OPERATING_AUTHORITY", label: "Operating Authority" },
-    { value: "BOC3", label: "BOC-3" },
-    { value: "UCR", label: "UCR" },
-    { value: "IFTA_LICENSE", label: "IFTA License" },
-    { value: "INSURANCE_POLICY", label: "Insurance Policy" },
-    { value: "OTHER", label: "Other" },
+const DRIVER_DOCUMENT_TYPES = [
+    { value: "CDL", label: "CDL / License Copy", hint: "Photo or scan of their driver's license" },
+    { value: "MEDICAL_CERTIFICATE", label: "DOT Physical Card", hint: "The card they get after their DOT physical exam" },
+    { value: "MVR", label: "Driving Record (MVR)", hint: "Official driving history from the state DMV" },
+    { value: "EMPLOYMENT_APPLICATION", label: "Employment Application", hint: "Their signed job application" },
+    { value: "DRUG_TEST_RESULT", label: "Drug Test Result", hint: "Pre-employment or random drug/alcohol test" },
+    { value: "ROAD_TEST_CERTIFICATE", label: "Road Test Certificate", hint: "Proof they passed a behind-the-wheel test" },
+    { value: "TRAINING_CERTIFICATE", label: "Training Certificate", hint: "Safety training, entry-level driver training, etc." },
+    { value: "CLEARINGHOUSE_CONSENT", label: "Clearinghouse Consent", hint: "Written consent to query the FMCSA Drug & Alcohol Clearinghouse" },
+    { value: "OTHER", label: "Other", hint: "" },
+];
+
+const VEHICLE_DOCUMENT_TYPES = [
+    { value: "REGISTRATION", label: "Registration", hint: "Current vehicle registration" },
+    { value: "INSURANCE", label: "Insurance Card / Certificate", hint: "Proof of insurance for this vehicle" },
+    { value: "ANNUAL_INSPECTION", label: "Annual Inspection Report", hint: "The yearly safety inspection (required by DOT)" },
+    { value: "LEASE_AGREEMENT", label: "Lease Agreement", hint: "If the vehicle is leased" },
+    { value: "TITLE", label: "Title", hint: "Vehicle title document" },
+    { value: "OTHER", label: "Other", hint: "" },
+];
+
+const COMPANY_DOCUMENT_TYPES = [
+    { value: "OPERATING_AUTHORITY", label: "Operating Authority (MC#)", hint: "Your FMCSA operating authority grant letter" },
+    { value: "BOC3", label: "BOC-3 Filing", hint: "Designation of process agents" },
+    { value: "UCR", label: "UCR Registration", hint: "Unified Carrier Registration — required annually" },
+    { value: "IFTA_LICENSE", label: "IFTA License", hint: "International Fuel Tax Agreement license" },
+    { value: "INSURANCE_POLICY", label: "Insurance Policy", hint: "Commercial auto liability policy" },
+    { value: "OTHER", label: "Other", hint: "" },
 ];
 
 interface DocumentUploadProps {
@@ -34,9 +42,10 @@ interface DocumentUploadProps {
 }
 
 export default function DocumentUpload({ driverId, vehicleId, onUploadComplete }: DocumentUploadProps) {
+    const docTypes = driverId ? DRIVER_DOCUMENT_TYPES : vehicleId ? VEHICLE_DOCUMENT_TYPES : COMPANY_DOCUMENT_TYPES;
     const [isOpen, setIsOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
-    const [docType, setDocType] = useState("OTHER");
+    const [docType, setDocType] = useState(docTypes[0]?.value || "OTHER");
     const [docName, setDocName] = useState("");
     const [expirationDate, setExpirationDate] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -198,20 +207,25 @@ export default function DocumentUpload({ driverId, vehicleId, onUploadComplete }
 
                         <div className={styles.fieldRow}>
                             <div className={styles.field}>
-                                <label className={styles.label}>Document Type</label>
+                                <label className={styles.label}>What type of document is this?</label>
                                 <select
                                     value={docType}
                                     onChange={(e) => setDocType(e.target.value)}
                                     className={styles.select}
                                 >
-                                    {DOCUMENT_TYPES.map((t) => (
+                                    {docTypes.map((t) => (
                                         <option key={t.value} value={t.value}>{t.label}</option>
                                     ))}
                                 </select>
+                                {docTypes.find(t => t.value === docType)?.hint && (
+                                    <span style={{ fontSize: "0.7rem", color: "#94a3b8", marginTop: "0.2rem", display: "block" }}>
+                                        {docTypes.find(t => t.value === docType)?.hint}
+                                    </span>
+                                )}
                             </div>
 
                             <div className={styles.field}>
-                                <label className={styles.label}>Expiration Date (optional)</label>
+                                <label className={styles.label}>Expiration Date (if any)</label>
                                 <input
                                     type="date"
                                     value={expirationDate}

@@ -199,10 +199,18 @@ export default function NewDriverPage() {
                                 {errors.cdlExpiration && <span style={errorStyle}>{errors.cdlExpiration.message}</span>}
                             </div>
                             <div>
-                                <label style={labelStyle}>Medical Card Expiration</label>
+                                <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                    DOT Physical Expiration
+                                    <span
+                                        title="Every CDL driver needs a DOT physical exam (also called a 'medical card'). A doctor checks that the driver is healthy enough to drive a commercial vehicle. It's usually good for 2 years."
+                                        style={{ cursor: "help", color: "#94a3b8" }}
+                                    >
+                                        <HelpCircle size={14} />
+                                    </span>
+                                </label>
                                 <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
                                 <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
-                                    DOT medical certificate — usually valid for 2 years. Leave blank if not yet obtained.
+                                    When does their DOT physical expire? Leave blank if they haven&apos;t gotten one yet — we&apos;ll remind you.
                                 </span>
                             </div>
                         </div>
@@ -244,9 +252,9 @@ export default function NewDriverPage() {
                             </div>
                             <div>
                                 <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                                    Medical Card Expiration
+                                    DOT Physical Expiration
                                     <span
-                                        title="A DOT medical card may be required even without a CDL if the driver operates a vehicle over 10,001 lbs in interstate commerce."
+                                        title="A DOT physical may be required even without a CDL if the driver operates a vehicle over 10,001 lbs in interstate commerce."
                                         style={{ cursor: "help", color: "#94a3b8" }}
                                     >
                                         <HelpCircle size={14} />
@@ -254,7 +262,7 @@ export default function NewDriverPage() {
                                 </label>
                                 <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
                                 <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
-                                    Only needed if operating vehicles over 10,001 lbs interstate
+                                    May be required for vehicles over 10,001 lbs. Leave blank if not applicable.
                                 </span>
                             </div>
                         </div>

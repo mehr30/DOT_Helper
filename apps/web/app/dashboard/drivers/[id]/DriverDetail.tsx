@@ -205,7 +205,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             { key: "cdlState", label: "Issuing State", type: "text" },
                             { key: "cdlClass", label: "CDL Class", type: "text" },
                             { key: "cdlExpiration", label: "License Expiration", type: "date" },
-                            { key: "medicalCardExpiration", label: "Medical Card Expiration", type: "date" },
+                            { key: "medicalCardExpiration", label: "DOT Physical Expiration", type: "date" },
                             { key: "hireDate", label: "Hire Date", type: "date" },
                         ].map(({ key, label, type }) => (
                             <div key={key}>
@@ -318,14 +318,14 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                     )}
                 </div>
 
-                {/* Medical Card */}
+                {/* DOT Physical / Medical Card */}
                 <div style={{
                     background: "white", borderRadius: "12px", padding: "1.25rem",
                     border: "1px solid #e2e8f0",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem", color: "#059669" }}>
                         <FileText size={18} />
-                        <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>Medical Card</span>
+                        <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>DOT Physical</span>
                     </div>
                     {driver.medicalCardExpiration ? (
                         <>
@@ -351,9 +351,16 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             )}
                         </>
                     ) : (
-                        <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>
-                            {isCDL ? "Not on file — required for CDL drivers" : "Not on file"}
-                        </span>
+                        <div>
+                            <span style={{ color: "#f59e0b", fontSize: "0.85rem", fontWeight: 500 }}>
+                                {isCDL ? "Not on file" : "Not on file"}
+                            </span>
+                            <p style={{ color: "#94a3b8", fontSize: "0.75rem", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
+                                {isCDL
+                                    ? "CDL drivers need a DOT physical exam before they can drive. The doctor gives them a \"medical card\" — click Edit above to add the expiration date once they have it."
+                                    : "A DOT physical may be required if this driver operates vehicles over 10,001 lbs. Click Edit to add it if needed."}
+                            </p>
+                        </div>
                     )}
                 </div>
 
@@ -455,9 +462,26 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                         })}
                     </div>
                 ) : (
-                    <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>
-                        No documents uploaded yet. Use the upload button above.
-                    </p>
+                    <div>
+                        <p style={{ color: "#64748b", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
+                            No documents uploaded yet. Here&apos;s what you should have on file for each driver:
+                        </p>
+                        <div style={{
+                            display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem 1rem",
+                            padding: "0.75rem", background: "#f8fafc", borderRadius: "8px",
+                            fontSize: "0.78rem", color: "#475569",
+                        }}>
+                            <span>&#x2022; Copy of their driver&apos;s license</span>
+                            <span>&#x2022; DOT physical card</span>
+                            <span>&#x2022; Employment application</span>
+                            <span>&#x2022; Driving record (MVR)</span>
+                            <span>&#x2022; Pre-employment drug test</span>
+                            <span>&#x2022; Road test certificate</span>
+                        </div>
+                        <p style={{ color: "#94a3b8", fontSize: "0.72rem", margin: "0.5rem 0 0" }}>
+                            Click &quot;Upload Document&quot; above to add these. You can also fill out forms in the Documents wizard.
+                        </p>
+                    </div>
                 )}
             </div>
 
