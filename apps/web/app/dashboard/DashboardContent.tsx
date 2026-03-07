@@ -12,8 +12,10 @@ import {
     Info,
     Plus,
     RefreshCw,
+    Search,
 } from "lucide-react";
 import Link from "next/link";
+import { useState, useRef, useEffect, useMemo } from "react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../components/DemoModeContext";
 import OnboardingChecklist from "../components/OnboardingChecklist";
@@ -94,6 +96,26 @@ const quickActions = [
 ];
 
 // ---------------------------------------------------------------------------
+// Search result type
+// ---------------------------------------------------------------------------
+
+export interface SearchableEntity {
+    id: string;
+    name: string;
+    type: "driver" | "vehicle";
+    subtitle?: string;
+}
+
+const mockSearchEntities: SearchableEntity[] = [
+    { id: "d1", name: "John Smith", type: "driver", subtitle: "CDL: TX-123456" },
+    { id: "d2", name: "Mike Johnson", type: "driver", subtitle: "CDL: TX-789012" },
+    { id: "d3", name: "Sarah Wilson", type: "driver", subtitle: "CDL: TX-345678" },
+    { id: "v1", name: "Unit 103", type: "vehicle", subtitle: "2022 Freightliner" },
+    { id: "v2", name: "Unit 105", type: "vehicle", subtitle: "2021 Peterbilt" },
+    { id: "v3", name: "Unit 108", type: "vehicle", subtitle: "2023 Kenworth" },
+];
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -102,11 +124,13 @@ export default function DashboardContent({
     hasCompany,
     complianceScores,
     userName,
+    searchEntities,
 }: {
     stats: DashboardStats | null;
     hasCompany: boolean;
     complianceScores?: ComplianceScores | null;
     userName?: string;
+    searchEntities?: SearchableEntity[];
 }) {
     const { isDemoMode } = useDemoMode();
     const showChecklist = !isDemoMode && hasCompany;
@@ -185,9 +209,37 @@ export default function DashboardContent({
         ? `${totalAttention} item${totalAttention !== 1 ? "s" : ""} need${totalAttention === 1 ? "s" : ""} your attention`
         : "You're all caught up";
 
+    // ---- Search ----
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchFocused, setSearchFocused] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    const entities = isDemoMode ? mockSearchEntities : (searchEntities ?? []);
+
+    const searchResults = useMemo(() => {
+        if (!searchQuery.trim()) return [];
+        const q = searchQuery.toLowerCase();
+        return entities
+            .filter(e => e.name.toLowerCase().includes(q) || e.subtitle?.toLowerCase().includes(q))
+            .slice(0, 5);
+    }, [searchQuery, entities]);
+
+    const showDropdown = searchFocused && searchQuery.trim().length > 0;
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setSearchFocused(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
+
     return (
         <div className={styles.dashboard}>
-            {/* 1. Greeting Header */}
+            {/* 1. Greeting Header + Search */}
             <header className={styles.greeting}>
                 <div>
                     <h1 className={styles.greetingName}>{getGreeting()}, {name}</h1>
@@ -197,7 +249,55 @@ export default function DashboardContent({
                         })}
                     </p>
                 </div>
+                <div className={styles.searchWrapper} ref={searchRef}>
+                    <Search size={16} className={styles.searchIcon} />
+                    <input
+                        type="text"
+                        className={styles.searchInput}
+                        placeholder="Search drivers or vehicles..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setSearchFocused(true)}
+                    />
+                    {showDropdown && (
+                        <div className={styles.searchDropdown}>
+                            {searchResults.length === 0 ? (
+                                <div className={styles.searchEmpty}>No results for &ldquo;{searchQuery}&rdquo;</div>
+                            ) : (
+                                searchResults.map((r) => (
+                                    <Link
+                                        key={r.id}
+                                        href={r.type === "driver" ? `/dashboard/drivers/${r.id}` : `/dashboard/vehicles/${r.id}`}
+                                        className={styles.searchResult}
+                                        onClick={() => { setSearchQuery(""); setSearchFocused(false); }}
+                                    >
+                                        <div className={styles.searchResultIcon}>
+                                            {r.type === "driver" ? <Users size={14} /> : <Truck size={14} />}
+                                        </div>
+                                        <div className={styles.searchResultText}>
+                                            <span className={styles.searchResultName}>{r.name}</span>
+                                            {r.subtitle && <span className={styles.searchResultSub}>{r.subtitle}</span>}
+                                        </div>
+                                    </Link>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
             </header>
+
+            {/* Quick Actions (above the fold) */}
+            <section className={styles.quickActionsSlim}>
+                {quickActions.map((action) => {
+                    const Icon = action.icon;
+                    return (
+                        <Link key={action.label} href={action.href} className={styles.pillButton}>
+                            <Icon size={16} />
+                            <span>{action.label}</span>
+                        </Link>
+                    );
+                })}
+            </section>
 
             {/* Onboarding Checklist */}
             {showChecklist && (
@@ -354,18 +454,6 @@ export default function DashboardContent({
                 )}
             </section>
 
-            {/* 5. Quick Actions (slim pills) */}
-            <section className={styles.quickActionsSlim}>
-                {quickActions.map((action) => {
-                    const Icon = action.icon;
-                    return (
-                        <Link key={action.label} href={action.href} className={styles.pillButton}>
-                            <Icon size={16} />
-                            <span>{action.label}</span>
-                        </Link>
-                    );
-                })}
-            </section>
         </div>
     );
 }

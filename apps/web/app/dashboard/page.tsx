@@ -1,6 +1,7 @@
 import { getServerSession } from "../../lib/session";
 import { prisma } from "@repo/database";
 import DashboardContent from "./DashboardContent";
+import type { SearchableEntity } from "./DashboardContent";
 import type { DashboardStats } from "../actions/dashboard";
 import { generateAlerts } from "../actions/alerts";
 import { getComplianceScores, type ComplianceScores } from "../actions/compliance";
@@ -9,6 +10,7 @@ export default async function DashboardPage() {
     const session = await getServerSession();
     let stats: DashboardStats | null = null;
     let complianceScores: ComplianceScores | null = null;
+    const searchEntities: SearchableEntity[] = [];
 
     if (session?.user) {
         const user = await prisma.user.findUnique({
@@ -25,7 +27,7 @@ export default async function DashboardPage() {
             const now = new Date();
             const sixtyDaysFromNow = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
-            const [driverCount, vehicleCount, activeAlerts, expiringDrivers, expiringVehicles] =
+            const [driverCount, vehicleCount, activeAlerts, expiringDrivers, expiringVehicles, allDrivers, allVehicles] =
                 await Promise.all([
                     prisma.driver.count({ where: { companyId, status: "ACTIVE" } }),
                     prisma.vehicle.count({ where: { companyId, status: "ACTIVE" } }),
@@ -51,6 +53,17 @@ export default async function DashboardPage() {
                             annualInspectionDue: { lte: sixtyDaysFromNow },
                         },
                         select: { id: true, unitNumber: true, annualInspectionDue: true },
+                    }),
+                    // For dashboard search
+                    prisma.driver.findMany({
+                        where: { companyId, status: "ACTIVE" },
+                        select: { id: true, firstName: true, lastName: true, cdlNumber: true },
+                        orderBy: { firstName: "asc" },
+                    }),
+                    prisma.vehicle.findMany({
+                        where: { companyId, status: "ACTIVE" },
+                        select: { id: true, unitNumber: true, make: true, model: true, year: true },
+                        orderBy: { unitNumber: "asc" },
                     }),
                 ]);
 
@@ -91,6 +104,25 @@ export default async function DashboardPage() {
 
             stats = { driverCount, vehicleCount, activeAlerts, upcomingExpirations };
 
+            // Build searchable entities for dashboard search
+            for (const d of allDrivers) {
+                searchEntities.push({
+                    id: d.id,
+                    name: `${d.firstName} ${d.lastName}`,
+                    type: "driver",
+                    subtitle: d.cdlNumber ? `CDL: ${d.cdlNumber}` : undefined,
+                });
+            }
+            for (const v of allVehicles) {
+                const desc = [v.year, v.make, v.model].filter(Boolean).join(" ");
+                searchEntities.push({
+                    id: v.id,
+                    name: `Unit ${v.unitNumber}`,
+                    type: "vehicle",
+                    subtitle: desc || undefined,
+                });
+            }
+
             // Fetch compliance scores for the dashboard snapshot
             try {
                 complianceScores = await getComplianceScores();
@@ -107,5 +139,5 @@ export default async function DashboardPage() {
         || session?.user?.email?.split("@")[0]
         || "there";
 
-    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} userName={userName} />;
+    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} userName={userName} searchEntities={searchEntities} />;
 }
