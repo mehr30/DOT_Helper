@@ -170,13 +170,22 @@ export default function DocumentsPage() {
     const handleBulkDownload = () => {
         const docsToDownload = filteredRealDocs.filter(d => selectedDocs.has(d.id) && d.fileUrl);
         docsToDownload.forEach((doc, i) => {
-            setTimeout(() => {
-                const a = document.createElement("a");
-                a.href = doc.fileUrl;
-                a.download = doc.fileName || doc.name;
-                a.target = "_blank";
-                a.click();
-            }, i * 300); // Stagger downloads slightly
+            setTimeout(async () => {
+                try {
+                    // Fetch the file as a blob to bypass cross-origin download restrictions
+                    const response = await fetch(doc.fileUrl);
+                    const blob = await response.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = blobUrl;
+                    a.download = doc.fileName || doc.name;
+                    a.click();
+                    URL.revokeObjectURL(blobUrl);
+                } catch {
+                    // Fallback: open in new tab if fetch fails
+                    window.open(doc.fileUrl, "_blank");
+                }
+            }, i * 500);
         });
     };
 
@@ -579,15 +588,26 @@ export default function DocumentsPage() {
                                                             <PenTool size={16} />
                                                         </button>
                                                         {doc.fileUrl ? (
-                                                            <a
-                                                                href={doc.fileUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                            <button
                                                                 className={styles.actionBtn}
                                                                 title="Download"
+                                                                onClick={async () => {
+                                                                    try {
+                                                                        const resp = await fetch(doc.fileUrl);
+                                                                        const blob = await resp.blob();
+                                                                        const blobUrl = URL.createObjectURL(blob);
+                                                                        const a = document.createElement("a");
+                                                                        a.href = blobUrl;
+                                                                        a.download = doc.fileName || doc.name;
+                                                                        a.click();
+                                                                        URL.revokeObjectURL(blobUrl);
+                                                                    } catch {
+                                                                        window.open(doc.fileUrl, "_blank");
+                                                                    }
+                                                                }}
                                                             >
                                                                 <Download size={16} />
-                                                            </a>
+                                                            </button>
                                                         ) : (
                                                             <Link
                                                                 href={`/dashboard/documents/wizard?form=${doc.fileName?.replace(/^wizard_/, "").replace(/_d_.*|_v_.*/, "") || ""}`}
