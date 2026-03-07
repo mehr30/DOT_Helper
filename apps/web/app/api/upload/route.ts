@@ -39,14 +39,26 @@ export async function POST(request: Request) {
     }
 
     // Upload to Vercel Blob
-    const blob = await put(`documents/${session.user.id}/${Date.now()}-${file.name}`, file, {
-        access: "public",
-    });
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        return NextResponse.json(
+            { error: "File storage is not configured. Please add BLOB_READ_WRITE_TOKEN to your environment variables." },
+            { status: 500 },
+        );
+    }
 
-    return NextResponse.json({
-        url: blob.url,
-        fileName: file.name,
-        fileSize: file.size,
-        mimeType: file.type,
-    });
+    try {
+        const blob = await put(`documents/${session.user.id}/${Date.now()}-${file.name}`, file, {
+            access: "public",
+        });
+
+        return NextResponse.json({
+            url: blob.url,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+        });
+    } catch (err) {
+        const message = err instanceof Error ? err.message : "Upload failed";
+        return NextResponse.json({ error: message }, { status: 500 });
+    }
 }
