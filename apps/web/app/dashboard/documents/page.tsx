@@ -1,18 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 import Link from "next/link";
 import {
     Search,
-    Filter,
-    Upload,
     FileText,
-    MoreVertical,
     AlertTriangle,
     Clock,
     CheckCircle,
     FolderOpen,
-    Plus,
     ClipboardList,
     Sparkles,
     ArrowRight,
@@ -21,8 +17,14 @@ import {
     Package,
     Printer,
     PenTool,
-    ExternalLink,
+    Download,
     Loader2,
+    Users,
+    Truck,
+    Building2,
+    ChevronDown,
+    Square,
+    CheckSquare,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
@@ -30,95 +32,6 @@ import { useDemoMode } from "../../components/DemoModeContext";
 import DocumentUpload from "../../components/DocumentUpload";
 import SignDocumentModal from "../../components/SignDocumentModal";
 import { getDocuments, deleteDocumentRecord, type DocumentData } from "../../actions/documents";
-
-// Document types and their categories
-const documentCategories = [
-    { id: "all", name: "All Documents", count: 47 },
-    { id: "driver", name: "Driver Files", count: 24 },
-    { id: "vehicle", name: "Vehicle Records", count: 15 },
-    { id: "company", name: "Company Documents", count: 8 },
-];
-
-// Mock documents data
-const documents = [
-    {
-        id: "1",
-        name: "CDL - John Smith",
-        type: "CDL",
-        category: "driver",
-        entity: "John Smith",
-        uploadDate: "Jan 15, 2026",
-        expirationDate: "Feb 15, 2026",
-        status: "expiring",
-        fileSize: "1.2 MB"
-    },
-    {
-        id: "2",
-        name: "Medical Card - Sarah Wilson",
-        type: "Medical Certificate",
-        category: "driver",
-        entity: "Sarah Wilson",
-        uploadDate: "Dec 10, 2025",
-        expirationDate: "Apr 14, 2026",
-        status: "current",
-        fileSize: "850 KB"
-    },
-    {
-        id: "3",
-        name: "Annual Inspection - Unit 103",
-        type: "DOT Inspection",
-        category: "vehicle",
-        entity: "Unit 103",
-        uploadDate: "Feb 22, 2025",
-        expirationDate: "Feb 22, 2026",
-        status: "expiring",
-        fileSize: "2.1 MB"
-    },
-    {
-        id: "4",
-        name: "Insurance Certificate",
-        type: "Insurance",
-        category: "company",
-        entity: "Transport Co.",
-        uploadDate: "Jan 01, 2026",
-        expirationDate: "Jan 01, 2027",
-        status: "current",
-        fileSize: "1.5 MB"
-    },
-    {
-        id: "5",
-        name: "MVR - Mike Johnson",
-        type: "MVR",
-        category: "driver",
-        entity: "Mike Johnson",
-        uploadDate: "Nov 20, 2025",
-        expirationDate: "Nov 20, 2026",
-        status: "current",
-        fileSize: "420 KB"
-    },
-    {
-        id: "6",
-        name: "Drug Test Results - Emily Brown",
-        type: "Drug Test",
-        category: "driver",
-        entity: "Emily Brown",
-        uploadDate: "Jan 25, 2026",
-        expirationDate: null,
-        status: "current",
-        fileSize: "320 KB"
-    },
-    {
-        id: "7",
-        name: "MCS-150 Filing",
-        type: "FMCSA Filing",
-        category: "company",
-        entity: "Transport Co.",
-        uploadDate: "Mar 15, 2024",
-        expirationDate: "Mar 15, 2026",
-        status: "expiring",
-        fileSize: "180 KB"
-    },
-];
 
 function getStatusBadge(status: string) {
     switch (status) {
@@ -141,6 +54,34 @@ function getCategoryLabel(cat: string) {
     }
 }
 
+function getEntityLabel(doc: DocumentData): string {
+    if (doc.driverName) return doc.driverName;
+    if (doc.vehicleName) return doc.vehicleName;
+    if (doc.companyId) return "Company";
+    return "—";
+}
+
+function getEntityIcon(doc: DocumentData) {
+    if (doc.driverId) return <Users size={12} style={{ color: "#3b82f6" }} />;
+    if (doc.vehicleId) return <Truck size={12} style={{ color: "#059669" }} />;
+    if (doc.companyId) return <Building2 size={12} style={{ color: "#7c3aed" }} />;
+    return null;
+}
+
+// Wizard form options for the "Fill a Form" dropdown
+const wizardForms = [
+    { id: "driverApp", label: "Driver Employment Application", category: "Driver" },
+    { id: "annualMVRReview", label: "Annual MVR Review", category: "Driver" },
+    { id: "roadTestCert", label: "Road Test Certificate", category: "Driver" },
+    { id: "annualCertViolations", label: "Annual Certification of Violations", category: "Driver" },
+    { id: "drugAlcoholPolicy", label: "Drug & Alcohol Policy Acknowledgment", category: "Driver" },
+    { id: "dvir", label: "Driver Vehicle Inspection Report (DVIR)", category: "Vehicle" },
+    { id: "vehicleMaintRecord", label: "Vehicle Maintenance Record", category: "Vehicle" },
+    { id: "accidentRegister", label: "Accident Register", category: "Company" },
+    { id: "mcs150", label: "MCS-150 Biennial Update", category: "Company" },
+    { id: "boc3", label: "BOC-3 Process Agent Designation", category: "Company" },
+];
+
 export default function DocumentsPage() {
     const { isDemoMode } = useDemoMode();
     const [savedDocs, setSavedDocs] = useState<SavedDocument[]>([]);
@@ -150,8 +91,10 @@ export default function DocumentsPage() {
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [isPending, startTransition] = useTransition();
+    const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+    const [showFormPicker, setShowFormPicker] = useState(false);
 
-    const loadRealDocs = async () => {
+    const loadRealDocs = useCallback(async () => {
         setLoadingDocs(true);
         try {
             const docs = await getDocuments();
@@ -160,14 +103,14 @@ export default function DocumentsPage() {
             // silently fail — user might not be authenticated
         }
         setLoadingDocs(false);
-    };
+    }, []);
 
     useEffect(() => {
         setSavedDocs(getSavedDocuments());
         if (!isDemoMode) {
             loadRealDocs();
         }
-    }, [isDemoMode]);
+    }, [isDemoMode, loadRealDocs]);
 
     const handleDeleteSavedDoc = (id: string) => {
         deleteDocument(id);
@@ -178,13 +121,21 @@ export default function DocumentsPage() {
         startTransition(async () => {
             await deleteDocumentRecord(docId);
             setRealDocs(prev => prev.filter(d => d.id !== docId));
+            setSelectedDocs(prev => {
+                const next = new Set(prev);
+                next.delete(docId);
+                return next;
+            });
         });
     };
 
     const filteredRealDocs = realDocs.filter(doc => {
+        const query = searchQuery.toLowerCase();
         const matchesSearch = !searchQuery ||
-            doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doc.documentType.toLowerCase().includes(searchQuery.toLowerCase());
+            doc.name.toLowerCase().includes(query) ||
+            doc.documentType.toLowerCase().includes(query) ||
+            (doc.driverName && doc.driverName.toLowerCase().includes(query)) ||
+            (doc.vehicleName && doc.vehicleName.toLowerCase().includes(query));
         const matchesCategory = categoryFilter === "all" ||
             (categoryFilter === "driver" && doc.driverId) ||
             (categoryFilter === "vehicle" && doc.vehicleId) ||
@@ -193,33 +144,67 @@ export default function DocumentsPage() {
     });
 
     const realDocCategories = [
-        { id: "all", name: "All Documents", count: realDocs.length },
-        { id: "driver", name: "Driver Files", count: realDocs.filter(d => d.driverId).length },
-        { id: "vehicle", name: "Vehicle Records", count: realDocs.filter(d => d.vehicleId).length },
-        { id: "company", name: "Company Documents", count: realDocs.filter(d => d.companyId).length },
+        { id: "all", name: "All Documents", count: realDocs.length, icon: FolderOpen },
+        { id: "driver", name: "Driver Files", count: realDocs.filter(d => d.driverId).length, icon: Users },
+        { id: "vehicle", name: "Vehicle Records", count: realDocs.filter(d => d.vehicleId).length, icon: Truck },
+        { id: "company", name: "Company Documents", count: realDocs.filter(d => d.companyId).length, icon: Building2 },
     ];
+
+    const toggleSelectDoc = (docId: string) => {
+        setSelectedDocs(prev => {
+            const next = new Set(prev);
+            if (next.has(docId)) next.delete(docId);
+            else next.add(docId);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedDocs.size === filteredRealDocs.length) {
+            setSelectedDocs(new Set());
+        } else {
+            setSelectedDocs(new Set(filteredRealDocs.map(d => d.id)));
+        }
+    };
+
+    const handleBulkDownload = () => {
+        const docsToDownload = filteredRealDocs.filter(d => selectedDocs.has(d.id) && d.fileUrl);
+        docsToDownload.forEach((doc, i) => {
+            setTimeout(() => {
+                const a = document.createElement("a");
+                a.href = doc.fileUrl;
+                a.download = doc.fileName || doc.name;
+                a.target = "_blank";
+                a.click();
+            }, i * 300); // Stagger downloads slightly
+        });
+    };
+
+    const hasAnyDocs = realDocs.length > 0 || savedDocs.length > 0;
 
     return (
         <div className={styles.page}>
-            {/* Compliance Setup Banner */}
-            <div className={styles.wizardBanner}>
-                <div className={styles.wizardBannerIcon}>
-                    <Sparkles size={24} />
+            {/* Compliance Setup Banner — only when no docs exist */}
+            {!hasAnyDocs && !loadingDocs && !isDemoMode && (
+                <div className={styles.wizardBanner}>
+                    <div className={styles.wizardBannerIcon}>
+                        <Sparkles size={24} />
+                    </div>
+                    <div className={styles.wizardBannerContent}>
+                        <h3>Set up your DOT compliance profile</h3>
+                        <p>
+                            Answer a few questions about your business, vehicles, and operations.
+                            We&apos;ll figure out exactly which DOT requirements apply to you and
+                            set up everything you need — no jargon, no guesswork.
+                        </p>
+                    </div>
+                    <Link href="/dashboard/documents/wizard" className={styles.wizardBannerButton}>
+                        <ClipboardList size={18} />
+                        Start Compliance Setup
+                        <ArrowRight size={16} />
+                    </Link>
                 </div>
-                <div className={styles.wizardBannerContent}>
-                    <h3>Set up your DOT compliance profile</h3>
-                    <p>
-                        Answer a few questions about your business, vehicles, and operations.
-                        We&apos;ll figure out exactly which DOT requirements apply to you and
-                        set up everything you need — no jargon, no guesswork.
-                    </p>
-                </div>
-                <Link href="/dashboard/documents/wizard" className={styles.wizardBannerButton}>
-                    <ClipboardList size={18} />
-                    Start Compliance Setup
-                    <ArrowRight size={16} />
-                </Link>
-            </div>
+            )}
 
             {/* Header */}
             <header className={styles.header}>
@@ -230,21 +215,91 @@ export default function DocumentsPage() {
                     </p>
                 </div>
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                    <Link href="/dashboard/documents/wizard" style={{
-                        display: "inline-flex", alignItems: "center", gap: "0.4rem",
-                        padding: "0.55rem 0.9rem", borderRadius: "8px", border: "1px solid #e2e8f0",
-                        background: "white", color: "#475569", fontWeight: 500, fontSize: "0.8rem",
-                        textDecoration: "none", whiteSpace: "nowrap",
-                    }}>
-                        <ClipboardList size={16} />
-                        Fill a Form
-                    </Link>
+                    {/* Form Picker Dropdown */}
+                    <div style={{ position: "relative" }}>
+                        <button
+                            onClick={() => setShowFormPicker(!showFormPicker)}
+                            style={{
+                                display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                                padding: "0.55rem 0.9rem", borderRadius: "8px", border: "1px solid #e2e8f0",
+                                background: "white", color: "#475569", fontWeight: 500, fontSize: "0.8rem",
+                                cursor: "pointer", whiteSpace: "nowrap",
+                            }}
+                        >
+                            <ClipboardList size={16} />
+                            Fill a Form
+                            <ChevronDown size={14} />
+                        </button>
+                        {showFormPicker && (
+                            <>
+                                <div
+                                    style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                                    onClick={() => setShowFormPicker(false)}
+                                />
+                                <div style={{
+                                    position: "absolute", right: 0, top: "calc(100% + 4px)",
+                                    width: "320px", background: "white", borderRadius: "12px",
+                                    border: "1px solid #e2e8f0", boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                                    zIndex: 50, maxHeight: "400px", overflowY: "auto",
+                                }}>
+                                    {["Driver", "Vehicle", "Company"].map(cat => {
+                                        const forms = wizardForms.filter(f => f.category === cat);
+                                        return (
+                                            <div key={cat}>
+                                                <div style={{
+                                                    padding: "0.5rem 0.75rem", fontSize: "0.7rem",
+                                                    fontWeight: 600, textTransform: "uppercase",
+                                                    letterSpacing: "0.05em", color: "#94a3b8",
+                                                    borderBottom: "1px solid #f1f5f9",
+                                                }}>
+                                                    {cat} Forms
+                                                </div>
+                                                {forms.map(form => (
+                                                    <Link
+                                                        key={form.id}
+                                                        href={`/dashboard/documents/wizard?form=${form.id}`}
+                                                        onClick={() => setShowFormPicker(false)}
+                                                        style={{
+                                                            display: "block", padding: "0.6rem 0.75rem",
+                                                            fontSize: "0.82rem", color: "#1e293b",
+                                                            textDecoration: "none", borderBottom: "1px solid #f8fafc",
+                                                        }}
+                                                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
+                                                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                                    >
+                                                        {form.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        );
+                                    })}
+                                    <div style={{ borderTop: "1px solid #e2e8f0" }}>
+                                        <Link
+                                            href="/dashboard/documents/wizard"
+                                            onClick={() => setShowFormPicker(false)}
+                                            style={{
+                                                display: "flex", alignItems: "center", gap: "0.4rem",
+                                                padding: "0.6rem 0.75rem", fontSize: "0.82rem",
+                                                color: "#3b82f6", fontWeight: 600, textDecoration: "none",
+                                            }}
+                                            onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
+                                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                        >
+                                            <Sparkles size={14} />
+                                            Compliance Assessment
+                                            <ArrowRight size={12} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            {/* Upload section - separate row so it doesn't break header layout */}
+            {/* Upload section */}
             {!isDemoMode && (
-                <div style={{ marginBottom: "1.25rem" }}>
+                <div style={{ marginBottom: "0.25rem" }}>
                     <DocumentUpload onUploadComplete={() => loadRealDocs()} />
                 </div>
             )}
@@ -258,11 +313,10 @@ export default function DocumentsPage() {
                             display: "flex", alignItems: "center", gap: "0.5rem", margin: 0,
                         }}>
                             <ClipboardList size={18} style={{ color: "#3b82f6" }} />
-                            Your Compliance Documents
+                            Your Compliance Forms
                         </h3>
                         <button
                             onClick={() => {
-                                // Generate a simple text summary of all saved docs for now
                                 const docs = getSavedDocuments();
                                 if (docs.length === 0) return;
                                 let content = "DOT COMPLIANCE PACKET\n";
@@ -284,7 +338,7 @@ export default function DocumentsPage() {
                                 const url = URL.createObjectURL(blob);
                                 const a = document.createElement("a");
                                 a.href = url;
-                                a.download = `dot-compliance-packet-${new Date().toISOString().split("T")[0]}.txt`;
+                                a.download = `dot-compliance-packet-${new Date().toISOString().split("T")[0] ?? ""}.txt`;
                                 a.click();
                                 URL.revokeObjectURL(url);
                             }}
@@ -317,7 +371,7 @@ export default function DocumentsPage() {
                                         background: doc.status === "completed" ? "#dcfce7" : "#fef3c7",
                                         color: doc.status === "completed" ? "#16a34a" : "#92400e",
                                     }}>
-                                        {doc.status === "completed" ? "✓ Completed" : "● Draft"}
+                                        {doc.status === "completed" ? "Completed" : "Draft"}
                                     </span>
                                     <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>
                                         {getCategoryLabel(doc.category)}
@@ -351,7 +405,6 @@ export default function DocumentsPage() {
                                         href={`/dashboard/documents/wizard?form=${doc.formId}`}
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            // Generate printable version of this single form
                                             const fields: string[] = [];
                                             const sigs: string[] = [];
                                             const signDate = (doc.data.signDate as string) || (doc.data.certDate as string) || "";
@@ -407,31 +460,49 @@ export default function DocumentsPage() {
                 <>
                     {/* Category Stats */}
                     <div className={styles.statsRow}>
-                        {realDocCategories.map((cat) => (
-                            <button
-                                key={cat.id}
-                                className={`${styles.categoryCard} ${categoryFilter === cat.id ? styles.active : ""}`}
-                                onClick={() => setCategoryFilter(cat.id)}
-                            >
-                                <FolderOpen size={20} />
-                                <span className={styles.categoryName}>{cat.name}</span>
-                                <span className={styles.categoryCount}>{cat.count}</span>
-                            </button>
-                        ))}
+                        {realDocCategories.map((cat) => {
+                            const Icon = cat.icon;
+                            return (
+                                <button
+                                    key={cat.id}
+                                    className={`${styles.categoryCard} ${categoryFilter === cat.id ? styles.active : ""}`}
+                                    onClick={() => setCategoryFilter(cat.id)}
+                                >
+                                    <Icon size={20} />
+                                    <span className={styles.categoryName}>{cat.name}</span>
+                                    <span className={styles.categoryCount}>{cat.count}</span>
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    {/* Search */}
+                    {/* Search + Bulk Actions */}
                     <div className={styles.toolbar}>
                         <div className={styles.searchBox}>
                             <Search size={18} className={styles.searchIcon} />
                             <input
                                 type="text"
-                                placeholder="Search documents..."
+                                placeholder="Search by name, type, driver, or vehicle..."
                                 className={styles.searchInput}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
+                        {selectedDocs.size > 0 && (
+                            <button
+                                onClick={handleBulkDownload}
+                                style={{
+                                    display: "flex", alignItems: "center", gap: "0.4rem",
+                                    padding: "0.5rem 1rem", borderRadius: "8px",
+                                    background: "#16a34a", color: "white", border: "none",
+                                    fontSize: "0.82rem", fontWeight: 600, cursor: "pointer",
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                <Download size={16} />
+                                Download {selectedDocs.size} Selected
+                            </button>
+                        )}
                     </div>
 
                     {/* Documents Table */}
@@ -447,8 +518,20 @@ export default function DocumentsPage() {
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
+                                        <th style={{ width: "36px", paddingRight: 0 }}>
+                                            <button
+                                                onClick={toggleSelectAll}
+                                                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", display: "flex", padding: 0 }}
+                                            >
+                                                {selectedDocs.size === filteredRealDocs.length && filteredRealDocs.length > 0
+                                                    ? <CheckSquare size={16} />
+                                                    : <Square size={16} />
+                                                }
+                                            </button>
+                                        </th>
                                         <th>Document</th>
                                         <th>Type</th>
+                                        <th>Associated With</th>
                                         <th>Uploaded</th>
                                         <th>Expires</th>
                                         <th>Status</th>
@@ -463,9 +546,18 @@ export default function DocumentsPage() {
                                         const status = isExpired ? "expired" : isExpiring ? "expiring" : "current";
                                         const badge = getStatusBadge(status);
                                         const BadgeIcon = badge.icon;
+                                        const isSelected = selectedDocs.has(doc.id);
 
                                         return (
-                                            <tr key={doc.id}>
+                                            <tr key={doc.id} style={{ background: isSelected ? "#f0fdf4" : undefined }}>
+                                                <td style={{ paddingRight: 0 }}>
+                                                    <button
+                                                        onClick={() => toggleSelectDoc(doc.id)}
+                                                        style={{ background: "none", border: "none", cursor: "pointer", color: isSelected ? "#16a34a" : "#cbd5e1", display: "flex", padding: 0 }}
+                                                    >
+                                                        {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+                                                    </button>
+                                                </td>
                                                 <td>
                                                     <div className={styles.docCell}>
                                                         <div className={styles.docIcon}>
@@ -474,7 +566,7 @@ export default function DocumentsPage() {
                                                         <div className={styles.docInfo}>
                                                             <span className={styles.docName}>{doc.name}</span>
                                                             <span className={styles.docSize}>
-                                                                {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : "—"}
+                                                                {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : doc.fileUrl ? "—" : "Form"}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -482,6 +574,12 @@ export default function DocumentsPage() {
                                                 <td>
                                                     <span className={styles.docType}>
                                                         {doc.documentType.replace(/_/g, " ")}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem" }}>
+                                                        {getEntityIcon(doc)}
+                                                        <span style={{ color: "#1e293b" }}>{getEntityLabel(doc)}</span>
                                                     </span>
                                                 </td>
                                                 <td>
@@ -519,15 +617,26 @@ export default function DocumentsPage() {
                                                         >
                                                             <PenTool size={16} />
                                                         </button>
-                                                        <a
-                                                            href={doc.fileUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className={styles.actionBtn}
-                                                            title="View / Download"
-                                                        >
-                                                            <ExternalLink size={16} />
-                                                        </a>
+                                                        {doc.fileUrl ? (
+                                                            <a
+                                                                href={doc.fileUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className={styles.actionBtn}
+                                                                title="Download"
+                                                            >
+                                                                <Download size={16} />
+                                                            </a>
+                                                        ) : (
+                                                            <Link
+                                                                href={`/dashboard/documents/wizard?form=${doc.fileName?.replace(/^wizard_/, "").replace(/_d_.*|_v_.*/, "") || ""}`}
+                                                                className={styles.actionBtn}
+                                                                title="Open in wizard"
+                                                                style={{ color: "#16a34a" }}
+                                                            >
+                                                                <FileText size={16} />
+                                                            </Link>
+                                                        )}
                                                         <button
                                                             className={styles.actionBtn}
                                                             title="Delete"
@@ -563,10 +672,15 @@ export default function DocumentsPage() {
                 </>
             )}
 
+            {/* Demo mode content */}
             {isDemoMode && <>
-                {/* Stats */}
                 <div className={styles.statsRow}>
-                    {documentCategories.map((cat) => (
+                    {[
+                        { id: "all", name: "All Documents", count: 47 },
+                        { id: "driver", name: "Driver Files", count: 24 },
+                        { id: "vehicle", name: "Vehicle Records", count: 15 },
+                        { id: "company", name: "Company Documents", count: 8 },
+                    ].map((cat) => (
                         <button
                             key={cat.id}
                             className={`${styles.categoryCard} ${cat.id === "all" ? styles.active : ""}`}
@@ -578,19 +692,17 @@ export default function DocumentsPage() {
                     ))}
                 </div>
 
-                {/* Toolbar */}
                 <div className={styles.toolbar}>
                     <div className={styles.searchBox}>
                         <Search size={18} className={styles.searchIcon} />
                         <input
                             type="text"
-                            placeholder="Search documents..."
+                            placeholder="Search by name, type, driver, or vehicle..."
                             className={styles.searchInput}
                         />
                     </div>
                 </div>
 
-                {/* Documents Table */}
                 <div className={styles.tableContainer}>
                     <table className={styles.table}>
                         <thead>
@@ -605,51 +717,46 @@ export default function DocumentsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {documents.map((doc) => {
-                                const status = getStatusBadge(doc.status);
-                                const StatusIcon = status.icon;
-
+                            {[
+                                { name: "CDL Copy", type: "CDL", entity: "John Smith", entityIcon: "driver", uploaded: "Jan 15, 2026", expires: "Feb 15, 2026", status: "expiring" },
+                                { name: "DOT Physical Card", type: "Medical Certificate", entity: "Sarah Wilson", entityIcon: "driver", uploaded: "Dec 10, 2025", expires: "Apr 14, 2026", status: "current" },
+                                { name: "Annual Inspection Report", type: "Annual Inspection", entity: "Unit 103", entityIcon: "vehicle", uploaded: "Feb 22, 2025", expires: "Feb 22, 2026", status: "expiring" },
+                                { name: "Insurance Certificate", type: "Insurance", entity: "Company", entityIcon: "company", uploaded: "Jan 01, 2026", expires: "Jan 01, 2027", status: "current" },
+                                { name: "Annual MVR Review", type: "MVR", entity: "Mike Johnson", entityIcon: "driver", uploaded: "Nov 20, 2025", expires: "Nov 20, 2026", status: "current" },
+                                { name: "Pre-Employment Drug Test", type: "Drug Test", entity: "Emily Brown", entityIcon: "driver", uploaded: "Jan 25, 2026", expires: null, status: "current" },
+                                { name: "MCS-150 Filing", type: "FMCSA Filing", entity: "Company", entityIcon: "company", uploaded: "Mar 15, 2024", expires: "Mar 15, 2026", status: "expiring" },
+                            ].map((doc, i) => {
+                                const badge = getStatusBadge(doc.status);
+                                const BadgeIcon = badge.icon;
                                 return (
-                                    <tr key={doc.id}>
+                                    <tr key={i}>
                                         <td>
                                             <div className={styles.docCell}>
-                                                <div className={styles.docIcon}>
-                                                    <FileText size={20} />
-                                                </div>
+                                                <div className={styles.docIcon}><FileText size={20} /></div>
                                                 <div className={styles.docInfo}>
                                                     <span className={styles.docName}>{doc.name}</span>
-                                                    <span className={styles.docSize}>{doc.fileSize}</span>
                                                 </div>
                                             </div>
                                         </td>
+                                        <td><span className={styles.docType}>{doc.type}</span></td>
                                         <td>
-                                            <span className={styles.docType}>{doc.type}</span>
-                                        </td>
-                                        <td>
-                                            <span className={styles.docEntity}>{doc.entity}</span>
-                                        </td>
-                                        <td>
-                                            <span className={styles.docDate}>{doc.uploadDate}</span>
-                                        </td>
-                                        <td>
-                                            <span className={styles.docDate}>
-                                                {doc.expirationDate || "—"}
+                                            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem" }}>
+                                                {doc.entityIcon === "driver" ? <Users size={12} style={{ color: "#3b82f6" }} /> :
+                                                 doc.entityIcon === "vehicle" ? <Truck size={12} style={{ color: "#059669" }} /> :
+                                                 <Building2 size={12} style={{ color: "#7c3aed" }} />}
+                                                <span style={{ color: "#1e293b" }}>{doc.entity}</span>
                                             </span>
                                         </td>
+                                        <td><span className={styles.docDate}>{doc.uploaded}</span></td>
+                                        <td><span className={styles.docDate}>{doc.expires || "—"}</span></td>
                                         <td>
-                                            <span className={`${styles.statusBadge} ${styles[status.class]}`}>
-                                                <StatusIcon size={14} />
-                                                {status.label}
+                                            <span className={`${styles.statusBadge} ${styles[badge.class]}`}>
+                                                <BadgeIcon size={14} />{badge.label}
                                             </span>
                                         </td>
                                         <td>
                                             <div className={styles.actions}>
-                                                <button className={styles.actionBtn} title="Download">
-                                                    <ExternalLink size={16} />
-                                                </button>
-                                                <button className={styles.actionBtn} title="More">
-                                                    <MoreVertical size={16} />
-                                                </button>
+                                                <button className={styles.actionBtn} title="Download"><Download size={16} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -657,17 +764,6 @@ export default function DocumentsPage() {
                             })}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Quick Upload Box */}
-                <div className={styles.uploadBox}>
-                    <div className={styles.uploadContent}>
-                        <Plus size={24} />
-                        <div>
-                            <h3>Quick Upload</h3>
-                            <p>Drag and drop files here or click to browse</p>
-                        </div>
-                    </div>
                 </div>
             </>}
 

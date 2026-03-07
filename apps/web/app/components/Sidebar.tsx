@@ -42,7 +42,6 @@ interface NavItem {
 const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Compliance", href: "/dashboard/compliance", icon: Shield },
-    { name: "Alerts", href: "/dashboard/alerts", icon: Bell, badge: 5 },
     { name: "Drivers", href: "/dashboard/drivers", icon: Users },
     { name: "Vehicles", href: "/dashboard/vehicles", icon: Truck },
     { name: "Hours of Service", href: "/dashboard/hos", icon: Clock },
@@ -227,11 +226,6 @@ export default function Sidebar() {
                     <div className={styles.bottomLinks}>
                         {!isOnboarding && (
                             <>
-                                <Link href="/dashboard/alerts" className={styles.bottomLink}>
-                                    <Bell size={18} />
-                                    <span>Notifications</span>
-                                    {isDemoMode && <span className={styles.notificationBadge}>3</span>}
-                                </Link>
                                 <Link href="/dashboard/settings" className={styles.bottomLink}>
                                     <Settings size={18} />
                                     <span>Settings</span>

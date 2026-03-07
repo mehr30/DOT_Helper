@@ -20,6 +20,8 @@ export interface DocumentData {
     vehicleId: string | null;
     companyId: string | null;
     createdAt: string;
+    driverName: string | null;
+    vehicleName: string | null;
 }
 
 export async function getDocuments(opts?: {
@@ -63,6 +65,10 @@ export async function getDocuments(opts?: {
         where,
         orderBy: { createdAt: "desc" },
         take: 200,
+        include: {
+            driver: { select: { firstName: true, lastName: true } },
+            vehicle: { select: { unitNumber: true, make: true, model: true } },
+        },
     });
 
     return docs.map((d) => ({
@@ -81,6 +87,8 @@ export async function getDocuments(opts?: {
         vehicleId: d.vehicleId,
         companyId: d.companyId,
         createdAt: d.createdAt.toISOString(),
+        driverName: d.driver ? `${d.driver.firstName} ${d.driver.lastName}` : null,
+        vehicleName: d.vehicle ? `Unit ${d.vehicle.unitNumber}${d.vehicle.make ? ` — ${d.vehicle.make} ${d.vehicle.model ?? ""}`.trim() : ""}` : null,
     }));
 }
 

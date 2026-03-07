@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeft,
@@ -10,12 +11,16 @@ import {
     Clock,
     CheckCircle,
     AlertTriangle,
-    Calendar,
     PenTool,
-    ExternalLink,
+    Download,
+    Edit3,
+    Save,
+    X,
+    Loader2,
 } from "lucide-react";
 import DocumentUpload from "../../../components/DocumentUpload";
 import SignDocumentModal from "../../../components/SignDocumentModal";
+import { updateVehicle } from "../../../actions/vehicles";
 
 interface VehicleData {
     id: string;
@@ -37,6 +42,7 @@ interface VehicleData {
         documentType: string;
         expirationDate: string | null;
         fileUrl: string;
+        fileName: string;
         mimeType: string | null;
         signatureCount: number;
     }>;
@@ -61,6 +67,76 @@ function getDaysUntil(dateStr: string) {
     return Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+interface ActionItem {
+    severity: "red" | "yellow" | "blue";
+    label: string;
+    action: string;
+    href: string;
+}
+
+function getVehicleActionItems(vehicle: VehicleData): ActionItem[] {
+    const items: ActionItem[] = [];
+    const docTypes = new Set(vehicle.documents.map(d => d.documentType));
+    const isPowerUnit = vehicle.vehicleType !== "TRAILER";
+
+    // Annual inspection
+    if (!vehicle.annualInspectionDue) {
+        items.push({ severity: "red", label: "No annual inspection date on file — every commercial vehicle needs one", action: "Add date", href: "#edit" });
+    } else {
+        const days = getDaysUntil(vehicle.annualInspectionDue);
+        if (days < 0) {
+            items.push({ severity: "red", label: `Annual inspection expired ${Math.abs(days)} days ago — vehicle cannot be operated`, action: "Update date", href: "#edit" });
+        } else if (days <= 30) {
+            items.push({ severity: "red", label: `Annual inspection expires in ${days} days — schedule now`, action: "Update date", href: "#edit" });
+        } else if (days <= 60) {
+            items.push({ severity: "yellow", label: `Annual inspection expires in ${days} days`, action: "Update date", href: "#edit" });
+        }
+    }
+
+    // PM schedule
+    if (vehicle.nextPmDue) {
+        const days = getDaysUntil(vehicle.nextPmDue);
+        if (days < 0) {
+            items.push({ severity: "yellow", label: `Preventive maintenance overdue by ${Math.abs(days)} days`, action: "Update PM date", href: "#edit" });
+        } else if (days <= 14) {
+            items.push({ severity: "yellow", label: `Preventive maintenance due in ${days} days`, action: "Update PM date", href: "#edit" });
+        }
+    }
+
+    // VIN
+    if (!vehicle.vin) {
+        items.push({ severity: "yellow", label: "No VIN on file", action: "Add VIN", href: "#edit" });
+    }
+
+    // Missing documents
+    if (!docTypes.has("REGISTRATION")) {
+        items.push({ severity: "yellow", label: "Missing: Vehicle registration", action: "Upload", href: "#documents" });
+    }
+    if (!docTypes.has("INSURANCE")) {
+        items.push({ severity: "yellow", label: "Missing: Insurance card / certificate", action: "Upload", href: "#documents" });
+    }
+    if (!docTypes.has("ANNUAL_INSPECTION")) {
+        items.push({ severity: "blue", label: "Missing: Annual inspection report", action: "Upload", href: "#documents" });
+    }
+    if (isPowerUnit && !docTypes.has("TITLE")) {
+        items.push({ severity: "blue", label: "Missing: Vehicle title", action: "Upload", href: "#documents" });
+    }
+
+    // Expired documents
+    vehicle.documents.forEach(doc => {
+        if (doc.expirationDate) {
+            const days = getDaysUntil(doc.expirationDate);
+            if (days < 0) {
+                items.push({ severity: "red", label: `${doc.name} expired ${Math.abs(days)} days ago`, action: "Upload new", href: "#documents" });
+            } else if (days <= 30) {
+                items.push({ severity: "yellow", label: `${doc.name} expires in ${days} days`, action: "Upload new", href: "#documents" });
+            }
+        }
+    });
+
+    return items;
+}
+
 export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
     const vTypeMap: Record<string, string> = {
         TRACTOR: "Semi-Truck", STRAIGHT_TRUCK: "Straight Truck", PICKUP: "Pickup",
@@ -68,8 +144,44 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
     };
     const vType = vTypeMap[vehicle.vehicleType] ?? vehicle.vehicleType.toLowerCase().replace("_", " ");
     const inspDays = vehicle.annualInspectionDue ? getDaysUntil(vehicle.annualInspectionDue) : null;
+    const actionItems = getVehicleActionItems(vehicle);
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
+    const router = useRouter();
+
+    // Inline edit state
+    const [editing, setEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [editData, setEditData] = useState({
+        unitNumber: vehicle.unitNumber,
+        make: vehicle.make || "",
+        model: vehicle.model || "",
+        year: vehicle.year?.toString() || "",
+        vin: vehicle.vin || "",
+        licensePlate: vehicle.licensePlate || "",
+        licensePlateState: vehicle.licensePlateState || "",
+        vehicleType: vehicle.vehicleType,
+        annualInspectionDue: vehicle.annualInspectionDue?.split("T")[0] || "",
+        nextPmDue: vehicle.nextPmDue?.split("T")[0] || "",
+    });
+    const [editError, setEditError] = useState<string | null>(null);
+
+    const handleSaveEdit = async () => {
+        setSaving(true);
+        setEditError(null);
+        const result = await updateVehicle({
+            id: vehicle.id,
+            ...editData,
+            year: editData.year ? parseInt(editData.year) : undefined,
+        });
+        setSaving(false);
+        if (result.error) {
+            setEditError(result.error);
+        } else {
+            setEditing(false);
+            router.refresh();
+        }
+    };
 
     return (
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -102,7 +214,7 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                         {vehicle.licensePlate && ` · ${vehicle.licensePlate} (${vehicle.licensePlateState})`}
                     </p>
                 </div>
-                <div style={{ marginLeft: "auto" }}>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                     <span className={`badge ${vehicle.status === "ACTIVE" ? "badge-success" :
                         vehicle.status === "MAINTENANCE" ? "badge-warning" : "badge-neutral"
                         }`}>
@@ -110,10 +222,197 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                         {vehicle.status === "MAINTENANCE" && <Wrench size={12} />}
                         {vehicle.status.toLowerCase()}
                     </span>
+                    {!editing && (
+                        <button
+                            onClick={() => setEditing(true)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "0.35rem",
+                                padding: "0.45rem 0.85rem", borderRadius: "8px",
+                                border: "1px solid #e2e8f0", background: "white",
+                                cursor: "pointer", fontSize: "0.85rem", fontWeight: 500,
+                                color: "#475569",
+                            }}
+                        >
+                            <Edit3 size={14} /> Edit
+                        </button>
+                    )}
                 </div>
             </div>
 
+            {/* Action Items */}
+            {!editing && actionItems.length > 0 && (
+                <div style={{
+                    background: "white", borderRadius: "12px", padding: "1rem 1.25rem",
+                    border: "1px solid #e2e8f0", marginBottom: "1.5rem",
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                        <AlertTriangle size={16} style={{ color: "#f59e0b" }} />
+                        <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "#0f172a" }}>
+                            Needs Attention ({actionItems.length})
+                        </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                        {actionItems.map((item, i) => (
+                            <div key={i} style={{
+                                display: "flex", alignItems: "center", gap: "0.75rem",
+                                padding: "0.5rem 0.6rem", borderRadius: "8px",
+                                background: item.severity === "red" ? "#fef2f2" : item.severity === "yellow" ? "#fffbeb" : "#eff6ff",
+                            }}>
+                                <div style={{
+                                    width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                                    background: item.severity === "red" ? "#ef4444" : item.severity === "yellow" ? "#f59e0b" : "#3b82f6",
+                                }} />
+                                <span style={{
+                                    flex: 1, fontSize: "0.82rem",
+                                    color: item.severity === "red" ? "#991b1b" : item.severity === "yellow" ? "#92400e" : "#1e40af",
+                                }}>
+                                    {item.label}
+                                </span>
+                                {item.href === "#edit" ? (
+                                    <button
+                                        onClick={() => setEditing(true)}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, border: "none", cursor: "pointer",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </button>
+                                ) : item.href === "#documents" ? (
+                                    <button
+                                        onClick={() => document.getElementById("vehicle-documents")?.scrollIntoView({ behavior: "smooth" })}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, border: "none", cursor: "pointer",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={item.href}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, textDecoration: "none",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </Link>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Form */}
+            {editing && (
+                <div style={{
+                    background: "white", borderRadius: "12px", padding: "1.5rem",
+                    border: "1px solid #e2e8f0", marginBottom: "2rem",
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                        <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Edit Vehicle</h3>
+                        <button onClick={() => setEditing(false)} style={{
+                            display: "flex", alignItems: "center", gap: "0.3rem",
+                            padding: "0.35rem 0.7rem", border: "1px solid #e2e8f0", borderRadius: "6px",
+                            background: "white", cursor: "pointer", fontSize: "0.8rem", color: "#64748b",
+                        }}>
+                            <X size={14} /> Cancel
+                        </button>
+                    </div>
+                    {editError && (
+                        <div style={{
+                            padding: "0.5rem 0.75rem", marginBottom: "1rem",
+                            background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px",
+                            color: "#dc2626", fontSize: "0.85rem",
+                        }}>
+                            {editError}
+                        </div>
+                    )}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                        <div>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
+                                Unit Number
+                            </label>
+                            <input
+                                type="text"
+                                value={editData.unitNumber}
+                                onChange={(e) => setEditData(prev => ({ ...prev, unitNumber: e.target.value }))}
+                                style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "0.875rem" }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
+                                Vehicle Type
+                            </label>
+                            <select
+                                value={editData.vehicleType}
+                                onChange={(e) => setEditData(prev => ({ ...prev, vehicleType: e.target.value }))}
+                                style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "0.875rem", background: "white" }}
+                            >
+                                <option value="TRACTOR">Semi-Truck</option>
+                                <option value="STRAIGHT_TRUCK">Straight Truck</option>
+                                <option value="PICKUP">Pickup</option>
+                                <option value="VAN">Van</option>
+                                <option value="SUV">SUV</option>
+                                <option value="TRAILER">Trailer</option>
+                                <option value="BUS">Bus</option>
+                            </select>
+                        </div>
+                        {[
+                            { key: "make", label: "Make", type: "text" },
+                            { key: "model", label: "Model", type: "text" },
+                            { key: "year", label: "Year", type: "number" },
+                            { key: "vin", label: "VIN", type: "text" },
+                            { key: "licensePlate", label: "License Plate", type: "text" },
+                            { key: "licensePlateState", label: "Plate State (e.g. TX)", type: "text" },
+                            { key: "annualInspectionDue", label: "Annual Inspection Due", type: "date" },
+                            { key: "nextPmDue", label: "Next PM Due", type: "date" },
+                        ].map(({ key, label, type }) => (
+                            <div key={key}>
+                                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
+                                    {label}
+                                </label>
+                                <input
+                                    type={type}
+                                    value={editData[key as keyof typeof editData]}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, [key]: e.target.value }))}
+                                    style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "0.875rem" }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1.25rem" }}>
+                        <button onClick={() => setEditing(false)} style={{
+                            padding: "0.5rem 1rem", border: "1px solid #e2e8f0", borderRadius: "8px",
+                            background: "white", cursor: "pointer", fontSize: "0.85rem", color: "#64748b",
+                        }}>
+                            Cancel
+                        </button>
+                        <button onClick={handleSaveEdit} disabled={saving} style={{
+                            display: "flex", alignItems: "center", gap: "0.35rem",
+                            padding: "0.5rem 1.25rem", border: "none", borderRadius: "8px",
+                            background: "#16a34a", cursor: "pointer", fontSize: "0.85rem",
+                            fontWeight: 600, color: "white",
+                            opacity: saving ? 0.7 : 1,
+                        }}>
+                            {saving ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Save size={14} />}
+                            {saving ? "Saving..." : "Save Changes"}
+                        </button>
+                    </div>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+                </div>
+            )}
+
             {/* Info Cards */}
+            {!editing && (
             <div style={{
                 display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                 gap: "1rem", marginBottom: "2rem",
@@ -162,7 +461,12 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                             )}
                         </>
                     ) : (
-                        <span style={{ color: "#94a3b8" }}>Not set</span>
+                        <div>
+                            <span style={{ color: "#f59e0b", fontSize: "0.85rem", fontWeight: 500 }}>Not on file</span>
+                            <p style={{ color: "#94a3b8", fontSize: "0.75rem", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
+                                Every commercial vehicle needs a yearly safety inspection by a certified inspector. Click Edit to add the date once you have it.
+                            </p>
+                        </div>
                     )}
                 </div>
 
@@ -191,9 +495,10 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                     </div>
                 </div>
             </div>
+            )}
 
             {/* Documents */}
-            <div style={{
+            <div id="vehicle-documents" style={{
                 background: "white", borderRadius: "12px", padding: "1.25rem",
                 border: "1px solid #e2e8f0", marginBottom: "1.5rem",
             }}>
@@ -254,28 +559,58 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                                         >
                                             <PenTool size={14} />
                                         </button>
-                                        <a
-                                            href={doc.fileUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            title="Download / View"
-                                            style={{
-                                                display: "flex", alignItems: "center", padding: "0.35rem",
-                                                border: "1px solid #e2e8f0", borderRadius: "6px",
-                                                background: "white", color: "#64748b",
-                                            }}
-                                        >
-                                            <ExternalLink size={14} />
-                                        </a>
+                                        {doc.fileUrl ? (
+                                            <a
+                                                href={doc.fileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title="Download / View"
+                                                style={{
+                                                    display: "flex", alignItems: "center", padding: "0.35rem",
+                                                    border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                    background: "white", color: "#64748b",
+                                                }}
+                                            >
+                                                <Download size={14} />
+                                            </a>
+                                        ) : (
+                                            <Link
+                                                href={`/dashboard/documents/wizard?form=${doc.fileName?.replace(/^wizard_/, "").replace(/_d_.*|_v_.*/, "") || ""}`}
+                                                title="Open in wizard"
+                                                style={{
+                                                    display: "flex", alignItems: "center", padding: "0.35rem",
+                                                    border: "1px solid #e2e8f0", borderRadius: "6px",
+                                                    background: "white", color: "#16a34a",
+                                                }}
+                                            >
+                                                <FileText size={14} />
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
-                    <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>
-                        No documents uploaded yet. Use the upload button above.
-                    </p>
+                    <div>
+                        <p style={{ color: "#64748b", fontSize: "0.85rem", margin: "0 0 0.75rem" }}>
+                            No documents uploaded yet. Here&apos;s what you should have on file for each vehicle:
+                        </p>
+                        <div style={{
+                            display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem 1rem",
+                            padding: "0.75rem", background: "#f8fafc", borderRadius: "8px",
+                            fontSize: "0.78rem", color: "#475569",
+                        }}>
+                            <span>&#x2022; Current registration</span>
+                            <span>&#x2022; Insurance card / certificate</span>
+                            <span>&#x2022; Annual inspection report</span>
+                            <span>&#x2022; Vehicle title</span>
+                            <span>&#x2022; Lease agreement (if leased)</span>
+                        </div>
+                        <p style={{ color: "#94a3b8", fontSize: "0.72rem", margin: "0.5rem 0 0" }}>
+                            Click &quot;Upload Document&quot; above to add these.
+                        </p>
+                    </div>
                 )}
             </div>
 

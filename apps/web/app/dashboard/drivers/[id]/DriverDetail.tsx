@@ -72,10 +72,79 @@ function getDaysUntil(dateStr: string) {
     return Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+interface ActionItem {
+    severity: "red" | "yellow" | "blue";
+    label: string;
+    action: string;
+    href: string;
+}
+
+function getDriverActionItems(driver: DriverData): ActionItem[] {
+    const items: ActionItem[] = [];
+    const isCDL = driver.licenseType === "CDL";
+    const docTypes = new Set(driver.documents.map(d => d.documentType));
+
+    // License issues
+    if (!driver.cdlNumber) {
+        items.push({ severity: "yellow", label: "No license number on file", action: "Add license info", href: "#edit" });
+    } else if (driver.cdlExpiration) {
+        const days = getDaysUntil(driver.cdlExpiration);
+        if (days < 0) {
+            items.push({ severity: "red", label: `License expired ${Math.abs(days)} days ago — driver cannot legally drive`, action: "Update expiration", href: "#edit" });
+        } else if (days <= 30) {
+            items.push({ severity: "red", label: `License expires in ${days} days — renew immediately`, action: "Update expiration", href: "#edit" });
+        } else if (days <= 60) {
+            items.push({ severity: "yellow", label: `License expires in ${days} days — schedule renewal`, action: "Update expiration", href: "#edit" });
+        }
+    }
+
+    // DOT physical / medical card
+    if (!driver.medicalCardExpiration) {
+        if (isCDL) {
+            items.push({ severity: "red", label: "No DOT physical on file — required for CDL drivers", action: "Add DOT physical date", href: "#edit" });
+        }
+    } else {
+        const days = getDaysUntil(driver.medicalCardExpiration);
+        if (days < 0) {
+            items.push({ severity: "red", label: `DOT physical expired ${Math.abs(days)} days ago — driver cannot legally drive`, action: "Update date", href: "#edit" });
+        } else if (days <= 30) {
+            items.push({ severity: "red", label: `DOT physical expires in ${days} days — schedule exam now`, action: "Update date", href: "#edit" });
+        } else if (days <= 60) {
+            items.push({ severity: "yellow", label: `DOT physical expires in ${days} days`, action: "Update date", href: "#edit" });
+        }
+    }
+
+    // Missing documents
+    if (!docTypes.has("CDL") && isCDL) {
+        items.push({ severity: "yellow", label: "Missing: Copy of driver's license", action: "Upload", href: "#documents" });
+    }
+    if (!docTypes.has("MEDICAL_CERTIFICATE") && isCDL) {
+        items.push({ severity: "yellow", label: "Missing: DOT physical card", action: "Upload", href: "#documents" });
+    }
+    if (!docTypes.has("EMPLOYMENT_APPLICATION")) {
+        items.push({ severity: "blue", label: "Missing: Employment application", action: "Fill out", href: `/dashboard/documents/wizard?form=driverApp&driver=${driver.id}` });
+    }
+    if (!docTypes.has("MVR")) {
+        items.push({ severity: "blue", label: "Missing: Driving record (MVR) / Annual review", action: "Fill out", href: `/dashboard/documents/wizard?form=annualMVRReview&driver=${driver.id}` });
+    }
+    if (!docTypes.has("DRUG_TEST_RESULT") && isCDL) {
+        items.push({ severity: "yellow", label: "Missing: Pre-employment drug test result", action: "Upload", href: "#documents" });
+    }
+    if (!docTypes.has("ROAD_TEST_CERTIFICATE") && isCDL) {
+        items.push({ severity: "blue", label: "Missing: Road test certificate", action: "Fill out", href: `/dashboard/documents/wizard?form=roadTestCert&driver=${driver.id}` });
+    }
+    if (!docTypes.has("CLEARINGHOUSE_CONSENT") && isCDL) {
+        items.push({ severity: "blue", label: "Missing: Clearinghouse consent form", action: "Fill out", href: `/dashboard/documents/wizard?form=drugAlcoholPolicy&driver=${driver.id}` });
+    }
+
+    return items;
+}
+
 export default function DriverDetail({ driver }: { driver: DriverData }) {
     const cdlDays = driver.cdlExpiration ? getDaysUntil(driver.cdlExpiration) : null;
     const medDays = driver.medicalCardExpiration ? getDaysUntil(driver.medicalCardExpiration) : null;
     const isCDL = driver.licenseType === "CDL";
+    const actionItems = getDriverActionItems(driver);
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const router = useRouter();
@@ -170,6 +239,78 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                     )}
                 </div>
             </div>
+
+            {/* Action Items */}
+            {!editing && actionItems.length > 0 && (
+                <div style={{
+                    background: "white", borderRadius: "12px", padding: "1rem 1.25rem",
+                    border: "1px solid #e2e8f0", marginBottom: "1.5rem",
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                        <AlertTriangle size={16} style={{ color: "#f59e0b" }} />
+                        <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "#0f172a" }}>
+                            Needs Attention ({actionItems.length})
+                        </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                        {actionItems.map((item, i) => (
+                            <div key={i} style={{
+                                display: "flex", alignItems: "center", gap: "0.75rem",
+                                padding: "0.5rem 0.6rem", borderRadius: "8px",
+                                background: item.severity === "red" ? "#fef2f2" : item.severity === "yellow" ? "#fffbeb" : "#eff6ff",
+                            }}>
+                                <div style={{
+                                    width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                                    background: item.severity === "red" ? "#ef4444" : item.severity === "yellow" ? "#f59e0b" : "#3b82f6",
+                                }} />
+                                <span style={{
+                                    flex: 1, fontSize: "0.82rem",
+                                    color: item.severity === "red" ? "#991b1b" : item.severity === "yellow" ? "#92400e" : "#1e40af",
+                                }}>
+                                    {item.label}
+                                </span>
+                                {item.href === "#edit" ? (
+                                    <button
+                                        onClick={() => setEditing(true)}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, border: "none", cursor: "pointer",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </button>
+                                ) : item.href === "#documents" ? (
+                                    <button
+                                        onClick={() => document.getElementById("driver-documents")?.scrollIntoView({ behavior: "smooth" })}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, border: "none", cursor: "pointer",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={item.href}
+                                        style={{
+                                            padding: "0.25rem 0.6rem", borderRadius: "6px", fontSize: "0.75rem",
+                                            fontWeight: 600, textDecoration: "none",
+                                            background: item.severity === "red" ? "#fee2e2" : item.severity === "yellow" ? "#fef3c7" : "#dbeafe",
+                                            color: item.severity === "red" ? "#dc2626" : item.severity === "yellow" ? "#d97706" : "#2563eb",
+                                        }}
+                                    >
+                                        {item.action}
+                                    </Link>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Edit Form */}
             {editing && (
@@ -383,7 +524,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
             )}
 
             {/* Documents */}
-            <div style={{
+            <div id="driver-documents" style={{
                 background: "white", borderRadius: "12px", padding: "1.25rem",
                 border: "1px solid #e2e8f0", marginBottom: "1.5rem",
             }}>
