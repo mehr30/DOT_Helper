@@ -296,15 +296,17 @@ export default function HomePage() {
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
             <Zap size={14} />
-            <span>DOT compliance, plain and simple.</span>
+            <span>Built for fleets of 1–50 trucks</span>
           </div>
           <h1 className={styles.heroTitle}>
-            {"The DOT can fine you $11,000"}<br />
-            <span className={styles.heroGradient}>for one missing piece of paper.</span>
+            {"You got into trucking to move freight."}<br />
+            <span className={styles.heroGradient}>Not to track expiration dates.</span>
           </h1>
           <p className={styles.heroDescription}>
-            We make sure that never happens. Greenlight DOT tracks your driver files,
-            vehicle inspections, and deadlines — so you stay compliant without the headache.
+            CDLs, medical cards, inspections, drug tests — one missed deadline
+            can cost you $16,000. Greenlight DOT watches all of it for you.
+            We tell you what&apos;s due, what&apos;s missing, and what to do next.
+            Plain English. Zero guesswork.
           </p>
           <div className={styles.heroCta}>
             <Link href="/register" className={styles.ctaPrimary}>
@@ -345,11 +347,11 @@ export default function HomePage() {
           <div className={styles.featuresHeader}>
             <span className={styles.featuresLabel}>Features</span>
             <h2 className={styles.featuresTitle}>
-              Everything you need for DOT compliance
+              We watch the details so you don&apos;t have to
             </h2>
             <p className={styles.featuresDescription}>
-              From driver files to vehicle inspections, we cover every aspect of
-              FMCSA compliance so you can focus on running your business.
+              Driver files, vehicle inspections, deadlines, drug tests — it&apos;s a lot to keep straight.
+              We keep it straight for you.
             </p>
           </div>
 
@@ -477,28 +479,28 @@ export default function HomePage() {
           <div className={styles.benefitsContent}>
             <span className={styles.benefitsLabel}>Why Greenlight DOT?</span>
             <h2 className={styles.benefitsTitle}>
-              Compliance made simple for small fleets
+              You&apos;ve got enough to worry about
             </h2>
             <ul className={styles.benefitsList}>
               <li className={styles.benefitItem}>
                 <CheckCircle size={20} className={styles.benefitIcon} />
-                <span>Reduce audit stress with organized, accessible records</span>
+                <span>Audit comes? Pull up every record in seconds — organized and ready</span>
               </li>
               <li className={styles.benefitItem}>
                 <CheckCircle size={20} className={styles.benefitIcon} />
-                <span>Prevent costly violations with automated expiration alerts</span>
+                <span>We alert you 90, 60, 30, and 7 days before anything expires</span>
               </li>
               <li className={styles.benefitItem}>
                 <CheckCircle size={20} className={styles.benefitIcon} />
-                <span>Save hours of paperwork with digital document management</span>
+                <span>No more filing cabinets — every document stored, searchable, shareable</span>
               </li>
               <li className={styles.benefitItem}>
                 <CheckCircle size={20} className={styles.benefitIcon} />
-                <span>Track your compliance score and know where you stand</span>
+                <span>See your compliance score at a glance — green means go</span>
               </li>
               <li className={styles.benefitItem}>
                 <CheckCircle size={20} className={styles.benefitIcon} />
-                <span>Mobile app for drivers to submit DVIRs on the go</span>
+                <span>Drivers can sign forms and upload docs right from their phone</span>
               </li>
             </ul>
             <Link href="/register" className={styles.benefitsCta}>
@@ -537,10 +539,10 @@ export default function HomePage() {
       <section className={styles.cta}>
         <div className={styles.ctaContainer}>
           <h2 className={styles.ctaTitle}>
-            You deserve a greenlight. Let&apos;s get you one.
+            Stop chasing paperwork. Start running your fleet.
           </h2>
           <p className={styles.ctaDescription}>
-            Join hundreds of businesses who trust Greenlight DOT for their fleet compliance. Start your free trial today.
+            14 days free. No credit card. Set up in 5 minutes. See why hundreds of fleet owners sleep better at night.
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/register" className={styles.ctaPrimaryLarge}>
