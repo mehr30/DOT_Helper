@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Users,
@@ -19,17 +19,19 @@ import {
     Building2,
     Check,
     AlertCircle,
+    Plus,
 } from "lucide-react";
 import GreenlightLogo from "./GreenlightLogo";
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
 import styles from "./Sidebar.module.css";
 import { useDemoMode } from "./DemoModeContext";
 import { useCompanyProfile } from "./CompanyProfileContext";
+import { getUserCompanies, switchCompany } from "../actions/company";
 
-const organizations = [
-    { id: "org1", name: "Transport Co.", initials: "TC", usdot: "1234567", location: "Kansas City, KS" },
-    { id: "org2", name: "Transport Co. — Denver", initials: "TD", usdot: "2345678", location: "Denver, CO" },
-    { id: "org3", name: "Southwest Fleet", initials: "SF", usdot: "3456789", location: "Dallas, TX" },
+const demoOrganizations = [
+    { id: "org1", name: "Transport Co.", usdotNumber: "1234567", location: "Kansas City, KS", role: "OWNER" as const },
+    { id: "org2", name: "Transport Co. — Denver", usdotNumber: "2345678", location: "Denver, CO", role: "ADMIN" as const },
+    { id: "org3", name: "Southwest Fleet", usdotNumber: "3456789", location: "Dallas, TX", role: "OWNER" as const },
 ];
 
 interface NavItem {
@@ -37,6 +39,14 @@ interface NavItem {
     href: string;
     icon: React.ElementType;
     badge?: number;
+}
+
+interface UserCompany {
+    id: string;
+    name: string;
+    usdotNumber: string | null;
+    location: string | null;
+    role: string;
 }
 
 const navigation: NavItem[] = [
@@ -49,19 +59,72 @@ const navigation: NavItem[] = [
     { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
 ];
 
+function getInitials(name: string): string {
+    return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+}
+
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
-    const [activeOrg, setActiveOrg] = useState(organizations[0]!);
     const { isDemoMode, exitDemo } = useDemoMode();
     const { profile } = useCompanyProfile();
+    const [isPending, startTransition] = useTransition();
 
-    // Always show all nav items — let users discover Driver Hours even if they don't need it yet
+    // Multi-org state
+    const [companies, setCompanies] = useState<UserCompany[]>([]);
+    const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
+
+    // Load user's companies on mount (non-demo mode only)
+    useEffect(() => {
+        if (isDemoMode) return;
+        getUserCompanies().then(result => {
+            setCompanies(result);
+            // The active company is determined by the profile context
+        }).catch(() => {});
+    }, [isDemoMode]);
+
+    // Sync activeCompanyId when profile loads
+    useEffect(() => {
+        if (!isDemoMode && profile.companyName && companies.length > 0) {
+            // Find the company that matches the current profile
+            const match = companies.find(c => c.name === profile.companyName);
+            if (match) {
+                setActiveCompanyId(match.id);
+            } else if (companies.length > 0) {
+                setActiveCompanyId(companies[0]!.id);
+            }
+        }
+    }, [isDemoMode, profile.companyName, companies]);
+
+    const activeCompany = isDemoMode
+        ? demoOrganizations[0]!
+        : companies.find(c => c.id === activeCompanyId) || companies[0];
+
+    const hasMultipleCompanies = isDemoMode
+        ? demoOrganizations.length > 1
+        : companies.length > 1;
+
+    const orgList = isDemoMode ? demoOrganizations : companies;
+
+    // Always show all nav items
     const visibleNavigation = navigation;
 
     // During onboarding, show a minimal sidebar (no nav links)
     const isOnboarding = pathname.startsWith("/dashboard/onboarding");
+
+    const handleSwitchCompany = (companyId: string) => {
+        if (isDemoMode) {
+            setActiveCompanyId(companyId);
+            setOrgDropdownOpen(false);
+            return;
+        }
+        setOrgDropdownOpen(false);
+        startTransition(async () => {
+            await switchCompany(companyId);
+        });
+    };
 
     return (
         <>
@@ -150,72 +213,81 @@ export default function Sidebar() {
                     )}
 
                     {/* Org switcher - hidden during onboarding */}
-                    {!isOnboarding && (
-                        <>
-                            {isDemoMode ? (
-                                <div className={styles.companyInfo}>
-                                    <button
-                                        className={styles.orgSwitcher}
-                                        onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-                                    >
-                                        <div className={styles.companyAvatar}>{activeOrg.initials}</div>
-                                        <div className={styles.companyDetails}>
-                                            <span className={styles.companyName}>{activeOrg.name}</span>
-                                            <span className={styles.usdot}>USDOT: {activeOrg.usdot}</span>
-                                        </div>
-                                        <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
-                                    </button>
+                    {!isOnboarding && activeCompany && (
+                        <div className={styles.companyInfo}>
+                            <button
+                                className={styles.orgSwitcher}
+                                onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                                style={isPending ? { opacity: 0.6, pointerEvents: "none" } : undefined}
+                            >
+                                <div className={styles.companyAvatar}>
+                                    {getInitials(activeCompany.name)}
+                                </div>
+                                <div className={styles.companyDetails}>
+                                    <span className={styles.companyName}>{activeCompany.name}</span>
+                                    <span className={styles.usdot}>
+                                        {activeCompany.usdotNumber ? `USDOT: ${activeCompany.usdotNumber}` : "USDOT: Pending"}
+                                    </span>
+                                </div>
+                                {(hasMultipleCompanies || !isDemoMode) && (
+                                    <ChevronDown size={16} className={`${styles.orgChevron} ${orgDropdownOpen ? styles.rotated : ""}`} />
+                                )}
+                            </button>
 
-                                    {orgDropdownOpen && (
-                                        <div className={styles.orgDropdown}>
-                                            <div className={styles.orgDropdownHeader}>
-                                                <Building2 size={14} />
-                                                <span>Switch Business Unit</span>
-                                            </div>
-                                            {organizations.map(org => (
-                                                <button
-                                                    key={org.id}
-                                                    className={`${styles.orgOption} ${org.id === activeOrg.id ? styles.activeOrg : ""}`}
-                                                    onClick={() => {
-                                                        setActiveOrg(org);
-                                                        setOrgDropdownOpen(false);
-                                                    }}
-                                                >
-                                                    <div className={styles.orgOptionAvatar}>{org.initials}</div>
-                                                    <div className={styles.orgOptionDetails}>
-                                                        <span className={styles.orgOptionName}>{org.name}</span>
-                                                        <span className={styles.orgOptionMeta}>DOT: {org.usdot} · {org.location}</span>
-                                                    </div>
-                                                    {org.id === activeOrg.id && <Check size={16} className={styles.orgCheck} />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : profile.companyName ? (
-                                <div className={styles.companyInfo}>
-                                    <div className={styles.orgSwitcher}>
-                                        <div className={styles.companyAvatar}>
-                                            {profile.companyName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-                                        </div>
-                                        <div className={styles.companyDetails}>
-                                            <span className={styles.companyName}>{profile.companyName}</span>
-                                            <span className={styles.usdot}>{profile.usdotNumber ? `USDOT: ${profile.usdotNumber}` : "USDOT: Pending"}</span>
-                                        </div>
+                            {orgDropdownOpen && (
+                                <div className={styles.orgDropdown}>
+                                    <div className={styles.orgDropdownHeader}>
+                                        <Building2 size={14} />
+                                        <span>Switch Company</span>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className={styles.companyInfo}>
-                                    <Link href="/dashboard/onboarding" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
-                                        <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
-                                        <div className={styles.companyDetails}>
-                                            <span className={styles.companyName}>Set Up Your Company</span>
-                                            <span className={styles.usdot}>Add USDOT &amp; details</span>
+                                    {orgList.map(org => (
+                                        <button
+                                            key={org.id}
+                                            className={`${styles.orgOption} ${org.id === activeCompany.id ? styles.activeOrg : ""}`}
+                                            onClick={() => handleSwitchCompany(org.id)}
+                                        >
+                                            <div className={styles.orgOptionAvatar}>{getInitials(org.name)}</div>
+                                            <div className={styles.orgOptionDetails}>
+                                                <span className={styles.orgOptionName}>{org.name}</span>
+                                                <span className={styles.orgOptionMeta}>
+                                                    {org.usdotNumber ? `DOT: ${org.usdotNumber}` : "No DOT"}
+                                                    {org.location ? ` · ${org.location}` : ""}
+                                                </span>
+                                            </div>
+                                            {org.id === activeCompany.id && <Check size={16} className={styles.orgCheck} />}
+                                        </button>
+                                    ))}
+                                    {/* Add Another Company */}
+                                    <Link
+                                        href="/dashboard/onboarding"
+                                        className={styles.orgOption}
+                                        onClick={() => setOrgDropdownOpen(false)}
+                                        style={{ borderTop: "1px solid rgba(255,255,255,0.1)", textDecoration: "none" }}
+                                    >
+                                        <div className={styles.orgOptionAvatar} style={{ background: "rgba(255,255,255,0.1)", fontSize: "1rem" }}>
+                                            <Plus size={16} />
+                                        </div>
+                                        <div className={styles.orgOptionDetails}>
+                                            <span className={styles.orgOptionName}>Add Another Company</span>
+                                            <span className={styles.orgOptionMeta}>Set up a new DOT entity</span>
                                         </div>
                                     </Link>
                                 </div>
                             )}
-                        </>
+                        </div>
+                    )}
+
+                    {/* Show setup prompt if no company and not onboarding */}
+                    {!isOnboarding && !activeCompany && !isDemoMode && (
+                        <div className={styles.companyInfo}>
+                            <Link href="/dashboard/onboarding" className={styles.orgSwitcher} style={{ textDecoration: 'none' }}>
+                                <div className={styles.companyAvatar} style={{ background: 'rgba(255,255,255,0.1)', fontSize: '1rem' }}>+</div>
+                                <div className={styles.companyDetails}>
+                                    <span className={styles.companyName}>Set Up Your Company</span>
+                                    <span className={styles.usdot}>Add USDOT &amp; details</span>
+                                </div>
+                            </Link>
+                        </div>
                     )}
 
                     <div className={styles.bottomLinks}>

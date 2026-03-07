@@ -229,7 +229,7 @@ export default function VehiclesTable({ vehicles: realVehicles }: { vehicles: Ve
                             <th>Vehicle Info</th>
                             <th>VIN</th>
                             <th>Annual Inspection</th>
-                            <th>Next PM Due</th>
+                            <th>Next Scheduled Service</th>
                             <th>Status</th>
                             <th></th>
                         </tr>

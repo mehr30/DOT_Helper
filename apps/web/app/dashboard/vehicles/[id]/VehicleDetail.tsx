@@ -374,7 +374,7 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                             { key: "licensePlate", label: "License Plate", type: "text" },
                             { key: "licensePlateState", label: "Plate State (e.g. TX)", type: "text" },
                             { key: "annualInspectionDue", label: "Annual Inspection Due", type: "date" },
-                            { key: "nextPmDue", label: "Next PM Due", type: "date" },
+                            { key: "nextPmDue", label: "Next Scheduled Service", type: "date" },
                         ].map(({ key, label, type }) => (
                             <div key={key}>
                                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
@@ -481,13 +481,13 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Last PM</span>
+                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Last Service</span>
                             <span style={{ fontWeight: 500 }}>
                                 {vehicle.lastPmDate ? formatDate(vehicle.lastPmDate) : "—"}
                             </span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Next PM Due</span>
+                            <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Next Scheduled Service</span>
                             <span style={{ fontWeight: 500 }}>
                                 {vehicle.nextPmDue ? formatDate(vehicle.nextPmDue) : "—"}
                             </span>

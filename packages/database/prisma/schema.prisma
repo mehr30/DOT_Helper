@@ -32,11 +32,20 @@ model Company {
   ucrDueDate        DateTime?
   ifta              Boolean  @default(false)
   hazmat            Boolean  @default(false)
-  
+
+  // Stripe billing (per-company subscription)
+  stripeCustomerId      String?   @unique
+  stripeSubscriptionId  String?
+  stripePriceId         String?
+  subscriptionStatus    String?   // "active", "trialing", "past_due", "canceled"
+  trialEndsAt           DateTime?
+
   drivers           Driver[]
   vehicles          Vehicle[]
   documents         Document[]
   users             User[]
+  members           CompanyMember[]
+  invites           CompanyInvite[]
   signingRequests   SigningRequest[]
 
   createdAt         DateTime @default(now())
@@ -55,8 +64,15 @@ model User {
   image             String?
   role              UserRole  @default(DISPATCHER)
 
+  // Legacy single-company link (kept for backward compat during migration)
   companyId         String?
   company           Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  // Multi-org: which company the user is currently viewing
+  activeCompanyId   String?
+
+  // Multi-org memberships
+  memberships       CompanyMember[]
 
   sessions          Session[]
   accounts          Account[]
@@ -113,6 +129,46 @@ enum UserRole {
   ADMIN
   DISPATCHER
   DRIVER
+}
+
+// ============================================================================
+// MULTI-ORG MEMBERSHIP & INVITES
+// ============================================================================
+
+model CompanyMember {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  role      UserRole @default(DISPATCHER)
+  invitedBy String?
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, companyId])
+}
+
+model CompanyInvite {
+  id        String       @id @default(cuid())
+  email     String
+  role      UserRole     @default(DISPATCHER)
+  token     String       @unique @default(cuid())
+  companyId String
+  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invitedBy String
+  status    InviteStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+
+  @@unique([email, companyId])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
 }
 
 // ============================================================================

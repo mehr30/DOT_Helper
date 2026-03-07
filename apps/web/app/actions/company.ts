@@ -30,7 +30,7 @@ export async function createCompany(formData: unknown) {
         }
     }
 
-    // Create company and connect user
+    // Create company, CompanyMember, and set activeCompanyId
     await prisma.$transaction(async (tx) => {
         const company = await tx.company.create({
             data: {
@@ -47,10 +47,21 @@ export async function createCompany(formData: unknown) {
             },
         });
 
+        // Create membership record
+        await tx.companyMember.create({
+            data: {
+                userId: session.user.id,
+                companyId: company.id,
+                role: data.userRole,
+            },
+        });
+
+        // Set this as the active company (and keep legacy companyId in sync)
         await tx.user.update({
             where: { id: session.user.id },
             data: {
                 companyId: company.id,
+                activeCompanyId: company.id,
                 role: data.userRole,
             },
         });
@@ -68,10 +79,11 @@ export async function updateCompany(formData: unknown) {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { companyId: true },
+        select: { activeCompanyId: true, companyId: true },
     });
 
-    if (!user?.companyId) {
+    const companyId = user?.activeCompanyId || user?.companyId;
+    if (!companyId) {
         return { error: "No company found" };
     }
 
@@ -88,13 +100,13 @@ export async function updateCompany(formData: unknown) {
         const existing = await prisma.company.findUnique({
             where: { usdotNumber: usdot },
         });
-        if (existing && existing.id !== user.companyId) {
+        if (existing && existing.id !== companyId) {
             return { error: "A different company already has this USDOT number" };
         }
     }
 
     await prisma.company.update({
-        where: { id: user.companyId },
+        where: { id: companyId },
         data: {
             name: data.name,
             usdotNumber: usdot,
@@ -120,24 +132,98 @@ export async function getCompanyForUser() {
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
+            activeCompanyId: true,
             companyId: true,
+        },
+    });
+
+    const companyId = user?.activeCompanyId || user?.companyId;
+    if (!companyId) return null;
+
+    return prisma.company.findUnique({
+        where: { id: companyId },
+        select: {
+            id: true,
+            name: true,
+            usdotNumber: true,
+            mcNumber: true,
+            address: true,
+            city: true,
+            state: true,
+            zip: true,
+            phone: true,
+            email: true,
+            fleetSizeRange: true,
+        },
+    });
+}
+
+/**
+ * Switch the user's active company. Validates membership before switching.
+ */
+export async function switchCompany(companyId: string) {
+    const session = await getServerSession();
+    if (!session?.user) {
+        return { error: "Not authenticated" };
+    }
+
+    // Verify the user is a member of this company
+    const membership = await prisma.companyMember.findUnique({
+        where: {
+            userId_companyId: {
+                userId: session.user.id,
+                companyId,
+            },
+        },
+    });
+
+    if (!membership) {
+        return { error: "You are not a member of this company" };
+    }
+
+    // Update activeCompanyId and legacy companyId
+    await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+            activeCompanyId: companyId,
+            companyId: companyId,
+            role: membership.role,
+        },
+    });
+
+    revalidatePath("/dashboard");
+    redirect("/dashboard");
+}
+
+/**
+ * Get all companies the current user is a member of.
+ */
+export async function getUserCompanies() {
+    const session = await getServerSession();
+    if (!session?.user) return [];
+
+    const memberships = await prisma.companyMember.findMany({
+        where: { userId: session.user.id },
+        select: {
+            role: true,
             company: {
                 select: {
                     id: true,
                     name: true,
                     usdotNumber: true,
-                    mcNumber: true,
-                    address: true,
                     city: true,
                     state: true,
-                    zip: true,
-                    phone: true,
-                    email: true,
-                    fleetSizeRange: true,
                 },
             },
         },
+        orderBy: { joinedAt: "asc" },
     });
 
-    return user?.company ?? null;
+    return memberships.map(m => ({
+        id: m.company.id,
+        name: m.company.name,
+        usdotNumber: m.company.usdotNumber,
+        location: [m.company.city, m.company.state].filter(Boolean).join(", ") || null,
+        role: m.role,
+    }));
 }

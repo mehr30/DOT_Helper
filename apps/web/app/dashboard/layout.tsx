@@ -22,9 +22,16 @@ export default async function DashboardLayout({
         if (session?.user && !isOnboardingPage) {
             const user = await prisma.user.findUnique({
                 where: { id: session.user.id },
-                select: { companyId: true },
+                select: {
+                    companyId: true,
+                    activeCompanyId: true,
+                    memberships: { select: { id: true }, take: 1 },
+                },
             });
-            if (!user?.companyId) {
+
+            // Redirect to onboarding if user has no memberships AND no legacy companyId
+            const hasCompany = (user?.memberships?.length ?? 0) > 0 || !!user?.companyId;
+            if (!hasCompany) {
                 redirect("/dashboard/onboarding");
             }
         }
