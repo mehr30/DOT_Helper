@@ -191,65 +191,132 @@ export default function SigningPage() {
                                 )}
                             </div>
 
-                            {/* Document fields (read-only) */}
+                            {/* Document fields — text fields read-only */}
                             <div style={{ padding: "1rem 1.25rem" }}>
-                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                                    <tbody>
-                                        {Object.entries(formData).map(([key, val]) => {
-                                            if (!val) return null;
-                                            // Skip signature fields and internal fields
-                                            if (typeof val === "string" && val.startsWith("data:image")) return null;
-                                            return (
-                                                <tr key={key}>
-                                                    <td style={{
-                                                        padding: "0.4rem 1rem 0.4rem 0",
-                                                        fontWeight: 500, color: "#475569",
-                                                        fontSize: "0.85rem", whiteSpace: "nowrap",
-                                                        borderBottom: "1px solid #f1f5f9",
-                                                        verticalAlign: "top",
+                                {(() => {
+                                    const textFields = Object.entries(formData).filter(
+                                        ([, val]) => val && typeof val === "string" && !val.startsWith("data:image")
+                                    );
+                                    const checkboxFields = Object.entries(formData).filter(
+                                        ([, val]) => typeof val === "boolean"
+                                    );
+                                    return (
+                                        <>
+                                            {textFields.length > 0 && (
+                                                <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "1rem" }}>
+                                                    <tbody>
+                                                        {textFields.map(([key, val]) => (
+                                                            <tr key={key}>
+                                                                <td style={{
+                                                                    padding: "0.4rem 1rem 0.4rem 0",
+                                                                    fontWeight: 500, color: "#475569",
+                                                                    fontSize: "0.85rem", whiteSpace: "nowrap",
+                                                                    borderBottom: "1px solid #f1f5f9",
+                                                                    verticalAlign: "top",
+                                                                }}>
+                                                                    {formatLabel(key)}
+                                                                </td>
+                                                                <td style={{
+                                                                    padding: "0.4rem 0",
+                                                                    color: "#0f172a",
+                                                                    fontSize: "0.85rem",
+                                                                    borderBottom: "1px solid #f1f5f9",
+                                                                }}>
+                                                                    {String(val)}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            )}
+
+                                            {/* Checkbox acknowledgments — interactive */}
+                                            {checkboxFields.length > 0 && (
+                                                <div style={{
+                                                    padding: "1rem", marginTop: "0.5rem",
+                                                    background: "#fffbeb", border: "1px solid #fef3c7",
+                                                    borderRadius: "10px",
+                                                }}>
+                                                    <p style={{
+                                                        fontSize: "0.8rem", fontWeight: 600, color: "#92400e",
+                                                        marginBottom: "0.75rem",
                                                     }}>
-                                                        {formatLabel(key)}
-                                                    </td>
-                                                    <td style={{
-                                                        padding: "0.4rem 0",
-                                                        color: "#0f172a",
-                                                        fontSize: "0.85rem",
-                                                        borderBottom: "1px solid #f1f5f9",
-                                                    }}>
-                                                        {val === true ? "Yes" : String(val)}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                                        Please review and check each item below:
+                                                    </p>
+                                                    {checkboxFields.map(([key]) => (
+                                                        <label
+                                                            key={key}
+                                                            style={{
+                                                                display: "flex", alignItems: "flex-start", gap: "0.6rem",
+                                                                padding: "0.5rem 0", cursor: "pointer",
+                                                                borderBottom: "1px solid #fef3c7",
+                                                                fontSize: "0.85rem", color: "#0f172a",
+                                                                lineHeight: 1.5,
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!formData[key]}
+                                                                onChange={(e) => setFormData(prev => ({ ...prev, [key]: e.target.checked }))}
+                                                                style={{
+                                                                    width: 18, height: 18, marginTop: 2,
+                                                                    accentColor: "#16a34a", flexShrink: 0,
+                                                                }}
+                                                            />
+                                                            <span>{formatLabel(key)}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             {/* Signature section */}
-                            <div style={{
-                                padding: "1.25rem", borderTop: "2px solid #e2e8f0",
-                                background: "#fafafa",
-                            }}>
-                                <h3 style={{
-                                    fontSize: "1rem", fontWeight: 700, color: "#0f172a",
-                                    marginBottom: "0.5rem",
-                                }}>
-                                    Your Signature
-                                </h3>
-                                <p style={{
-                                    color: "#64748b", fontSize: "0.8rem", marginBottom: "1rem",
-                                    lineHeight: 1.5,
-                                }}>
-                                    By signing below, you acknowledge that you have reviewed the information above
-                                    and agree to the terms of this document. Your signature is legally binding under
-                                    the ESIGN Act (15 U.S.C. &sect; 7001).
-                                </p>
-                                <SignaturePad
-                                    onSignature={handleSign}
-                                    width={Math.min(520, typeof window !== "undefined" ? window.innerWidth - 80 : 520)}
-                                    height={180}
-                                />
-                            </div>
+                            {(() => {
+                                const checkboxFields = Object.entries(formData).filter(([, val]) => typeof val === "boolean");
+                                const allChecked = checkboxFields.length === 0 || checkboxFields.every(([, val]) => val === true);
+                                return (
+                                    <div style={{
+                                        padding: "1.25rem", borderTop: "2px solid #e2e8f0",
+                                        background: "#fafafa",
+                                    }}>
+                                        <h3 style={{
+                                            fontSize: "1rem", fontWeight: 700, color: "#0f172a",
+                                            marginBottom: "0.5rem",
+                                        }}>
+                                            Your Signature
+                                        </h3>
+                                        <p style={{
+                                            color: "#64748b", fontSize: "0.8rem", marginBottom: "1rem",
+                                            lineHeight: 1.5,
+                                        }}>
+                                            By signing below, you acknowledge that you have reviewed the information above
+                                            and agree to the terms of this document. Your signature is legally binding under
+                                            the ESIGN Act (15 U.S.C. &sect; 7001).
+                                        </p>
+                                        {allChecked ? (
+                                            <SignaturePad
+                                                onSignature={handleSign}
+                                                width={Math.min(520, typeof window !== "undefined" ? window.innerWidth - 80 : 520)}
+                                                height={180}
+                                            />
+                                        ) : (
+                                            <div style={{
+                                                padding: "1.25rem", textAlign: "center",
+                                                background: "#f1f5f9", borderRadius: "10px",
+                                                border: "1px dashed #cbd5e1",
+                                            }}>
+                                                <AlertTriangle size={24} style={{ color: "#f59e0b", marginBottom: "0.5rem" }} />
+                                                <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>
+                                                    Please check all acknowledgment boxes above before signing.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Expiry notice */}

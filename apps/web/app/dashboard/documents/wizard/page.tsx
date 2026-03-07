@@ -401,10 +401,17 @@ function WizardContent() {
             : undefined;
 
         try {
+            // Reset checkboxes and signatures so the driver must check/sign themselves
+            const signingFormData = { ...formData };
+            for (const [key, val] of Object.entries(signingFormData)) {
+                if (typeof val === "boolean") signingFormData[key] = false;
+                if (typeof val === "string" && val.startsWith("data:image")) delete signingFormData[key];
+            }
+
             const result = await createSigningRequest({
                 formId: activeForm.id,
                 formTitle: activeForm.title,
-                formData: formData,
+                formData: signingFormData,
                 driverId: selectedDriverId || undefined,
                 vehicleId: selectedVehicleId || undefined,
                 driverEmail,
