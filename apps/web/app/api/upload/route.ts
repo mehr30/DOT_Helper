@@ -39,16 +39,10 @@ export async function POST(request: Request) {
     }
 
     // Upload to Vercel Blob
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-        return NextResponse.json(
-            { error: "File storage is not configured. Please add BLOB_READ_WRITE_TOKEN to your environment variables." },
-            { status: 500 },
-        );
-    }
-
     try {
         const blob = await put(`documents/${session.user.id}/${Date.now()}-${file.name}`, file, {
             access: "public",
+            token: process.env.BLOB_READ_WRITE_TOKEN,
         });
 
         return NextResponse.json({
