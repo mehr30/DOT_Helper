@@ -12,7 +12,7 @@ interface SignaturePadProps {
 
 export default function SignaturePad({ onSignature, width = 500, height = 200 }: SignaturePadProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isDrawing, setIsDrawing] = useState(false);
+    const isDrawingRef = useRef(false);
     const [hasDrawn, setHasDrawn] = useState(false);
 
     const getCtx = useCallback(() => {
@@ -61,23 +61,23 @@ export default function SignaturePad({ onSignature, width = 500, height = 200 }:
         const pos = getPos(e);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
-        setIsDrawing(true);
+        isDrawingRef.current = true;
     };
 
     const draw = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
-        if (!isDrawing) return;
+        if (!isDrawingRef.current) return;
         const ctx = getCtx();
         if (!ctx) return;
         const pos = getPos(e);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
-        setHasDrawn(true);
+        if (!hasDrawn) setHasDrawn(true);
     };
 
     const stopDrawing = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
-        setIsDrawing(false);
+        isDrawingRef.current = false;
     };
 
     const clear = () => {

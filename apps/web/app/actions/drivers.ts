@@ -95,6 +95,8 @@ export async function updateDriver(formData: unknown) {
             ...(data.cdlExpiration !== undefined && { cdlExpiration: data.cdlExpiration ? new Date(data.cdlExpiration) : null }),
             ...(data.medicalCardExpiration !== undefined && { medicalCardExpiration: data.medicalCardExpiration ? new Date(data.medicalCardExpiration) : null }),
             ...(data.hireDate !== undefined && { hireDate: new Date(data.hireDate) }),
+            ...(data.clearinghouseQueryDate !== undefined && { clearinghouseQueryDate: data.clearinghouseQueryDate ? new Date(data.clearinghouseQueryDate) : null }),
+            ...(data.lastDrugTestDate !== undefined && { lastDrugTestDate: data.lastDrugTestDate ? new Date(data.lastDrugTestDate) : null }),
             ...(data.endorsements !== undefined && { endorsements: data.endorsements }),
         },
     });

@@ -139,9 +139,9 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
         return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update Driver" };
     }
 
-    // Clearinghouse — link to wizard consent form for consent, documents page for query results
+    // Clearinghouse query — link to the driver's page to update the query date
     if (lower.includes("clearinghouse query") || lower.includes("drug testing database check")) {
-        return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Run Query" };
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update Driver" };
     }
     if (lower.includes("clearinghouse consent") || lower.includes("drug testing authorization")) {
         return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Get Consent" };

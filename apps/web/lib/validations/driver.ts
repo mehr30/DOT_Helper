@@ -44,6 +44,8 @@ export const driverUpdateSchema = z.object({
     cdlExpiration: z.string().optional().or(z.literal("")),
     medicalCardExpiration: z.string().optional().or(z.literal("")),
     hireDate: z.string().optional(),
+    clearinghouseQueryDate: z.string().optional().or(z.literal("")),
+    lastDrugTestDate: z.string().optional().or(z.literal("")),
     endorsements: z.array(z.string()).optional(),
 });
 

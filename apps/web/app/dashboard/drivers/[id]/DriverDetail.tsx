@@ -39,6 +39,8 @@ interface DriverData {
     cdlExpiration: string | null;
     medicalCardExpiration: string | null;
     hireDate: string;
+    clearinghouseQueryDate: string | null;
+    lastDrugTestDate: string | null;
     status: string;
     endorsements: string[];
     documents: Array<{
@@ -163,6 +165,8 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
         cdlExpiration: driver.cdlExpiration?.split("T")[0] || "",
         medicalCardExpiration: driver.medicalCardExpiration?.split("T")[0] || "",
         hireDate: driver.hireDate.split("T")[0],
+        clearinghouseQueryDate: driver.clearinghouseQueryDate?.split("T")[0] || "",
+        lastDrugTestDate: driver.lastDrugTestDate?.split("T")[0] || "",
     });
     const [editError, setEditError] = useState<string | null>(null);
 
@@ -349,6 +353,8 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             { key: "cdlExpiration", label: "License Expiration", type: "date" },
                             { key: "medicalCardExpiration", label: "DOT Physical Expiration", type: "date" },
                             { key: "hireDate", label: "Hire Date", type: "date" },
+                            { key: "clearinghouseQueryDate", label: "Last Clearinghouse Query", type: "date" },
+                            { key: "lastDrugTestDate", label: "Last Drug Test", type: "date" },
                         ].map(({ key, label, type }) => (
                             <div key={key}>
                                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>

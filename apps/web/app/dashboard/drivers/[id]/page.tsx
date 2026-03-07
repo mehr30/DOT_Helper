@@ -66,6 +66,8 @@ export default async function DriverPage({
         cdlExpiration: driver.cdlExpiration?.toISOString() ?? null,
         medicalCardExpiration: driver.medicalCardExpiration?.toISOString() ?? null,
         hireDate: driver.hireDate.toISOString(),
+        clearinghouseQueryDate: driver.clearinghouseQueryDate?.toISOString() ?? null,
+        lastDrugTestDate: driver.lastDrugTestDate?.toISOString() ?? null,
         status: driver.status,
         endorsements: driver.endorsements,
         documents: driver.documents.map(d => ({
