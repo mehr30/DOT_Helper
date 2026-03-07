@@ -2,7 +2,7 @@
 
 import { useState, useRef, useTransition } from "react";
 import Link from "next/link";
-import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
+import { Upload, FileText, X, CheckCircle, AlertCircle, AlertTriangle, Loader2, ArrowLeft } from "lucide-react";
 import { createDocumentRecord } from "../actions/documents";
 import styles from "./DocumentUpload.module.css";
 
@@ -36,21 +36,59 @@ const COMPANY_DOCUMENT_TYPES = [
     { value: "OTHER", label: "Other", hint: "" },
 ];
 
+// Document types that require an expiration date for compliance tracking
+const EXPIRATION_REQUIRED_TYPES = new Set([
+    "CDL", "MEDICAL_CERTIFICATE",
+    "REGISTRATION", "INSURANCE", "ANNUAL_INSPECTION",
+    "UCR", "IFTA_LICENSE", "INSURANCE_POLICY",
+]);
+
 interface DocumentUploadProps {
     driverId?: string;
     vehicleId?: string;
     defaultDocType?: string;
     autoOpen?: boolean;
     onUploadComplete?: () => void;
+    drivers?: { id: string; name: string }[];
+    vehicles?: { id: string; label: string }[];
+    existingDocuments?: { documentType: string; driverId: string | null; vehicleId: string | null; companyId: string | null }[];
 }
 
 const ALL_DOC_TYPES = [...DRIVER_DOCUMENT_TYPES, ...VEHICLE_DOCUMENT_TYPES, ...COMPANY_DOCUMENT_TYPES];
 
-export default function DocumentUpload({ driverId, vehicleId, defaultDocType, autoOpen, onUploadComplete }: DocumentUploadProps) {
-    const docTypes = driverId ? DRIVER_DOCUMENT_TYPES : vehicleId ? VEHICLE_DOCUMENT_TYPES : COMPANY_DOCUMENT_TYPES;
+type EntityTarget = "company" | "driver" | "vehicle";
+
+export default function DocumentUpload({
+    driverId,
+    vehicleId,
+    defaultDocType,
+    autoOpen,
+    onUploadComplete,
+    drivers,
+    vehicles,
+    existingDocuments,
+}: DocumentUploadProps) {
+    // If driverId or vehicleId is pre-set (from detail pages / compliance links), lock the entity
+    const entityLocked = !!(driverId || vehicleId);
+    const initialTarget: EntityTarget = driverId ? "driver" : vehicleId ? "vehicle" : "company";
+
+    const [entityTarget, setEntityTarget] = useState<EntityTarget>(initialTarget);
+    const [selectedDriverId, setSelectedDriverId] = useState<string>("");
+    const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
+
+    // Effective entity IDs: prop overrides user selection
+    const effectiveDriverId = driverId ?? (entityTarget === "driver" ? selectedDriverId || undefined : undefined);
+    const effectiveVehicleId = vehicleId ?? (entityTarget === "vehicle" ? selectedVehicleId || undefined : undefined);
+
+    // Pick doc types based on entity target
+    const docTypes = entityTarget === "driver" ? DRIVER_DOCUMENT_TYPES
+        : entityTarget === "vehicle" ? VEHICLE_DOCUMENT_TYPES
+        : COMPANY_DOCUMENT_TYPES;
+
     const resolvedDefault = defaultDocType && docTypes.some(t => t.value === defaultDocType)
         ? defaultDocType
-        : docTypes[0]?.value || "OTHER";
+        : "";
+
     const [isOpen, setIsOpen] = useState(autoOpen ?? false);
     const [file, setFile] = useState<File | null>(null);
     const [docType, setDocType] = useState(resolvedDefault);
@@ -62,6 +100,25 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
     const [success, setSuccess] = useState(false);
     const [isPending, startTransition] = useTransition();
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const expirationRequired = EXPIRATION_REQUIRED_TYPES.has(docType);
+
+    // Check for duplicate documents
+    const isDuplicate = docType && existingDocuments?.some(d => {
+        if (d.documentType !== docType) return false;
+        if (effectiveDriverId) return d.driverId === effectiveDriverId;
+        if (effectiveVehicleId) return d.vehicleId === effectiveVehicleId;
+        return !!d.companyId;
+    });
+
+    const docTypeLabel = ALL_DOC_TYPES.find(t => t.value === docType)?.label ?? docType;
+
+    const handleEntityChange = (target: EntityTarget) => {
+        setEntityTarget(target);
+        setDocType("");
+        setSelectedDriverId("");
+        setSelectedVehicleId("");
+    };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0];
@@ -82,9 +139,27 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
         }
     };
 
+    const canSubmit = file && docType && docName.trim()
+        && (!expirationRequired || expirationDate)
+        && (entityTarget !== "driver" || entityLocked || selectedDriverId)
+        && (entityTarget !== "vehicle" || entityLocked || selectedVehicleId);
+
     const handleUpload = async () => {
         if (!file) { setError("Please select a file"); return; }
+        if (!docType) { setError("Please select a document type"); return; }
         if (!docName.trim()) { setError("Please enter a document name"); return; }
+        if (expirationRequired && !expirationDate) {
+            setError("This document type requires an expiration date for compliance tracking");
+            return;
+        }
+        if (entityTarget === "driver" && !entityLocked && !selectedDriverId) {
+            setError("Please select a driver for this document");
+            return;
+        }
+        if (entityTarget === "vehicle" && !entityLocked && !selectedVehicleId) {
+            setError("Please select a vehicle for this document");
+            return;
+        }
 
         setUploading(true);
         setError("");
@@ -95,7 +170,15 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
             formData.append("file", file);
 
             const res = await fetch("/api/upload", { method: "POST", body: formData });
-            const data = await res.json();
+
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                setError("Upload failed — server returned an unexpected response.");
+                setUploading(false);
+                return;
+            }
 
             if (!res.ok) {
                 setError(data.error || "Upload failed");
@@ -105,32 +188,37 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
 
             // Create document record
             startTransition(async () => {
-                await createDocumentRecord({
-                    name: docName.trim(),
-                    documentType: docType,
-                    fileName: data.fileName,
-                    fileUrl: data.url,
-                    fileSize: data.fileSize,
-                    mimeType: data.mimeType,
-                    driverId,
-                    vehicleId,
-                    expirationDate: expirationDate || undefined,
-                });
+                try {
+                    await createDocumentRecord({
+                        name: docName.trim(),
+                        documentType: docType,
+                        fileName: data.fileName,
+                        fileUrl: data.url,
+                        fileSize: data.fileSize,
+                        mimeType: data.mimeType,
+                        driverId: effectiveDriverId,
+                        vehicleId: effectiveVehicleId,
+                        expirationDate: expirationDate || undefined,
+                    });
 
-                setSuccess(true);
-                setUploading(false);
-                onUploadComplete?.();
+                    setSuccess(true);
+                    setUploading(false);
+                    onUploadComplete?.();
 
-                // Don't auto-close when user came from compliance — let them click "Return"
-                if (!cameFromCompliance) {
-                    setTimeout(() => {
-                        setFile(null);
-                        setDocName("");
-                        setDocType(resolvedDefault);
-                        setExpirationDate("");
-                        setSuccess(false);
-                        setIsOpen(false);
-                    }, 1500);
+                    // Don't auto-close when user came from compliance — let them click "Return"
+                    if (!cameFromCompliance) {
+                        setTimeout(() => {
+                            setFile(null);
+                            setDocName("");
+                            setDocType(resolvedDefault);
+                            setExpirationDate("");
+                            setSuccess(false);
+                            setIsOpen(false);
+                        }, 1500);
+                    }
+                } catch (err) {
+                    setError(err instanceof Error ? err.message : "Failed to save document record. Please try again.");
+                    setUploading(false);
                 }
             });
         } catch {
@@ -196,6 +284,67 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
                         ) : null;
                     })()}
 
+                    {/* Entity selector — only when not locked to a specific driver/vehicle */}
+                    {!entityLocked && drivers && vehicles && (
+                        <div style={{ marginBottom: "0.75rem" }}>
+                            <label className={styles.label} style={{ marginBottom: "0.4rem", display: "block" }}>
+                                This document is for:
+                            </label>
+                            <div style={{ display: "flex", gap: "0.25rem", background: "#f1f5f9", borderRadius: "8px", padding: "3px" }}>
+                                {([
+                                    { key: "company" as const, label: "Company" },
+                                    { key: "driver" as const, label: "A Driver" },
+                                    { key: "vehicle" as const, label: "A Vehicle" },
+                                ]).map(opt => (
+                                    <button
+                                        key={opt.key}
+                                        onClick={() => handleEntityChange(opt.key)}
+                                        style={{
+                                            flex: 1, padding: "0.45rem 0.5rem", borderRadius: "6px",
+                                            border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+                                            background: entityTarget === opt.key ? "white" : "transparent",
+                                            color: entityTarget === opt.key ? "#0f172a" : "#64748b",
+                                            boxShadow: entityTarget === opt.key ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                                            transition: "all 0.15s",
+                                        }}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Driver dropdown */}
+                            {entityTarget === "driver" && (
+                                <select
+                                    value={selectedDriverId}
+                                    onChange={(e) => setSelectedDriverId(e.target.value)}
+                                    className={styles.select}
+                                    style={{ marginTop: "0.4rem" }}
+                                >
+                                    <option value="" disabled>Select a driver...</option>
+                                    {drivers.map(d => (
+                                        <option key={d.id} value={d.id}>{d.name}</option>
+                                    ))}
+                                </select>
+                            )}
+
+                            {/* Vehicle dropdown */}
+                            {entityTarget === "vehicle" && (
+                                <select
+                                    value={selectedVehicleId}
+                                    onChange={(e) => setSelectedVehicleId(e.target.value)}
+                                    className={styles.select}
+                                    style={{ marginTop: "0.4rem" }}
+                                >
+                                    <option value="" disabled>Select a vehicle...</option>
+                                    {vehicles.map(v => (
+                                        <option key={v.id} value={v.id}>{v.label}</option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
+                    )}
+
                     {/* Drop zone */}
                     <div
                         className={`${styles.dropZone} ${file ? styles.hasFile : ""}`}
@@ -256,6 +405,7 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
                                     onChange={(e) => setDocType(e.target.value)}
                                     className={styles.select}
                                 >
+                                    <option value="" disabled>Select document type...</option>
                                     {docTypes.map((t) => (
                                         <option key={t.value} value={t.value}>{t.label}</option>
                                     ))}
@@ -268,16 +418,38 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
                             </div>
 
                             <div className={styles.field}>
-                                <label className={styles.label}>Expiration Date (if any)</label>
+                                <label className={styles.label}>
+                                    Expiration Date{expirationRequired ? (
+                                        <span style={{ color: "#dc2626", marginLeft: "0.2rem" }}>*</span>
+                                    ) : " (if any)"}
+                                </label>
                                 <input
                                     type="date"
                                     value={expirationDate}
                                     onChange={(e) => setExpirationDate(e.target.value)}
                                     className={styles.input}
                                 />
+                                {expirationRequired && (
+                                    <span style={{ fontSize: "0.7rem", color: "#dc2626", marginTop: "0.2rem", display: "block" }}>
+                                        This document expires — the date is needed for compliance tracking
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
+
+                    {/* Duplicate warning */}
+                    {isDuplicate && (
+                        <div style={{
+                            display: "flex", alignItems: "center", gap: "0.5rem",
+                            padding: "0.6rem 0.75rem", borderRadius: "8px",
+                            background: "#fffbeb", border: "1px solid #fef3c7",
+                            fontSize: "0.78rem", color: "#92400e", marginTop: "0.25rem",
+                        }}>
+                            <AlertTriangle size={14} style={{ flexShrink: 0 }} />
+                            A {docTypeLabel} is already on file. Uploading will add another copy.
+                        </div>
+                    )}
 
                     {error && (
                         <div className={styles.error}>
@@ -289,7 +461,7 @@ export default function DocumentUpload({ driverId, vehicleId, defaultDocType, au
                     <button
                         className={styles.submitButton}
                         onClick={handleUpload}
-                        disabled={uploading || !file}
+                        disabled={uploading || !canSubmit}
                     >
                         {uploading ? (
                             <><Loader2 size={18} className={styles.spinner} /> Uploading...</>

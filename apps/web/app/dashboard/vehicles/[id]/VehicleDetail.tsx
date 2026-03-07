@@ -501,7 +501,7 @@ export default function VehicleDetail({ vehicle }: { vehicle: VehicleData }) {
                     <DocumentUpload
                         key={refreshKey}
                         vehicleId={vehicle.id}
-                        onUploadComplete={() => setRefreshKey(k => k + 1)}
+                        onUploadComplete={() => { setRefreshKey(k => k + 1); router.refresh(); }}
                     />
                 </div>
                 {vehicle.documents.length > 0 ? (

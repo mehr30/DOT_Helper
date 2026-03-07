@@ -331,6 +331,14 @@
     background: var(--bg-tertiary);
 }
 
+.checklistItemClickable {
+    cursor: pointer;
+}
+
+.checklistItemClickable:hover {
+    background: var(--color-primary-50);
+}
+
 .itemIcon {
     width: 28px;
     height: 28px;

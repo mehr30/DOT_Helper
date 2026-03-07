@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     Shield,
@@ -210,6 +211,7 @@ function friendlyLabel(label: string): string {
 export default function ComplianceContent({ scores }: { scores: ComplianceScores | null }) {
     const { isDemoMode } = useDemoMode();
     const data = isDemoMode ? mockScores : scores;
+    const router = useRouter();
 
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Driver Qualification", "Vehicle Maintenance"]));
 
@@ -367,8 +369,14 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                                         {category.items.map((item, idx) => {
                                             const cssStatus = statusToCss(item.status);
                                             const action = getActionForItem(item);
+                                            const isClickable = !!action;
                                             return (
-                                                <div key={idx} className={styles.checklistItem}>
+                                                <div
+                                                    key={idx}
+                                                    className={`${styles.checklistItem} ${isClickable ? styles.checklistItemClickable : ""}`}
+                                                    onClick={isClickable ? () => router.push(action.href) : undefined}
+                                                    role={isClickable ? "link" : undefined}
+                                                >
                                                     <div className={`${styles.itemIcon} ${styles[cssStatus]}`}>
                                                         {getStatusIcon(item.status)}
                                                     </div>
@@ -395,6 +403,7 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                                                         {action && (
                                                             <Link
                                                                 href={action.href}
+                                                                onClick={(e) => e.stopPropagation()}
                                                                 style={{
                                                                     display: "inline-flex", alignItems: "center", gap: "0.25rem",
                                                                     padding: "0.3rem 0.6rem", borderRadius: "6px",

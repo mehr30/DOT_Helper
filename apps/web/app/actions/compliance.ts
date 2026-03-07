@@ -76,7 +76,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                     { vehicle: { companyId } },
                 ],
             },
-            select: { documentType: true, driverId: true, vehicleId: true, companyId: true },
+            select: { documentType: true, driverId: true, vehicleId: true, companyId: true, expirationDate: true },
         }),
         prisma.company.findUnique({
             where: { id: companyId },
@@ -91,9 +91,12 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     const companyCreatedAt = companyRecord?.createdAt ?? now;
 
     // Helper: check if a document type exists for a specific entity
+    // Documents with a past expiration date are not counted as valid
     const hasDoc = (type: string, opts?: { driverId?: string; vehicleId?: string }) => {
         return documents.some((d) => {
             if (d.documentType !== type) return false;
+            // If the document has an expiration date and it's in the past, skip it
+            if (d.expirationDate && d.expirationDate < now) return false;
             if (opts?.driverId) return d.driverId === opts.driverId;
             if (opts?.vehicleId) return d.vehicleId === opts.vehicleId;
             return d.companyId === companyId;

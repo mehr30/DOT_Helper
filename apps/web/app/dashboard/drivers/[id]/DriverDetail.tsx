@@ -527,7 +527,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                     <DocumentUpload
                         key={refreshKey}
                         driverId={driver.id}
-                        onUploadComplete={() => setRefreshKey(k => k + 1)}
+                        onUploadComplete={() => { setRefreshKey(k => k + 1); router.refresh(); }}
                     />
                 </div>
                 {driver.documents.length > 0 ? (

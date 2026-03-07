@@ -30,7 +30,7 @@ import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocumen
 import { useDemoMode } from "../../components/DemoModeContext";
 import DocumentUpload from "../../components/DocumentUpload";
 import SignDocumentModal from "../../components/SignDocumentModal";
-import { getDocuments, deleteDocumentRecord, type DocumentData } from "../../actions/documents";
+import { getDocuments, deleteDocumentRecord, getDriversForWizard, getVehiclesForWizard, type DocumentData } from "../../actions/documents";
 import { downloadCompliancePacket, downloadFormPdf, type SavedFormData } from "../../../lib/pdf";
 
 function getStatusBadge(status: string) {
@@ -96,12 +96,20 @@ function DocumentsPageInner() {
     const [isPending, startTransition] = useTransition();
     const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
     const [showFormPicker, setShowFormPicker] = useState(false);
+    const [driversList, setDriversList] = useState<{ id: string; name: string }[]>([]);
+    const [vehiclesList, setVehiclesList] = useState<{ id: string; label: string }[]>([]);
 
     const loadRealDocs = useCallback(async () => {
         setLoadingDocs(true);
         try {
-            const docs = await getDocuments();
+            const [docs, drivers, vehicles] = await Promise.all([
+                getDocuments(),
+                getDriversForWizard(),
+                getVehiclesForWizard(),
+            ]);
             setRealDocs(docs);
+            setDriversList(drivers.map(d => ({ id: d.id, name: d.name })));
+            setVehiclesList(vehicles.map(v => ({ id: v.id, label: v.label })));
         } catch {
             // silently fail — user might not be authenticated
         }
@@ -278,6 +286,14 @@ function DocumentsPageInner() {
                         defaultDocType={uploadDocType}
                         autoOpen={!!uploadDocType}
                         onUploadComplete={() => loadRealDocs()}
+                        drivers={driversList}
+                        vehicles={vehiclesList}
+                        existingDocuments={realDocs.map(d => ({
+                            documentType: d.documentType,
+                            driverId: d.driverId,
+                            vehicleId: d.vehicleId,
+                            companyId: d.companyId,
+                        }))}
                     />
                 </div>
             )}
