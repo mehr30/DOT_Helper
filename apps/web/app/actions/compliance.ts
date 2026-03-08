@@ -49,6 +49,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 id: true,
                 firstName: true,
                 lastName: true,
+                licenseType: true,
                 cdlExpiration: true,
                 medicalCardExpiration: true,
                 clearinghouseQueryDate: true,
@@ -108,6 +109,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
 
     for (const d of drivers) {
         const name = `${d.firstName} ${d.lastName}`;
+        const isCDL = d.licenseType === "CDL";
 
         // CDL / License validity — check driver record date OR uploaded document
         const hasCDLDoc = hasDoc("CDL", { driverId: d.id });
@@ -130,25 +132,27 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             });
         }
 
-        // Medical certificate — check driver record date OR uploaded document
-        const hasMedDoc = hasDoc("MEDICAL_CERTIFICATE", { driverId: d.id });
-        if (d.medicalCardExpiration) {
-            const medDays = daysUntil(d.medicalCardExpiration);
-            dqItems.push({
-                label: `Medical Certificate — ${name}`,
-                regulation: "49 CFR 391.43",
-                status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
-                detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
-                driverId: d.id,
-            });
-        } else {
-            dqItems.push({
-                label: `Medical Certificate — ${name}`,
-                regulation: "49 CFR 391.43",
-                status: hasMedDoc ? "compliant" : "action_needed",
-                detail: hasMedDoc ? "On file" : "Missing — set expiration on driver profile or upload DOT physical card",
-                driverId: d.id,
-            });
+        // Medical certificate — CDL drivers only (49 CFR 391.43)
+        if (isCDL) {
+            const hasMedDoc = hasDoc("MEDICAL_CERTIFICATE", { driverId: d.id });
+            if (d.medicalCardExpiration) {
+                const medDays = daysUntil(d.medicalCardExpiration);
+                dqItems.push({
+                    label: `Medical Certificate — ${name}`,
+                    regulation: "49 CFR 391.43",
+                    status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
+                    detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
+                    driverId: d.id,
+                });
+            } else {
+                dqItems.push({
+                    label: `Medical Certificate — ${name}`,
+                    regulation: "49 CFR 391.43",
+                    status: hasMedDoc ? "compliant" : "action_needed",
+                    detail: hasMedDoc ? "On file" : "Missing — set expiration on driver profile or upload DOT physical card",
+                    driverId: d.id,
+                });
+            }
         }
 
         // MVR on file
@@ -161,24 +165,26 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             driverId: d.id,
         });
 
-        // Clearinghouse query
-        if (!d.clearinghouseQueryDate) {
-            dqItems.push({
-                label: `Clearinghouse Query — ${name}`,
-                regulation: "49 CFR 382.701",
-                status: "action_needed",
-                detail: "No query on file",
-                driverId: d.id,
-            });
-        } else {
-            const daysSince = Math.ceil((now.getTime() - d.clearinghouseQueryDate.getTime()) / (1000 * 60 * 60 * 24));
-            dqItems.push({
-                label: `Clearinghouse Query — ${name}`,
-                regulation: "49 CFR 382.701",
-                status: daysSince >= 365 ? "expired" : daysSince >= 335 ? "action_needed" : "compliant",
-                detail: daysSince >= 365 ? `Overdue by ${daysSince - 365} days` : `${365 - daysSince} days until next required`,
-                driverId: d.id,
-            });
+        // Clearinghouse query — CDL drivers only (49 CFR 382.701)
+        if (isCDL) {
+            if (!d.clearinghouseQueryDate) {
+                dqItems.push({
+                    label: `Clearinghouse Query — ${name}`,
+                    regulation: "49 CFR 382.701",
+                    status: "action_needed",
+                    detail: "No query on file",
+                    driverId: d.id,
+                });
+            } else {
+                const daysSince = Math.ceil((now.getTime() - d.clearinghouseQueryDate.getTime()) / (1000 * 60 * 60 * 24));
+                dqItems.push({
+                    label: `Clearinghouse Query — ${name}`,
+                    regulation: "49 CFR 382.701",
+                    status: daysSince >= 365 ? "expired" : daysSince >= 335 ? "action_needed" : "compliant",
+                    detail: daysSince >= 365 ? `Overdue by ${daysSince - 365} days` : `${365 - daysSince} days until next required`,
+                    driverId: d.id,
+                });
+            }
         }
 
         // Employment application on file
@@ -259,10 +265,11 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         });
     }
 
-    // ── Drug & Alcohol ──
+    // ── Drug & Alcohol (CDL drivers only — 49 CFR 382) ──
     const daItems: ComplianceItem[] = [];
+    const cdlDrivers = drivers.filter(d => d.licenseType === "CDL");
 
-    for (const d of drivers) {
+    for (const d of cdlDrivers) {
         const name = `${d.firstName} ${d.lastName}`;
 
         // Pre-employment test — distinguish new hires from existing employees
@@ -305,12 +312,12 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         });
     }
 
-    if (drivers.length === 0) {
+    if (cdlDrivers.length === 0) {
         daItems.push({
-            label: "No active drivers",
+            label: "No CDL drivers",
             regulation: "49 CFR 382",
             status: "not_applicable",
-            detail: "Add drivers to track D&A compliance",
+            detail: "Drug & alcohol testing only applies to CDL drivers",
         });
     }
 
