@@ -74,6 +74,32 @@ function getDaysUntil(dateStr: string) {
     return Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+const DOC_TYPE_LABELS: Record<string, string> = {
+    CDL: "CDL / License Copy",
+    MEDICAL_CERTIFICATE: "DOT Physical Card",
+    MVR: "Driving Record (MVR)",
+    EMPLOYMENT_APPLICATION: "Employment Application",
+    DRUG_TEST_RESULT: "Drug Test Result",
+    ROAD_TEST_CERTIFICATE: "Road Test Certificate",
+    TRAINING_CERTIFICATE: "Training Certificate",
+    CLEARINGHOUSE_CONSENT: "Clearinghouse Consent",
+    REGISTRATION: "Registration",
+    INSURANCE: "Insurance Card",
+    ANNUAL_INSPECTION: "Annual Inspection Report",
+    LEASE_AGREEMENT: "Lease Agreement",
+    TITLE: "Title",
+    OPERATING_AUTHORITY: "Operating Authority",
+    BOC3: "BOC-3 Filing",
+    UCR: "UCR Registration",
+    IFTA_LICENSE: "IFTA License",
+    INSURANCE_POLICY: "Insurance Policy",
+    OTHER: "Other",
+};
+
+function friendlyDocType(type: string): string {
+    return DOC_TYPE_LABELS[type] ?? type.replace(/_/g, " ");
+}
+
 interface ActionItem {
     severity: "red" | "yellow" | "blue";
     label: string;
@@ -554,7 +580,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                         <div style={{ minWidth: 0 }}>
                                             <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{doc.name}</div>
                                             <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
-                                                {doc.documentType.replace(/_/g, " ")}
+                                                {friendlyDocType(doc.documentType)}
                                                 {doc.expirationDate && (
                                                     <span style={{
                                                         marginLeft: "0.5rem",
@@ -577,17 +603,6 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                                 <CheckCircle size={10} /> Signed
                                             </span>
                                         )}
-                                        <button
-                                            onClick={() => setSigningDoc({ id: doc.id, name: doc.name, url: doc.fileUrl })}
-                                            title="Sign document"
-                                            style={{
-                                                display: "flex", alignItems: "center", padding: "0.35rem",
-                                                border: "1px solid #e2e8f0", borderRadius: "6px",
-                                                background: "white", cursor: "pointer", color: "#64748b",
-                                            }}
-                                        >
-                                            <PenTool size={14} />
-                                        </button>
                                         {doc.fileUrl ? (
                                             <a
                                                 href={doc.fileUrl}

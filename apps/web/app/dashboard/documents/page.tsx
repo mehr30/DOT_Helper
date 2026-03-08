@@ -33,6 +33,32 @@ import SignDocumentModal from "../../components/SignDocumentModal";
 import { getDocuments, deleteDocumentRecord, getDriversForWizard, getVehiclesForWizard, type DocumentData } from "../../actions/documents";
 import { downloadCompliancePacket, downloadFormPdf, type SavedFormData } from "../../../lib/pdf";
 
+const DOC_TYPE_LABELS: Record<string, string> = {
+    CDL: "CDL / License Copy",
+    MEDICAL_CERTIFICATE: "DOT Physical Card",
+    MVR: "Driving Record (MVR)",
+    EMPLOYMENT_APPLICATION: "Employment Application",
+    DRUG_TEST_RESULT: "Drug Test Result",
+    ROAD_TEST_CERTIFICATE: "Road Test Certificate",
+    TRAINING_CERTIFICATE: "Training Certificate",
+    CLEARINGHOUSE_CONSENT: "Clearinghouse Consent",
+    REGISTRATION: "Registration",
+    INSURANCE: "Insurance Card",
+    ANNUAL_INSPECTION: "Annual Inspection Report",
+    LEASE_AGREEMENT: "Lease Agreement",
+    TITLE: "Title",
+    OPERATING_AUTHORITY: "Operating Authority",
+    BOC3: "BOC-3 Filing",
+    UCR: "UCR Registration",
+    IFTA_LICENSE: "IFTA License",
+    INSURANCE_POLICY: "Insurance Policy",
+    OTHER: "Other",
+};
+
+function friendlyDocType(type: string): string {
+    return DOC_TYPE_LABELS[type] ?? type.replace(/_/g, " ");
+}
+
 function getStatusBadge(status: string) {
     switch (status) {
         case "expiring":
@@ -523,7 +549,7 @@ function DocumentsPageInner() {
                                                 </td>
                                                 <td>
                                                     <span className={styles.docType}>
-                                                        {doc.documentType.replace(/_/g, " ")}
+                                                        {friendlyDocType(doc.documentType)}
                                                     </span>
                                                 </td>
                                                 <td>
