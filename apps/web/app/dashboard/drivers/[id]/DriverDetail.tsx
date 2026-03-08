@@ -33,6 +33,7 @@ interface DriverData {
     email: string | null;
     phone: string | null;
     licenseType: string;
+    operatesCMV: boolean;
     cdlNumber: string | null;
     cdlState: string | null;
     cdlClass: string | null;
@@ -110,6 +111,7 @@ interface ActionItem {
 function getDriverActionItems(driver: DriverData): ActionItem[] {
     const items: ActionItem[] = [];
     const isCDL = driver.licenseType === "CDL";
+    const needsDOTPhysical = isCDL || driver.operatesCMV;
     const docTypes = new Set(driver.documents.map(d => d.documentType));
 
     // License issues
@@ -126,33 +128,33 @@ function getDriverActionItems(driver: DriverData): ActionItem[] {
         }
     }
 
-    // DOT physical / medical card
-    if (!driver.medicalCardExpiration) {
-        if (isCDL) {
-            items.push({ severity: "red", label: "No DOT physical on file — required for CDL drivers", action: "Add DOT physical date", href: "#edit" });
-        }
-    } else {
-        const days = getDaysUntil(driver.medicalCardExpiration);
-        if (days < 0) {
-            items.push({ severity: "red", label: `DOT physical expired ${Math.abs(days)} days ago — driver cannot legally drive`, action: "Update date", href: "#edit" });
-        } else if (days <= 30) {
-            items.push({ severity: "red", label: `DOT physical expires in ${days} days — schedule exam now`, action: "Update date", href: "#edit" });
-        } else if (days <= 60) {
-            items.push({ severity: "yellow", label: `DOT physical expires in ${days} days`, action: "Update date", href: "#edit" });
+    // DOT physical / medical card — required for CDL and CMV operators
+    if (needsDOTPhysical) {
+        if (!driver.medicalCardExpiration) {
+            items.push({ severity: "red", label: `No DOT physical on file — required for ${isCDL ? "CDL drivers" : "drivers operating vehicles over 10,001 lbs"}`, action: "Add DOT physical date", href: "#edit" });
+        } else {
+            const days = getDaysUntil(driver.medicalCardExpiration);
+            if (days < 0) {
+                items.push({ severity: "red", label: `DOT physical expired ${Math.abs(days)} days ago — driver cannot legally drive`, action: "Update date", href: "#edit" });
+            } else if (days <= 30) {
+                items.push({ severity: "red", label: `DOT physical expires in ${days} days — schedule exam now`, action: "Update date", href: "#edit" });
+            } else if (days <= 60) {
+                items.push({ severity: "yellow", label: `DOT physical expires in ${days} days`, action: "Update date", href: "#edit" });
+            }
         }
     }
 
-    // Missing documents
+    // Missing documents — tiered by CDL vs CMV vs regular
     if (!docTypes.has("CDL") && isCDL) {
         items.push({ severity: "yellow", label: "Missing: Copy of driver's license", action: "Upload", href: "#documents" });
     }
-    if (!docTypes.has("MEDICAL_CERTIFICATE") && isCDL) {
+    if (!docTypes.has("MEDICAL_CERTIFICATE") && needsDOTPhysical) {
         items.push({ severity: "yellow", label: "Missing: DOT physical card", action: "Upload", href: "#documents" });
     }
-    if (!docTypes.has("EMPLOYMENT_APPLICATION")) {
+    if (!docTypes.has("EMPLOYMENT_APPLICATION") && needsDOTPhysical) {
         items.push({ severity: "blue", label: "Missing: Employment application", action: "Fill out", href: `/dashboard/documents/wizard?form=driverApp&driver=${driver.id}` });
     }
-    if (!docTypes.has("MVR")) {
+    if (!docTypes.has("MVR") && needsDOTPhysical) {
         items.push({ severity: "blue", label: "Missing: Driving record (MVR) / Annual review", action: "Fill out", href: `/dashboard/documents/wizard?form=annualMVRReview&driver=${driver.id}` });
     }
     if (!docTypes.has("DRUG_TEST_RESULT") && isCDL) {
@@ -175,6 +177,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
     const effectiveMedExpiration = driver.medicalCardExpiration ?? medCertDoc?.expirationDate ?? null;
     const medDays = effectiveMedExpiration ? getDaysUntil(effectiveMedExpiration) : null;
     const isCDL = driver.licenseType === "CDL";
+    const needsDOTPhysical = isCDL || driver.operatesCMV;
     const actionItems = getDriverActionItems(driver);
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -188,6 +191,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
         lastName: driver.lastName,
         email: driver.email || "",
         phone: driver.phone || "",
+        operatesCMV: driver.operatesCMV,
         cdlNumber: driver.cdlNumber || "",
         cdlState: driver.cdlState || "",
         cdlClass: driver.cdlClass || "",
@@ -378,12 +382,14 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             { key: "phone", label: "Phone", type: "tel" },
                             { key: "cdlNumber", label: "License Number", type: "text" },
                             { key: "cdlState", label: "Issuing State", type: "text" },
-                            { key: "cdlClass", label: "CDL Class", type: "text" },
+                            ...(isCDL ? [{ key: "cdlClass", label: "CDL Class", type: "text" }] : []),
                             { key: "cdlExpiration", label: "License Expiration", type: "date" },
                             { key: "medicalCardExpiration", label: "DOT Physical Expiration", type: "date" },
                             { key: "hireDate", label: "Hire Date", type: "date" },
-                            { key: "clearinghouseQueryDate", label: "Last Clearinghouse Query", type: "date" },
-                            { key: "lastDrugTestDate", label: "Last Drug Test", type: "date" },
+                            ...(isCDL ? [
+                                { key: "clearinghouseQueryDate", label: "Last Clearinghouse Query", type: "date" },
+                                { key: "lastDrugTestDate", label: "Last Drug Test", type: "date" },
+                            ] : []),
                         ].map(({ key, label, type }) => (
                             <div key={key}>
                                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 500, color: "#475569", marginBottom: "0.25rem" }}>
@@ -391,7 +397,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                 </label>
                                 <input
                                     type={type}
-                                    value={editData[key as keyof typeof editData]}
+                                    value={editData[key as keyof typeof editData] as string}
                                     onChange={(e) => setEditData(prev => ({ ...prev, [key]: type === "tel" ? formatPhone(e.target.value) : e.target.value }))}
                                     style={{
                                         width: "100%", padding: "0.5rem 0.75rem",
@@ -402,6 +408,31 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             </div>
                         ))}
                     </div>
+                    {/* CMV toggle — only shown for Non-CDL drivers */}
+                    {!isCDL && (
+                        <div style={{
+                            marginTop: "1rem", padding: "0.75rem 1rem",
+                            background: "#f8fafc", borderRadius: "8px",
+                            border: "1px solid #e2e8f0",
+                        }}>
+                            <label style={{
+                                display: "flex", alignItems: "center", gap: "0.5rem",
+                                cursor: "pointer", fontSize: "0.85rem", fontWeight: 500,
+                                color: "#334155",
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={editData.operatesCMV}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, operatesCMV: e.target.checked }))}
+                                    style={{ width: 16, height: 16, accentColor: "#16a34a" }}
+                                />
+                                This driver operates vehicles over 10,001 lbs
+                            </label>
+                            <p style={{ margin: "0.35rem 0 0 1.6rem", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 1.4 }}>
+                                Drivers of vehicles over 10,001 lbs need a DOT physical, driving record, and employment application — but don&apos;t need drug testing or a CDL.
+                            </p>
+                        </div>
+                    )}
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "1.25rem" }}>
                         <button onClick={handleSaveEdit} disabled={saving} style={{
                             display: "flex", alignItems: "center", gap: "0.35rem",
@@ -438,7 +469,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             <span style={{
                                 fontSize: "0.7rem", fontWeight: 600, padding: "0.1rem 0.4rem",
                                 borderRadius: "4px", background: "#f1f5f9", color: "#64748b",
-                            }}>Non-CDL</span>
+                            }}>{driver.operatesCMV ? "Non-CDL · CMV" : "Non-CDL"}</span>
                         )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -523,13 +554,15 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                         </>
                     ) : (
                         <div>
-                            <span style={{ color: "#f59e0b", fontSize: "0.85rem", fontWeight: 500 }}>
-                                {isCDL ? "Not on file" : "Not on file"}
+                            <span style={{ color: needsDOTPhysical ? "#f59e0b" : "#94a3b8", fontSize: "0.85rem", fontWeight: 500 }}>
+                                Not on file
                             </span>
                             <p style={{ color: "#94a3b8", fontSize: "0.75rem", margin: "0.4rem 0 0", lineHeight: 1.4 }}>
                                 {isCDL
                                     ? "CDL drivers need a DOT physical exam before they can drive. The doctor gives them a \"medical card\" — click Edit above to add the expiration date once they have it."
-                                    : "A DOT physical may be required if this driver operates vehicles over 10,001 lbs. Click Edit to add it if needed."}
+                                    : driver.operatesCMV
+                                    ? "Required for drivers operating vehicles over 10,001 lbs. Click Edit to add the expiration date."
+                                    : "Not required for this driver's vehicle weight class."}
                             </p>
                         </div>
                     )}

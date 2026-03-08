@@ -15,6 +15,7 @@ export default function NewDriverPage() {
     const router = useRouter();
     const [serverError, setServerError] = useState("");
     const [licenseType, setLicenseType] = useState<"CDL" | "NON_CDL">("CDL");
+    const [operatesCMV, setOperatesCMV] = useState(false);
     const { profile } = useCompanyProfile();
     const companyState = profile.addresses[0]?.state || "";
     const today = new Date().toISOString().split("T")[0];
@@ -40,6 +41,12 @@ export default function NewDriverPage() {
         if (type === "NON_CDL") {
             setValue("cdlClass", undefined);
             setValue("endorsements", []);
+        }
+        if (type === "CDL") {
+            setOperatesCMV(false);
+            setValue("operatesCMV", true); // CDL drivers always operate CMVs
+        } else {
+            setValue("operatesCMV", false);
         }
     };
 
@@ -220,6 +227,33 @@ export default function NewDriverPage() {
                 {/* Non-CDL fields */}
                 {licenseType === "NON_CDL" && (
                     <>
+                        {/* CMV toggle */}
+                        <div style={{
+                            marginBottom: "1.25rem", padding: "0.85rem 1rem",
+                            background: "#f8fafc", borderRadius: "10px",
+                            border: "1px solid #e2e8f0",
+                        }}>
+                            <label style={{
+                                display: "flex", alignItems: "center", gap: "0.5rem",
+                                cursor: "pointer", fontSize: "0.9rem", fontWeight: 500,
+                                color: "#334155",
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={operatesCMV}
+                                    onChange={(e) => {
+                                        setOperatesCMV(e.target.checked);
+                                        setValue("operatesCMV", e.target.checked);
+                                    }}
+                                    style={{ width: 16, height: 16, accentColor: "#16a34a" }}
+                                />
+                                This driver will operate vehicles over 10,001 lbs
+                            </label>
+                            <p style={{ margin: "0.35rem 0 0 1.6rem", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 1.4 }}>
+                                Vehicles over 10,001 lbs GVWR require a DOT physical, driving record, and employment application — but don&apos;t need drug testing or a CDL.
+                            </p>
+                        </div>
+
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
                             <div>
                                 <label style={labelStyle}>License Number</label>
@@ -250,21 +284,23 @@ export default function NewDriverPage() {
                                 <label style={labelStyle}>License Expiration</label>
                                 <input {...register("cdlExpiration")} type="date" style={inputStyle} />
                             </div>
-                            <div>
-                                <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                                    DOT Physical Expiration
-                                    <span
-                                        title="A DOT physical may be required even without a CDL if the driver operates a vehicle over 10,001 lbs in interstate commerce."
-                                        style={{ cursor: "help", color: "#94a3b8" }}
-                                    >
-                                        <HelpCircle size={14} />
+                            {operatesCMV && (
+                                <div>
+                                    <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                        DOT Physical Expiration
+                                        <span
+                                            title="Required for drivers operating vehicles over 10,001 lbs GVWR."
+                                            style={{ cursor: "help", color: "#94a3b8" }}
+                                        >
+                                            <HelpCircle size={14} />
+                                        </span>
+                                    </label>
+                                    <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
+                                    <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
+                                        Leave blank if they haven&apos;t gotten one yet — we&apos;ll remind you.
                                     </span>
-                                </label>
-                                <input {...register("medicalCardExpiration")} type="date" style={inputStyle} />
-                                <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem", display: "block" }}>
-                                    May be required for vehicles over 10,001 lbs. Leave blank if not applicable.
-                                </span>
-                            </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}

@@ -60,6 +60,7 @@ export default async function DriverPage({
         email: driver.email,
         phone: driver.phone,
         licenseType: driver.licenseType,
+        operatesCMV: driver.operatesCMV,
         cdlNumber: driver.cdlNumber,
         cdlState: driver.cdlState,
         cdlClass: driver.cdlClass,

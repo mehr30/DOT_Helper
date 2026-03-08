@@ -193,7 +193,11 @@ model Driver {
   endorsements          String[]     // ["H", "N", "T", "P", "S", "X"]
   restrictions          String[]
 
-  // Medical Certification (required for CDL, optional for non-CDL)
+  // Commercial Motor Vehicle operation (10,001+ lbs GVWR)
+  // CDL drivers are always CMV; non-CDL drivers may still operate CMVs 10,001-26,000 lbs
+  operatesCMV           Boolean      @default(false)
+
+  // Medical Certification (required for CDL and CMV operators)
   medicalCardExpiration DateTime?
   medicalExaminerName   String?
   medicalExaminerNPI    String?

@@ -50,6 +50,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 firstName: true,
                 lastName: true,
                 licenseType: true,
+                operatesCMV: true,
                 cdlExpiration: true,
                 medicalCardExpiration: true,
                 clearinghouseQueryDate: true,
@@ -110,6 +111,8 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     for (const d of drivers) {
         const name = `${d.firstName} ${d.lastName}`;
         const isCDL = d.licenseType === "CDL";
+        // 3-tier: CDL (26,001+ lbs) → everything | CMV (10,001-26,000 lbs) → DOT physical, MVR, app | Regular → license only
+        const needsDOTPhysical = isCDL || d.operatesCMV;
 
         // CDL / License validity — check driver record date OR uploaded document
         const hasCDLDoc = hasDoc("CDL", { driverId: d.id });
@@ -132,13 +135,13 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             });
         }
 
-        // Medical certificate — CDL drivers only (49 CFR 391.43)
-        if (isCDL) {
+        // Medical certificate — required for CDL and CMV operators (49 CFR 391.43)
+        if (needsDOTPhysical) {
             const hasMedDoc = hasDoc("MEDICAL_CERTIFICATE", { driverId: d.id });
             if (d.medicalCardExpiration) {
                 const medDays = daysUntil(d.medicalCardExpiration);
                 dqItems.push({
-                    label: `Medical Certificate — ${name}`,
+                    label: `DOT Physical — ${name}`,
                     regulation: "49 CFR 391.43",
                     status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
                     detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
@@ -146,7 +149,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 });
             } else {
                 dqItems.push({
-                    label: `Medical Certificate — ${name}`,
+                    label: `DOT Physical — ${name}`,
                     regulation: "49 CFR 391.43",
                     status: hasMedDoc ? "compliant" : "action_needed",
                     detail: hasMedDoc ? "On file" : "Missing — set expiration on driver profile or upload DOT physical card",
@@ -155,15 +158,17 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             }
         }
 
-        // MVR on file
-        const hasMVR = hasDoc("MVR", { driverId: d.id });
-        dqItems.push({
-            label: `MVR on File — ${name}`,
-            regulation: "49 CFR 391.25",
-            status: hasMVR ? "compliant" : "action_needed",
-            detail: hasMVR ? "On file" : "Missing — annual MVR required",
-            driverId: d.id,
-        });
+        // MVR on file — required for CDL and CMV operators
+        if (needsDOTPhysical) {
+            const hasMVR = hasDoc("MVR", { driverId: d.id });
+            dqItems.push({
+                label: `MVR on File — ${name}`,
+                regulation: "49 CFR 391.25",
+                status: hasMVR ? "compliant" : "action_needed",
+                detail: hasMVR ? "On file" : "Missing — annual MVR required",
+                driverId: d.id,
+            });
+        }
 
         // Clearinghouse query — CDL drivers only (49 CFR 382.701)
         if (isCDL) {
@@ -187,15 +192,17 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             }
         }
 
-        // Employment application on file
-        const hasApp = hasDoc("EMPLOYMENT_APPLICATION", { driverId: d.id });
-        dqItems.push({
-            label: `Employment Application — ${name}`,
-            regulation: "49 CFR 391.21",
-            status: hasApp ? "compliant" : "action_needed",
-            detail: hasApp ? "On file" : "Missing",
-            driverId: d.id,
-        });
+        // Employment application on file — required for CDL and CMV operators
+        if (needsDOTPhysical) {
+            const hasApp = hasDoc("EMPLOYMENT_APPLICATION", { driverId: d.id });
+            dqItems.push({
+                label: `Employment Application — ${name}`,
+                regulation: "49 CFR 391.21",
+                status: hasApp ? "compliant" : "action_needed",
+                detail: hasApp ? "On file" : "Missing",
+                driverId: d.id,
+            });
+        }
     }
 
     if (drivers.length === 0) {
