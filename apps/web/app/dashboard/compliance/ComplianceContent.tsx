@@ -172,7 +172,7 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     if (lower.includes("preventive maintenance")) {
         return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
-    if (lower.includes("registration")) {
+    if (lower.includes("registration") && !lower.includes("federal registration")) {
         return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
 
