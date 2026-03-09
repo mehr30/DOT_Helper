@@ -323,3 +323,146 @@
 .spinner {
     animation: spin 1s linear infinite;
 }
+
+/* Path Selection (Step 0) */
+.pathGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pathCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.pathCard:hover {
+    border-color: #ABEBC6;
+    background: #EAFAF1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(15, 46, 26, 0.08);
+}
+
+.pathCardIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #EAFAF1 0%, #dcfce7 100%);
+    color: #1B5E35;
+}
+
+.pathCardTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0F2E1A;
+}
+
+.pathCardDesc {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* FMCSA Lookup */
+.lookupRow {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.lookupRow .input {
+    flex: 1;
+}
+
+.lookupButton {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    border: none;
+    background: #2ECC71;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: fit-content;
+}
+
+.lookupButton:hover {
+    background: #27ae60;
+}
+
+.lookupButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lookupResult {
+    padding: 0.75rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #166534;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lookupWarning {
+    padding: 0.75rem 1rem;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #92400e;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+}
+
+.lookupError {
+    padding: 0.75rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #dc2626;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+}
+
+/* Operation type descriptions */
+.opDescription {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.4;
+    max-width: 100%;
+}
+
+/* Pre-filled badge */
+.prefilledBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: #16a34a;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}

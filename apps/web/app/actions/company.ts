@@ -37,6 +37,8 @@ export async function createCompany(formData: unknown) {
                 name: data.name,
                 usdotNumber: usdot,
                 fleetSizeRange: data.fleetSizeRange,
+                operationType: data.operationType || null,
+                operationScope: data.operationScope || null,
                 mcNumber: data.mcNumber || null,
                 address: data.address || null,
                 city: data.city || null,
@@ -117,6 +119,8 @@ export async function updateCompany(formData: unknown) {
             zip: data.zip || null,
             phone: data.phone || null,
             email: data.email || null,
+            operationType: data.operationType || null,
+            operationScope: data.operationScope || null,
         },
     });
 
@@ -154,6 +158,8 @@ export async function getCompanyForUser() {
             phone: true,
             email: true,
             fleetSizeRange: true,
+            operationType: true,
+            operationScope: true,
         },
     });
 }

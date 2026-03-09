@@ -17,7 +17,6 @@ import {
 import Link from "next/link";
 import { useState, useRef, useEffect, useMemo } from "react";
 import styles from "./page.module.css";
-import { useDemoMode } from "../components/DemoModeContext";
 import OnboardingChecklist from "../components/OnboardingChecklist";
 import { humanize } from "../../lib/plain-english";
 import type { DashboardStats } from "../actions/dashboard";
@@ -200,35 +199,6 @@ export interface UpcomingItem {
     href: string;
 }
 
-// ---------------------------------------------------------------------------
-// Mock data for demo mode
-// ---------------------------------------------------------------------------
-
-const mockComplianceScores: ComplianceScores = {
-    overall: 87,
-    categories: [
-        { name: "Driver Qualification", score: 92, items: [] },
-        { name: "Vehicle Maintenance", score: 85, items: [] },
-        { name: "Drug & Alcohol", score: 100, items: [] },
-        { name: "Company & Authority", score: 72, items: [] },
-    ],
-    summary: { totalItems: 24, compliant: 20, actionNeeded: 3, expired: 1 },
-};
-
-const mockAttentionItems: AttentionItem[] = [
-    { id: "m1", title: "License Expiration", detail: "John Smith — expired Feb 15", daysLeft: -20, severity: "expired", type: "driver" },
-    { id: "m2", title: "Annual Inspection Overdue", detail: "Unit 103 — expired Feb 22", daysLeft: -13, severity: "expired", type: "vehicle" },
-    { id: "m3", title: "Medical Card Expiring", detail: "Mike Johnson — Apr 1, 2026", daysLeft: 25, severity: "warning", type: "driver" },
-    { id: "m4", title: "Drug Test Due", detail: "Sarah Wilson — random selection", daysLeft: 14, severity: "warning", type: "compliance" },
-    { id: "m5", title: "MCS-150 Update", detail: "Biennial update due Jun 15", daysLeft: 100, severity: "info", type: "compliance" },
-];
-
-const mockUpcomingItems: UpcomingItem[] = [
-    { id: "u1", title: "CDL Renewal — Mike Johnson", date: "2026-05-12", daysLeft: 65, href: "/dashboard/drivers" },
-    { id: "u2", title: "Annual Inspection — Unit 105", date: "2026-04-20", daysLeft: 43, href: "/dashboard/vehicles" },
-    { id: "u3", title: "DOT Physical — Sarah Wilson", date: "2026-05-28", daysLeft: 81, href: "/dashboard/drivers" },
-];
-
 const quickActions = [
     { label: "Add Driver", href: "/dashboard/drivers/new", icon: Plus },
     { label: "Add Vehicle", href: "/dashboard/vehicles/new", icon: Plus },
@@ -246,15 +216,6 @@ export interface SearchableEntity {
     type: "driver" | "vehicle";
     subtitle?: string;
 }
-
-const mockSearchEntities: SearchableEntity[] = [
-    { id: "d1", name: "John Smith", type: "driver", subtitle: "CDL: TX-123456" },
-    { id: "d2", name: "Mike Johnson", type: "driver", subtitle: "CDL: TX-789012" },
-    { id: "d3", name: "Sarah Wilson", type: "driver", subtitle: "CDL: TX-345678" },
-    { id: "v1", name: "Unit 103", type: "vehicle", subtitle: "2022 Freightliner" },
-    { id: "v2", name: "Unit 105", type: "vehicle", subtitle: "2021 Peterbilt" },
-    { id: "v3", name: "Unit 108", type: "vehicle", subtitle: "2023 Kenworth" },
-];
 
 // ---------------------------------------------------------------------------
 // Component
@@ -275,15 +236,14 @@ export default function DashboardContent({
     searchEntities?: SearchableEntity[];
     upcomingItems?: UpcomingItem[];
 }) {
-    const { isDemoMode } = useDemoMode();
-    const showChecklist = !isDemoMode && hasCompany;
+    const showChecklist = hasCompany;
 
     const name = userName || "there";
-    const scores = isDemoMode ? mockComplianceScores : complianceScores;
+    const scores = complianceScores;
     const overallScore = scores?.overall ?? 0;
 
     // ---- Build attention items ----
-    const attentionItems: AttentionItem[] = isDemoMode ? mockAttentionItems : (() => {
+    const attentionItems: AttentionItem[] = (() => {
         const map = new Map<string, AttentionItem>();
 
         // From upcoming expirations
@@ -345,18 +305,18 @@ export default function DashboardContent({
     const driverIssues = attentionItems.filter(i => i.type === "driver").length;
     const vehicleIssues = attentionItems.filter(i => i.type === "vehicle").length;
 
-    const driverCount = isDemoMode ? 12 : (stats?.driverCount ?? 0);
-    const vehicleCount = isDemoMode ? 8 : (stats?.vehicleCount ?? 0);
+    const driverCount = stats?.driverCount ?? 0;
+    const vehicleCount = stats?.vehicleCount ?? 0;
 
     // ---- Upcoming items ----
-    const upcomingItems = isDemoMode ? mockUpcomingItems : (upcomingItemsProp ?? []);
+    const upcomingItems = upcomingItemsProp ?? [];
 
     // ---- Search ----
     const [searchQuery, setSearchQuery] = useState("");
     const [searchFocused, setSearchFocused] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    const entities = isDemoMode ? mockSearchEntities : (searchEntities ?? []);
+    const entities = searchEntities ?? [];
 
     const searchResults = useMemo(() => {
         if (!searchQuery.trim()) return [];
@@ -450,18 +410,10 @@ export default function DashboardContent({
                 />
             )}
 
-            {/* Demo data banner */}
-            {isDemoMode && (
-                <div className={styles.demoBanner}>
-                    <Info size={16} />
-                    You&apos;re viewing sample data. Add your drivers and vehicles to see real compliance info.
-                </div>
-            )}
-
             {/* 4. Compact DOT Readiness Score Bar */}
             <Link href="/dashboard/compliance" className={styles.healthBarLink}>
-                <section className={`${styles.healthBar} ${isDemoMode ? "demoWrapper" : ""}`}>
-                    {overallScore === 0 && !isDemoMode ? (
+                <section className={styles.healthBar}>
+                    {overallScore === 0 ? (
                         <div className={styles.healthBarEmpty}>
                             <Shield size={28} style={{ opacity: 0.4 }} />
                             <p>Add your drivers and vehicles to see your DOT readiness score</p>
@@ -494,7 +446,7 @@ export default function DashboardContent({
             </Link>
 
             {/* 5. What Needs Attention — THE STAR */}
-            <section className={`${styles.attentionPanel} ${isDemoMode ? "demoWrapper" : ""}`}>
+            <section className={styles.attentionPanel}>
                 <div className={styles.panelHeader}>
                     <h3 className={styles.sectionTitle}>What Needs Attention</h3>
                     {totalAttention > 10 && (
@@ -567,7 +519,7 @@ export default function DashboardContent({
 
             {/* 6. Upcoming Deadlines */}
             {upcomingItems.length > 0 && (
-                <section className={`${styles.upcomingPanel} ${isDemoMode ? "demoWrapper" : ""}`}>
+                <section className={styles.upcomingPanel}>
                     <div className={styles.panelHeader}>
                         <h3 className={styles.sectionTitle}>Upcoming Deadlines</h3>
                     </div>
@@ -589,7 +541,7 @@ export default function DashboardContent({
             )}
 
             {/* 7. Fleet Snapshot — 2 cards */}
-            <section className={isDemoMode ? "demoWrapper" : ""}>
+            <section>
                 <div className={styles.statsGrid}>
                     <Link href="/dashboard/drivers" className={`${styles.statCard} ${styles.primary}`}>
                         <div className={styles.statIcon}><Users size={22} /></div>

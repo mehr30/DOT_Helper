@@ -82,13 +82,23 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         }),
         prisma.company.findUnique({
             where: { id: companyId },
-            select: { mcs150DueDate: true, ucrDueDate: true, ifta: true, hazmat: true },
+            select: { mcs150DueDate: true, ucrDueDate: true, ifta: true, hazmat: true, operationType: true, operationScope: true },
         }),
         prisma.company.findUnique({
             where: { id: companyId },
             select: { createdAt: true },
         }),
     ]);
+
+    // Conditional compliance: determine which items this carrier actually needs
+    const opType = company?.operationType ?? "FOR_HIRE"; // default to most items if unknown
+    const opScope = company?.operationScope ?? "INTERSTATE";
+    const isIntrastate = opScope === "INTRASTATE";
+    const isForHire = opType === "FOR_HIRE";
+    const needsBOC3 = isForHire && !isIntrastate;
+    const needsOperatingAuthority = isForHire && !isIntrastate;
+    const needsUCR = !isIntrastate;
+    const needsIFTA = !isIntrastate || company?.ifta;
 
     const companyCreatedAt = companyRecord?.createdAt ?? now;
 
@@ -331,44 +341,50 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     // ── Company & Authority ──
     const caItems: ComplianceItem[] = [];
 
-    // Operating authority doc
-    const hasOA = hasDoc("OPERATING_AUTHORITY");
-    caItems.push({
-        label: "Operating Authority on File",
-        regulation: "49 CFR 365",
-        status: hasOA ? "compliant" : "action_needed",
-        detail: hasOA ? "On file" : "Upload your operating authority document",
-    });
-
-    // BOC-3
-    const hasBOC3 = hasDoc("BOC3");
-    caItems.push({
-        label: "BOC-3 Process Agent",
-        regulation: "49 CFR 366",
-        status: hasBOC3 ? "compliant" : "action_needed",
-        detail: hasBOC3 ? "On file" : "Upload BOC-3 filing",
-    });
-
-    // UCR
-    const hasUCR = hasDoc("UCR");
-    if (company?.ucrDueDate) {
-        const days = daysUntil(company.ucrDueDate);
+    // Operating authority doc — only for-hire interstate carriers
+    if (needsOperatingAuthority) {
+        const hasOA = hasDoc("OPERATING_AUTHORITY");
         caItems.push({
-            label: "Unified Carrier Registration (UCR)",
-            regulation: "49 CFR 367",
-            status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
-            detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days remaining`,
-        });
-    } else {
-        caItems.push({
-            label: "Unified Carrier Registration (UCR)",
-            regulation: "49 CFR 367",
-            status: hasUCR ? "compliant" : "action_needed",
-            detail: hasUCR ? "On file" : "Upload UCR registration",
+            label: "Operating Authority on File",
+            regulation: "49 CFR 365",
+            status: hasOA ? "compliant" : "action_needed",
+            detail: hasOA ? "On file" : "Upload your operating authority document",
         });
     }
 
-    // MCS-150
+    // BOC-3 — only for-hire interstate carriers
+    if (needsBOC3) {
+        const hasBOC3 = hasDoc("BOC3");
+        caItems.push({
+            label: "BOC-3 Process Agent",
+            regulation: "49 CFR 366",
+            status: hasBOC3 ? "compliant" : "action_needed",
+            detail: hasBOC3 ? "On file" : "Upload BOC-3 filing",
+        });
+    }
+
+    // UCR — not required for intrastate-only carriers
+    if (needsUCR) {
+        const hasUCR = hasDoc("UCR");
+        if (company?.ucrDueDate) {
+            const days = daysUntil(company.ucrDueDate);
+            caItems.push({
+                label: "Unified Carrier Registration (UCR)",
+                regulation: "49 CFR 367",
+                status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
+                detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days remaining`,
+            });
+        } else {
+            caItems.push({
+                label: "Unified Carrier Registration (UCR)",
+                regulation: "49 CFR 367",
+                status: hasUCR ? "compliant" : "action_needed",
+                detail: hasUCR ? "On file" : "Upload UCR registration",
+            });
+        }
+    }
+
+    // MCS-150 — everyone with a USDOT
     if (company?.mcs150DueDate) {
         const days = daysUntil(company.mcs150DueDate);
         caItems.push({
@@ -386,7 +402,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         });
     }
 
-    // Insurance
+    // Insurance — everyone
     const hasInsurance = hasDoc("INSURANCE_POLICY");
     caItems.push({
         label: "Insurance Policy on File",
@@ -395,8 +411,8 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         detail: hasInsurance ? "On file" : "Upload insurance policy",
     });
 
-    // IFTA
-    if (company?.ifta) {
+    // IFTA — not required for intrastate-only carriers (unless explicitly flagged)
+    if (needsIFTA) {
         const hasIFTA = hasDoc("IFTA_LICENSE");
         caItems.push({
             label: "IFTA License",
