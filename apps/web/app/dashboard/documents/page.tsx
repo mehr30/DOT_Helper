@@ -585,17 +585,19 @@ function DocumentsPageInner() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.actions}>
-                                                        <button
-                                                            className={styles.actionBtn}
-                                                            title="Sign"
-                                                            onClick={() => setSigningDoc({
-                                                                id: doc.id,
-                                                                name: doc.name,
-                                                                url: doc.fileUrl,
-                                                            })}
-                                                        >
-                                                            <PenTool size={16} />
-                                                        </button>
+                                                        {doc.fileUrl && (
+                                                            <button
+                                                                className={styles.actionBtn}
+                                                                title="Sign"
+                                                                onClick={() => setSigningDoc({
+                                                                    id: doc.id,
+                                                                    name: doc.name,
+                                                                    url: doc.fileUrl,
+                                                                })}
+                                                            >
+                                                                <PenTool size={16} />
+                                                            </button>
+                                                        )}
                                                         {doc.fileUrl ? (
                                                             <button
                                                                 className={styles.actionBtn}

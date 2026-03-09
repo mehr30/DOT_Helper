@@ -393,6 +393,14 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                                                                 </span>
                                                             )}
                                                         </div>
+                                                        {item.reason && (
+                                                            <div style={{
+                                                                fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.15rem",
+                                                                fontStyle: "italic", lineHeight: 1.4,
+                                                            }}>
+                                                                {item.reason}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
                                                         <span className={`${styles.itemBadge} ${styles[cssStatus]}`}>

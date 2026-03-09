@@ -363,6 +363,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                             placeholder="Your company name"
                             style={inputStyle}
                             disabled={!company}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -400,34 +401,34 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div>
-                            <label style={labelStyle}>Operation Type</label>
+                            <label style={labelStyle}>How do you use your vehicles?</label>
                             <select
                                 value={companyForm.operationType}
                                 onChange={(e) => setCompanyForm(p => ({ ...p, operationType: e.target.value }))}
                                 style={inputStyle}
                                 disabled={!company}
                             >
-                                <option value="">Not set</option>
-                                <option value="FOR_HIRE">For-Hire Carrier</option>
-                                <option value="PRIVATE">Private Carrier</option>
-                                <option value="EXEMPT">Exempt Carrier</option>
+                                <option value="">Not sure yet</option>
+                                <option value="FOR_HIRE">I haul or transport for other people/businesses</option>
+                                <option value="PRIVATE">I only use my vehicles for my own business</option>
+                                <option value="EXEMPT">Farm, government, or other exempt use</option>
                             </select>
-                            <span style={helpStyle}>Determines which compliance items apply</span>
+                            <span style={helpStyle}>Most service companies (pest control, plumbing, etc.) are &quot;Private&quot;</span>
                         </div>
                         <div>
-                            <label style={labelStyle}>Operation Scope</label>
+                            <label style={labelStyle}>Do you drive across state lines?</label>
                             <select
                                 value={companyForm.operationScope}
                                 onChange={(e) => setCompanyForm(p => ({ ...p, operationScope: e.target.value }))}
                                 style={inputStyle}
                                 disabled={!company}
                             >
-                                <option value="">Not set</option>
-                                <option value="INTERSTATE">Interstate (cross state lines)</option>
-                                <option value="INTRASTATE">Intrastate only (one state)</option>
-                                <option value="BOTH">Both</option>
+                                <option value="">Not sure yet</option>
+                                <option value="INTRASTATE">No — I only operate in one state</option>
+                                <option value="INTERSTATE">Yes — I cross state lines</option>
+                                <option value="BOTH">Sometimes — I do both</option>
                             </select>
-                            <span style={helpStyle}>Intrastate carriers have fewer federal requirements</span>
+                            <span style={helpStyle}>If you only work in one state, you have fewer federal requirements</span>
                         </div>
                     </div>
 
@@ -446,6 +447,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                             placeholder="123 Main St"
                             style={inputStyle}
                             disabled={!company}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -458,6 +460,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                 placeholder="Kansas City"
                                 style={inputStyle}
                                 disabled={!company}
+                                autoComplete="off"
                             />
                         </div>
                         <div>
@@ -482,6 +485,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                 placeholder="64101"
                                 style={inputStyle}
                                 disabled={!company}
+                                autoComplete="off"
                             />
                         </div>
                     </div>
@@ -496,6 +500,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                 placeholder="(555) 123-4567"
                                 style={inputStyle}
                                 disabled={!company}
+                                autoComplete="off"
                             />
                         </div>
                         <div>
@@ -507,6 +512,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                 type="email"
                                 style={inputStyle}
                                 disabled={!company}
+                                autoComplete="off"
                             />
                         </div>
                     </div>

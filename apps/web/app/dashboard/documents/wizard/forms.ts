@@ -28,6 +28,12 @@ export interface DOTForm {
     description: string;
     estimatedTime: string;
     sections: FormSection[];
+    /** Instructions shown after saving — tells the user what to do with this form next */
+    filingInstructions?: string;
+    /** External URL where this form needs to be filed (if applicable) */
+    filingUrl?: string;
+    /** Label for the filing URL link */
+    filingUrlLabel?: string;
 }
 
 // ─── Assessment Questions ────────────────────────────────────────

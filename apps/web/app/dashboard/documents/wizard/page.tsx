@@ -76,6 +76,7 @@ function WizardContent() {
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [savedForms, setSavedForms] = useState<Set<string>>(new Set());
     const [saveNotice, setSaveNotice] = useState(false);
+    const cameFromUrl = !!searchParams.get("form"); // Entered form directly via URL
     const [addressPickerOpen, setAddressPickerOpen] = useState<string | null>(null);
     const [signingLinkUrl, setSigningLinkUrl] = useState<string | null>(null);
     const [signingLinkSending, setSigningLinkSending] = useState(false);
@@ -709,6 +710,7 @@ function WizardContent() {
                         placeholder={field.placeholder}
                         className={`${styles.fieldInput} ${styles.textarea}`}
                         rows={3}
+                        autoComplete="off"
                     />
                 ) : (
                     <input
@@ -717,6 +719,7 @@ function WizardContent() {
                         onChange={(e) => handleFieldChange(field.id, field.type === "tel" ? formatPhone(e.target.value) : e.target.value)}
                         placeholder={field.type === "tel" ? "(555) 123-4567" : field.placeholder}
                         className={styles.fieldInput}
+                        autoComplete="off"
                     />
                 )}
 
@@ -1010,7 +1013,13 @@ function WizardContent() {
                             <button className={styles.saveButton} onClick={handleSaveAndClose}>
                                 <Save size={16} /> Save & Close
                             </button>
-                            <button className={styles.backToResults} onClick={() => setStep("results")}>
+                            <button className={styles.backToResults} onClick={() => {
+                                if (cameFromUrl && recommendedForms.length === 0) {
+                                    router.push("/dashboard/documents");
+                                } else {
+                                    setStep("results");
+                                }
+                            }}>
                                 <ArrowLeft size={16} /> All Documents
                             </button>
                         </div>

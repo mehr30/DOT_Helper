@@ -13,6 +13,7 @@ export interface ComplianceItem {
     regulation: string;
     status: "compliant" | "action_needed" | "expired" | "not_applicable";
     detail?: string;
+    reason?: string; // Plain-English explanation of WHY this item is required
     driverId?: string;
     vehicleId?: string;
 }
@@ -91,14 +92,16 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     ]);
 
     // Conditional compliance: determine which items this carrier actually needs
-    const opType = company?.operationType ?? "FOR_HIRE"; // default to most items if unknown
-    const opScope = company?.operationScope ?? "INTERSTATE";
+    // Only show interstate-specific items when the user has explicitly confirmed they cross state lines
+    const opType = company?.operationType ?? "PRIVATE"; // default to private (most small businesses)
+    const opScope = company?.operationScope ?? null;
     const isIntrastate = opScope === "INTRASTATE";
+    const isInterstate = opScope === "INTERSTATE" || opScope === "BOTH";
     const isForHire = opType === "FOR_HIRE";
-    const needsBOC3 = isForHire && !isIntrastate;
-    const needsOperatingAuthority = isForHire && !isIntrastate;
-    const needsUCR = !isIntrastate;
-    const needsIFTA = !isIntrastate || company?.ifta;
+    const needsBOC3 = isForHire && isInterstate;
+    const needsOperatingAuthority = isForHire && isInterstate;
+    const needsUCR = isInterstate;
+    const needsIFTA = isInterstate || !!company?.ifta;
 
     const companyCreatedAt = companyRecord?.createdAt ?? now;
 
@@ -126,6 +129,9 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
 
         // CDL / License validity — check driver record date OR uploaded document
         const hasCDLDoc = hasDoc("CDL", { driverId: d.id });
+        const licenseReason = isCDL
+            ? `${name} holds a CDL — a valid license must be on file at all times`
+            : `${name} operates a commercial vehicle — a valid license is required`;
         if (d.cdlExpiration) {
             const cdlDays = daysUntil(d.cdlExpiration);
             dqItems.push({
@@ -133,6 +139,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.11",
                 status: cdlDays <= 0 ? "expired" : cdlDays <= 30 ? "action_needed" : "compliant",
                 detail: cdlDays <= 0 ? `Expired ${Math.abs(cdlDays)} days ago` : `${cdlDays} days remaining`,
+                reason: licenseReason,
                 driverId: d.id,
             });
         } else {
@@ -141,12 +148,16 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.11",
                 status: hasCDLDoc ? "compliant" : "action_needed",
                 detail: hasCDLDoc ? "On file" : "Missing — set expiration on driver profile or upload CDL copy",
+                reason: licenseReason,
                 driverId: d.id,
             });
         }
 
         // Medical certificate — required for CDL and CMV operators (49 CFR 391.43)
         if (needsDOTPhysical) {
+            const medReason = isCDL
+                ? `${name} holds a CDL — DOT physical exam is required every 2 years`
+                : `${name} operates a vehicle over 10,001 lbs — DOT physical is required`;
             const hasMedDoc = hasDoc("MEDICAL_CERTIFICATE", { driverId: d.id });
             if (d.medicalCardExpiration) {
                 const medDays = daysUntil(d.medicalCardExpiration);
@@ -155,6 +166,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                     regulation: "49 CFR 391.43",
                     status: medDays <= 0 ? "expired" : medDays <= 30 ? "action_needed" : "compliant",
                     detail: medDays <= 0 ? `Expired ${Math.abs(medDays)} days ago` : `${medDays} days remaining`,
+                    reason: medReason,
                     driverId: d.id,
                 });
             } else {
@@ -163,6 +175,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                     regulation: "49 CFR 391.43",
                     status: hasMedDoc ? "compliant" : "action_needed",
                     detail: hasMedDoc ? "On file" : "Missing — set expiration on driver profile or upload DOT physical card",
+                    reason: medReason,
                     driverId: d.id,
                 });
             }
@@ -176,18 +189,21 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.25",
                 status: hasMVR ? "compliant" : "action_needed",
                 detail: hasMVR ? "On file" : "Missing — annual MVR required",
+                reason: `${name} operates a commercial vehicle — you must pull their driving record (MVR) once a year`,
                 driverId: d.id,
             });
         }
 
         // Clearinghouse query — CDL drivers only (49 CFR 382.701)
         if (isCDL) {
+            const chReason = `${name} holds a CDL — you must check the FMCSA Drug & Alcohol Clearinghouse once a year`;
             if (!d.clearinghouseQueryDate) {
                 dqItems.push({
                     label: `Clearinghouse Query — ${name}`,
                     regulation: "49 CFR 382.701",
                     status: "action_needed",
                     detail: "No query on file",
+                    reason: chReason,
                     driverId: d.id,
                 });
             } else {
@@ -197,6 +213,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                     regulation: "49 CFR 382.701",
                     status: daysSince >= 365 ? "expired" : daysSince >= 335 ? "action_needed" : "compliant",
                     detail: daysSince >= 365 ? `Overdue by ${daysSince - 365} days` : `${365 - daysSince} days until next required`,
+                    reason: chReason,
                     driverId: d.id,
                 });
             }
@@ -210,6 +227,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 391.21",
                 status: hasApp ? "compliant" : "action_needed",
                 detail: hasApp ? "On file" : "Missing",
+                reason: `${name} operates a commercial vehicle — DOT requires a signed employment application on file`,
                 driverId: d.id,
             });
         }
@@ -229,6 +247,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
 
     for (const v of vehicles) {
         // Annual inspection
+        const inspReason = `Unit ${v.unitNumber} is a commercial vehicle — DOT requires an annual inspection by a certified mechanic`;
         if (v.annualInspectionDue) {
             const days = daysUntil(v.annualInspectionDue);
             vmItems.push({
@@ -236,6 +255,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.17",
                 status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days remaining`,
+                reason: inspReason,
                 vehicleId: v.id,
             });
         } else {
@@ -244,6 +264,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.17",
                 status: "action_needed",
                 detail: "No inspection date set",
+                reason: inspReason,
                 vehicleId: v.id,
             });
         }
@@ -256,6 +277,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 396.3",
                 status: days <= 0 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days until next PM`,
+                reason: `Unit ${v.unitNumber} needs regular maintenance to stay safe and pass inspections`,
                 vehicleId: v.id,
             });
         }
@@ -268,6 +290,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "State Law",
                 status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Expired ${Math.abs(days)} days ago` : `${days} days remaining`,
+                reason: `Unit ${v.unitNumber} must have current registration — expired registration can lead to fines or being put out of service`,
                 vehicleId: v.id,
             });
         }
@@ -288,6 +311,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
 
     for (const d of cdlDrivers) {
         const name = `${d.firstName} ${d.lastName}`;
+        const cdlDrugReason = `${name} holds a CDL — federal law requires drug & alcohol testing for all CDL holders`;
 
         // Pre-employment test — distinguish new hires from existing employees
         const hasPreEmployment = hasDoc("DRUG_TEST_RESULT", { driverId: d.id });
@@ -298,6 +322,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 382.301",
                 status: "compliant",
                 detail: "On file",
+                reason: cdlDrugReason,
                 driverId: d.id,
             });
         } else if (isExistingEmployee) {
@@ -306,6 +331,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 382.301",
                 status: "compliant",
                 detail: "Existing employee — upload if available",
+                reason: cdlDrugReason,
                 driverId: d.id,
             });
         } else {
@@ -314,6 +340,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 382.301",
                 status: "action_needed",
                 detail: "Missing pre-employment drug test result",
+                reason: cdlDrugReason,
                 driverId: d.id,
             });
         }
@@ -325,6 +352,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 382.703",
             status: hasConsent ? "compliant" : "action_needed",
             detail: hasConsent ? "On file" : "Missing signed consent form",
+            reason: `${name} holds a CDL — you need their signed consent to run Clearinghouse queries`,
             driverId: d.id,
         });
     }
@@ -349,6 +377,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 365",
             status: hasOA ? "compliant" : "action_needed",
             detail: hasOA ? "On file" : "Upload your operating authority document",
+            reason: "Because you haul for other businesses across state lines, you need FMCSA operating authority",
         });
     }
 
@@ -360,12 +389,14 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 366",
             status: hasBOC3 ? "compliant" : "action_needed",
             detail: hasBOC3 ? "On file" : "Upload BOC-3 filing",
+            reason: "Because you operate interstate for-hire, you must designate a legal process agent in each state",
         });
     }
 
     // UCR — not required for intrastate-only carriers
     if (needsUCR) {
         const hasUCR = hasDoc("UCR");
+        const ucrReason = "Because you operate across state lines, you must register and pay the annual UCR fee";
         if (company?.ucrDueDate) {
             const days = daysUntil(company.ucrDueDate);
             caItems.push({
@@ -373,6 +404,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 367",
                 status: days <= 0 ? "expired" : days <= 30 ? "action_needed" : "compliant",
                 detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `${days} days remaining`,
+                reason: ucrReason,
             });
         } else {
             caItems.push({
@@ -380,11 +412,13 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 regulation: "49 CFR 367",
                 status: hasUCR ? "compliant" : "action_needed",
                 detail: hasUCR ? "On file" : "Upload UCR registration",
+                reason: ucrReason,
             });
         }
     }
 
     // MCS-150 — everyone with a USDOT
+    const mcs150Reason = "Every company with a USDOT number must update their federal business info every 2 years";
     if (company?.mcs150DueDate) {
         const days = daysUntil(company.mcs150DueDate);
         caItems.push({
@@ -392,6 +426,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 390.19",
             status: days <= 0 ? "expired" : days <= 60 ? "action_needed" : "compliant",
             detail: days <= 0 ? `Overdue by ${Math.abs(days)} days` : `Due in ${days} days`,
+            reason: mcs150Reason,
         });
     } else {
         caItems.push({
@@ -399,6 +434,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "49 CFR 390.19",
             status: "action_needed",
             detail: "Set your MCS-150 due date in company settings",
+            reason: mcs150Reason,
         });
     }
 
@@ -409,6 +445,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         regulation: "49 CFR 387",
         status: hasInsurance ? "compliant" : "action_needed",
         detail: hasInsurance ? "On file" : "Upload insurance policy",
+        reason: "All commercial vehicle operators must carry liability insurance — keep a copy on file",
     });
 
     // IFTA — not required for intrastate-only carriers (unless explicitly flagged)
@@ -419,6 +456,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             regulation: "IFTA Agreement",
             status: hasIFTA ? "compliant" : "action_needed",
             detail: hasIFTA ? "On file" : "Upload IFTA license",
+            reason: "Because you operate across state lines, you need an IFTA fuel tax license to report fuel tax in each state",
         });
     }
 
