@@ -176,7 +176,7 @@ async function sendSigningEmail(to: string, formTitle: string, signingUrl: strin
     }
     const { Resend } = await import("resend");
     const resend = new Resend(apiKey);
-    const from = process.env.EMAIL_FROM ?? "Greenlight DOT <noreply@greenlightdot.com>";
+    const from = process.env.EMAIL_FROM ?? "Greenlight USDOT <noreply@greenlightdot.com>";
 
     await resend.emails.send({
         from,
@@ -208,7 +208,7 @@ async function sendSigningEmail(to: string, formTitle: string, signingUrl: strin
                 </p>
                 <hr style="border:none;border-top:1px solid #e2e8f0;margin:1.5rem 0" />
                 <p style="color:#94a3b8;font-size:0.75rem;text-align:center">
-                    Sent via Greenlight DOT &mdash; DOT Compliance Made Simple
+                    Sent via Greenlight USDOT &mdash; DOT Compliance Made Simple
                 </p>
             </div>
         `,

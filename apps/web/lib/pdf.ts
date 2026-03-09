@@ -1,5 +1,5 @@
 /**
- * Shared PDF generation utilities for Greenlight DOT.
+ * Shared PDF generation utilities for Greenlight USDOT.
  * Uses jsPDF + jspdf-autotable for professional compliance reports.
  */
 
@@ -29,7 +29,7 @@ function dateStamp(): string {
     return new Date().toISOString().split("T")[0] ?? "";
 }
 
-/** Add the standard Greenlight DOT header to a PDF page */
+/** Add the standard Greenlight USDOT header to a PDF page */
 function addHeader(doc: jsPDF, title: string, subtitle?: string) {
     // Green header bar
     doc.setFillColor(...BRAND_GREEN);
@@ -38,7 +38,7 @@ function addHeader(doc: jsPDF, title: string, subtitle?: string) {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("Greenlight DOT", 14, 12);
+    doc.text("Greenlight USDOT", 14, 12);
 
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
@@ -65,7 +65,7 @@ function addFooter(doc: jsPDF) {
         doc.setFontSize(7);
         doc.setTextColor(...GRAY_400);
         doc.text(
-            `Greenlight DOT — Confidential — Generated ${timestamp()} — Page ${i} of ${pageCount}`,
+            `Greenlight USDOT — Confidential — Generated ${timestamp()} — Page ${i} of ${pageCount}`,
             105,
             287,
             { align: "center" },

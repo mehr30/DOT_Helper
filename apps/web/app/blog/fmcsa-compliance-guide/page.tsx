@@ -118,7 +118,7 @@ export default function FmcsaComplianceGuidePost() {
 
                     <h2>It&apos;s a Lot. We Know.</h2>
                     <p>
-                        Managing all of this across multiple drivers and vehicles while also running your actual business is overwhelming. That&apos;s why we built <strong>Greenlight DOT</strong> — specifically for small fleet owners who need to stay compliant without hiring a full-time compliance person. We track every requirement, send reminders, and keep your documentation organized so you&apos;re always ready.
+                        Managing all of this across multiple drivers and vehicles while also running your actual business is overwhelming. That&apos;s why we built <strong>Greenlight USDOT</strong> — specifically for small fleet owners who need to stay compliant without hiring a full-time compliance person. We track every requirement, send reminders, and keep your documentation organized so you&apos;re always ready.
                     </p>
         </BlogPostLayout>
     );

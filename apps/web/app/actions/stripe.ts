@@ -1,6 +1,6 @@
 "use server";
 
-// Stripe Server Actions for Greenlight DOT SaaS
+// Stripe Server Actions for Greenlight USDOT SaaS
 // These actions handle creating Checkout Sessions and Customer Portal sessions
 // Billing is per-company: each company has its own Stripe subscription.
 

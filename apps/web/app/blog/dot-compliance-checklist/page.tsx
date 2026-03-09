@@ -108,7 +108,7 @@ export default function DotComplianceChecklistPost() {
                     <p>
                         The first time you see this list, it feels like a lot. That&apos;s because it <em>is</em> a lot. But most of it is just staying organized — knowing what&apos;s due, when it&apos;s due, and where to find the paperwork when someone asks for it.
                     </p>
-                    <p>That&apos;s exactly what Greenlight DOT does. We track every item on this checklist, send you reminders before things expire, and keep everything in one place so you&apos;re always ready if an auditor comes knocking.</p>
+                    <p>That&apos;s exactly what Greenlight USDOT does. We track every item on this checklist, send you reminders before things expire, and keep everything in one place so you&apos;re always ready if an auditor comes knocking.</p>
         </BlogPostLayout>
     );
 }

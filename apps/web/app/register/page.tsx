@@ -54,7 +54,7 @@ export default function RegisterPage() {
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
                         <GreenlightLogo size={44} />
-                        <span>Greenlight DOT</span>
+                        <span>Greenlight USDOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
                         <h1>See What You're Missing.</h1>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
                 <div className={styles.authForm}>
                     <div className={styles.formHeader}>
                         <h2>Create your account</h2>
-                        <p>Get started with Greenlight DOT in minutes</p>
+                        <p>Get started with Greenlight USDOT in minutes</p>
                     </div>
 
                     {error && (

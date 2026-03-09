@@ -27,13 +27,13 @@ import styles from "./page.module.css";
 // Searchable compliance topics (from blog index)
 const complianceTopics = [
   { slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist", category: "Compliance" },
-  { slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide for Small Fleets", category: "Regulations" },
-  { slug: "driver-qualification-file-requirements", title: "Driver Qualification File Requirements", category: "Driver Management" },
+  { slug: "fmcsa-compliance-guide", title: "Federal Trucking Rules: A Guide for Small Fleets", category: "Regulations" },
+  { slug: "driver-qualification-file-requirements", title: "Driver Paperwork: What You Need on File", category: "Driver Management" },
   { slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance & Inspection Guide", category: "Vehicle Compliance" },
   { slug: "drug-alcohol-testing-compliance", title: "Drug & Alcohol Testing Compliance Guide", category: "Drug & Alcohol" },
   { slug: "how-to-pass-dot-audit", title: "How to Pass a DOT Audit", category: "Audit Prep" },
   { slug: "hos-rules-explained", title: "Hours of Service (HOS) Rules Explained", category: "HOS" },
-  { slug: "fmcsa-clearinghouse-guide", title: "FMCSA Clearinghouse Guide for Employers", category: "Driver Management" },
+  { slug: "fmcsa-clearinghouse-guide", title: "Drug Testing Database: Guide for Employers", category: "Driver Management" },
   { slug: "cdl-requirements-guide", title: "CDL Requirements: Classes & Endorsements", category: "Driver Management" },
   { slug: "dot-medical-card-requirements", title: "DOT Medical Card Requirements", category: "Driver Management" },
   { slug: "common-dot-violations", title: "10 Most Common DOT Violations", category: "Compliance" },
@@ -43,14 +43,14 @@ const complianceTopics = [
   { slug: "usdot-number-requirements", title: "USDOT Number: Who Needs One & How to Get It", category: "Compliance" },
   { slug: "dot-insurance-requirements", title: "DOT Insurance Requirements & Minimums", category: "Regulations" },
   { slug: "roadside-inspection-guide", title: "Roadside Inspections: How to Prepare", category: "Vehicle Compliance" },
-  { slug: "csa-scores-explained", title: "CSA Scores Explained", category: "Regulations" },
+  { slug: "csa-scores-explained", title: "Safety Scores Explained", category: "Regulations" },
   { slug: "preventive-maintenance-program-guide", title: "Building a Preventive Maintenance Program", category: "Vehicle Compliance" },
   { slug: "dot-compliance-costs-fines", title: "DOT Compliance Costs & Fines", category: "Business" },
   { slug: "post-accident-drug-testing", title: "Post-Accident Drug Testing Requirements", category: "Drug & Alcohol" },
   { slug: "brake-compliance-guide", title: "Brake Compliance Guide", category: "Vehicle Compliance" },
-  { slug: "dvir-best-practices", title: "DVIR Best Practices", category: "Vehicle Compliance" },
+  { slug: "dvir-best-practices", title: "Daily Vehicle Inspection Report Best Practices", category: "Vehicle Compliance" },
   { slug: "hiring-cdl-drivers-compliance", title: "Hiring CDL Drivers: Compliance Steps", category: "Driver Management" },
-  { slug: "mcs-150-biennial-update", title: "MCS-150 Biennial Update Guide", category: "Compliance" },
+  { slug: "mcs-150-biennial-update", title: "USDOT Number Update (Every 2 Years)", category: "Compliance" },
 ];
 
 function HeroSearch() {
@@ -162,7 +162,7 @@ function ProductShowcase() {
             Everything you need to stay compliant
           </h2>
           <p className={styles.showcaseSubtitle}>
-            Real screenshots from Greenlight DOT — no mockups, no filler.
+            Real screenshots from Greenlight USDOT — no mockups, no filler.
           </p>
         </div>
 
@@ -210,33 +210,33 @@ function ProductShowcase() {
 const features = [
   {
     icon: Users,
-    title: "Driver Qualification Files",
-    description: "Track CDLs, medical cards, MVRs, and all required driver documentation with automated expiration alerts."
+    title: "Driver File Tracking",
+    description: "Keep all your drivers' paperwork organized — licenses, physicals, driving records. We'll alert you before anything expires so no one gets caught driving with outdated documents."
   },
   {
     icon: Clock,
-    title: "Hours of Service",
-    description: "Monitor HOS compliance in real-time, track driving hours, and prevent violations before they happen."
+    title: "Driving Hours Tracking",
+    description: "The government limits how long your drivers can be on the road each day. We help you track those hours so nobody gets a violation."
   },
   {
     icon: Shield,
-    title: "Clearinghouse Integration",
-    description: "Manage pre-employment and annual queries, track driver consent, and maintain FMCSA compliance."
+    title: "Drug Testing Tracking",
+    description: "CDL drivers need drug tests and background checks through a federal database. We track what's been done and what's still needed."
   },
   {
     icon: Truck,
-    title: "Vehicle Inspections",
-    description: "Schedule DOT inspections, capture DVIRs digitally, and maintain complete maintenance histories."
+    title: "Vehicle Inspection Tracking",
+    description: "Your commercial vehicles need annual inspections and regular maintenance checks. We track when everything is due and keep records organized."
   },
   {
     icon: FileText,
-    title: "Document Management",
-    description: "Secure cloud storage for all compliance documents with version control and instant access."
+    title: "All Your Documents, One Place",
+    description: "Upload and organize every compliance document. No more filing cabinets or lost paperwork. Everything searchable and shareable."
   },
   {
     icon: Bell,
-    title: "Smart Alerts",
-    description: "Get notified 90, 60, 30, and 7 days before any document or certification expires."
+    title: "Automatic Reminders",
+    description: "We notify you 90, 60, 30, and 7 days before any license, physical, or inspection expires. Never miss a deadline again."
   }
 ];
 
@@ -249,14 +249,14 @@ const stats = [
 
 const testimonials = [
   {
-    quote: "Greenlight DOT saved us from a $12,000 fine by alerting us to an expiring medical card. This software pays for itself.",
+    quote: "Greenlight USDOT saved us from a $12,000 fine by alerting us to an expiring medical card. This software pays for itself.",
     author: "Mike Rodriguez",
     role: "Owner, Rodriguez Trucking LLC",
     company: "8 Trucks • Texas",
     rating: 5
   },
   {
-    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. Greenlight DOT made it easy to get everything organized.",
+    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. Greenlight USDOT made it easy to get everything organized.",
     author: "Sarah Chen",
     role: "Operations Manager, Chen Heating & Air",
     company: "12 Service Vans • California",
@@ -279,7 +279,7 @@ const pricingPlans = [
     period: "month",
     features: [
       "1 to 3 vehicles / drivers",
-      "Core DQ file management",
+      "Driver file tracking",
       "Compliance calendar",
       "Automated deadline alerts",
       "Document storage",
@@ -296,7 +296,7 @@ const pricingPlans = [
     features: [
       "4 to 15 vehicles / drivers",
       "Everything in Starter",
-      "Audit readiness scoring",
+      "Audit readiness score",
       "Violation history tracking",
       "Employee document e-signing",
     ],
@@ -331,7 +331,7 @@ const faqs = [
   },
   {
     question: "How does the mobile app work?",
-    answer: "Our mobile app allows drivers to complete DVIRs, view their documents, and receive alerts on the go. It works offline and syncs when connected."
+    answer: "Our mobile app allows drivers to complete daily vehicle inspection reports, view their documents, and receive alerts on the go. It works offline and syncs when connected."
   },
   {
     question: "Is my data secure?",
@@ -349,7 +349,7 @@ export default function HomePage() {
         <div className={styles.navContainer}>
           <Link href="/" className={styles.logo}>
             <GreenlightLogo size={36} />
-            <span>Greenlight DOT</span>
+            <span>Greenlight USDOT</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -407,7 +407,7 @@ export default function HomePage() {
           <p className={styles.heroDescription}>
             Trucking, HVAC, plumbing, landscaping — if you have commercial vehicles,
             the DOT has rules for you. Miss one deadline and it&apos;s a $16,000 fine.
-            Greenlight DOT tracks every expiration, every document, every requirement.
+            Greenlight USDOT tracks every expiration, every document, every requirement.
             We tell you exactly what needs attention. Plain English. Zero guesswork.
           </p>
           <div className={styles.heroCta}>
@@ -580,7 +580,7 @@ export default function HomePage() {
       <section className={styles.benefits}>
         <div className={styles.benefitsContainer}>
           <div className={styles.benefitsContent}>
-            <span className={styles.benefitsLabel}>Why Greenlight DOT?</span>
+            <span className={styles.benefitsLabel}>Why Greenlight USDOT?</span>
             <h2 className={styles.benefitsTitle}>
               You&apos;ve got enough to worry about
             </h2>
@@ -666,7 +666,7 @@ export default function HomePage() {
           <div className={styles.footerBrand}>
             <Link href="/" className={styles.footerLogo}>
               <GreenlightLogo size={32} />
-              <span>Greenlight DOT</span>
+              <span>Greenlight USDOT</span>
             </Link>
             <p className={styles.footerTagline}>
               DOT compliance, plain and simple. For trucking, home services, and any business with commercial vehicles.
@@ -702,7 +702,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>&copy; {new Date().getFullYear()} Greenlight DOT. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Greenlight USDOT. All rights reserved.</p>
           <div className={styles.footerSocial}>
             <span>DOT compliance, plain and simple.</span>
           </div>

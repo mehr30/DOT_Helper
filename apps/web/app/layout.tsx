@@ -3,39 +3,40 @@ import "./globals.css";
 import AuthProvider from "./components/AuthProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://greenlightdot.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://greenlightusdot.com"),
   title: {
-    default: "Greenlight DOT — DOT Compliance, Plain and Simple",
-    template: "%s | Greenlight DOT",
+    default: "Greenlight USDOT — DOT Compliance, Plain and Simple",
+    template: "%s | Greenlight USDOT",
   },
   description:
-    "Greenlight DOT is DOT compliance software for small business fleets. Track driver qualifications, vehicle inspections, HOS, and stay audit-ready. Start your free trial today.",
+    "Put your USDOT compliance on autopilot. Greenlight USDOT tracks your drivers, vehicles, inspections, and deadlines so you don't have to. Built for small businesses. Start free.",
   keywords: [
     "DOT compliance software",
-    "FMCSA compliance",
+    "USDOT compliance for small business",
+    "how to get DOT compliant",
+    "DOT compliance made easy",
     "fleet compliance software",
-    "DOT compliance for small business",
-    "driver qualification file management",
-    "HOS tracking software",
-    "DVIR software",
+    "DOT compliance checklist",
+    "USDOT number compliance",
     "DOT audit readiness",
     "trucking compliance software",
     "fleet management software",
-    "ELD compliance",
-    "drug and alcohol testing DOT",
-    "CSA scores",
-    "vehicle maintenance compliance",
+    "commercial vehicle compliance",
+    "DOT compliance for owner operators",
     "small fleet compliance",
+    "DOT compliance autopilot",
+    "FMCSA compliance",
+    "vehicle inspection tracking",
   ],
-  authors: [{ name: "Greenlight DOT" }],
-  creator: "Greenlight DOT",
-  publisher: "Greenlight DOT",
+  authors: [{ name: "Greenlight USDOT" }],
+  creator: "Greenlight USDOT",
+  publisher: "Greenlight USDOT",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "Greenlight DOT",
-    title: "Greenlight DOT — DOT Compliance, Plain and Simple",
+    siteName: "Greenlight USDOT",
+    title: "Greenlight USDOT — DOT Compliance, Plain and Simple",
     description:
       "DOT compliance software built for small fleets. Track drivers, vehicles, inspections, and documents — all in one place.",
     images: [
@@ -43,13 +44,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Greenlight DOT — DOT Compliance Software",
+        alt: "Greenlight USDOT — DOT Compliance Software",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Greenlight DOT — DOT Compliance, Plain and Simple",
+    title: "Greenlight USDOT — DOT Compliance, Plain and Simple",
     description:
       "DOT compliance software built for small fleets. Start your free trial today.",
     images: ["/og-image.png"],
@@ -74,11 +75,11 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Greenlight DOT",
+  name: "Greenlight USDOT",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web, iOS, Android",
   description:
-    "DOT compliance management software for small business fleets. Track driver qualifications, HOS, vehicle inspections, drug & alcohol testing, and more.",
+    "Put your USDOT compliance on autopilot. Track drivers, vehicles, inspections, and deadlines — we tell you exactly what needs attention, in plain English.",
   offers: {
     "@type": "AggregateOffer",
     lowPrice: "39",

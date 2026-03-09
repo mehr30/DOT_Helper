@@ -152,12 +152,12 @@ export default function Sidebar() {
                     {isOnboarding ? (
                         <div className={styles.logoLink}>
                             <GreenlightLogo size={44} />
-                            <span className={styles.logoText}>Greenlight DOT</span>
+                            <span className={styles.logoText}>Greenlight USDOT</span>
                         </div>
                     ) : (
                         <Link href="/dashboard" className={styles.logoLink}>
                             <GreenlightLogo size={44} />
-                            <span className={styles.logoText}>Greenlight DOT</span>
+                            <span className={styles.logoText}>Greenlight USDOT</span>
                         </Link>
                     )}
                 </div>

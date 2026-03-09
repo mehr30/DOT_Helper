@@ -2,8 +2,8 @@ import Link from "next/link";
 import { CheckCircle, ArrowRight, Truck } from "lucide-react";
 
 export const metadata = {
-    title: "Welcome to Greenlight DOT! | Subscription Confirmed",
-    description: "Your Greenlight DOT subscription is active. Start managing your fleet compliance today.",
+    title: "Welcome to Greenlight USDOT! | Subscription Confirmed",
+    description: "Your Greenlight USDOT subscription is active. Start managing your fleet compliance today.",
 };
 
 export default function CheckoutSuccessPage() {
@@ -45,7 +45,7 @@ export default function CheckoutSuccessPage() {
                     color: "var(--text-primary)",
                     marginBottom: "0.75rem",
                 }}>
-                    Welcome to Greenlight DOT!
+                    Welcome to Greenlight USDOT!
                 </h1>
                 <p style={{
                     fontSize: "1rem",

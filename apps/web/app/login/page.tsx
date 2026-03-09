@@ -44,7 +44,7 @@ export default function LoginPage() {
                 <div className={styles.authBranding}>
                     <Link href="/" className={styles.logo}>
                         <GreenlightLogo size={44} />
-                        <span>Greenlight DOT</span>
+                        <span>Greenlight USDOT</span>
                     </Link>
                     <div className={styles.brandingContent}>
                         <h1>Good to Go.</h1>

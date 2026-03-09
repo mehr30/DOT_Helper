@@ -1,4 +1,4 @@
-const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight DOT <noreply@greenlightdot.com>";
+const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight USDOT <noreply@greenlightdot.com>";
 
 /**
  * Send an email via Resend. Silently skips if RESEND_API_KEY is not set.

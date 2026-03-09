@@ -76,7 +76,7 @@ export default function SigningPage() {
                 padding: "1rem", borderBottom: "1px solid #e2e8f0", background: "white",
             }}>
                 <Shield size={22} style={{ color: "#16a34a" }} />
-                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>Greenlight DOT</span>
+                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>Greenlight USDOT</span>
             </header>
 
             <main style={{ maxWidth: 600, margin: "0 auto", padding: "1.5rem 1rem" }}>

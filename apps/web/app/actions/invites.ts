@@ -66,12 +66,12 @@ export async function inviteUser(email: string, role: "ADMIN" | "DISPATCHER" | "
     const inviteUrl = `${APP_URL}/invite/${invite.token}`;
     await sendEmail(
         email,
-        `You've been invited to ${company?.name ?? "a company"} on Greenlight DOT`,
+        `You've been invited to ${company?.name ?? "a company"} on Greenlight USDOT`,
         `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto;">
             <h2 style="color: #1a1a1a;">You're invited!</h2>
             <p style="color: #4a4a4a; line-height: 1.6;">
-                You've been invited to join <strong>${company?.name ?? "a company"}</strong> on Greenlight DOT
+                You've been invited to join <strong>${company?.name ?? "a company"}</strong> on Greenlight USDOT
                 as a <strong>${role.charAt(0) + role.slice(1).toLowerCase()}</strong>.
             </p>
             <a href="${inviteUrl}" style="

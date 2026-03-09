@@ -23,7 +23,7 @@ const pricingPlans = [
         yearlyPrice: 41, // 2 months free → $490/yr ÷ 12 ≈ $41/mo
         features: [
             "1 to 3 vehicles / drivers",
-            "Core DQ file management",
+            "Driver file tracking",
             "Compliance calendar",
             "Automated deadline alerts",
             "Document storage",
@@ -41,7 +41,7 @@ const pricingPlans = [
         features: [
             "4 to 15 vehicles / drivers",
             "Everything in Starter",
-            "Audit readiness scoring",
+            "Audit readiness score",
             "Violation history tracking",
             "Employee document e-signing",
         ],
@@ -81,7 +81,7 @@ const faqs = [
     },
     {
         question: "Is this really worth $49/month?",
-        answer: "One FMCSA violation carries a minimum $11,000 fine. Our Starter plan costs $588/year — that's a 19:1 return on investment just from avoiding a single violation. Most customers tell us it pays for itself in the first month.",
+        answer: "One DOT violation can cost $11,000 or more. Our Starter plan costs $588/year. Most customers tell us it pays for itself in the first month just from avoiding a single missed deadline.",
     },
     {
         question: "Is my data secure?",
@@ -89,7 +89,7 @@ const faqs = [
     },
     {
         question: "Will this actually help me pass a DOT audit?",
-        answer: "That's exactly what we built it for. We track every FMCSA requirement, alert you before deadlines, and keep organized digital records ready for auditors. Many customers report passing audits with zero findings.",
+        answer: "That's exactly what we built it for. We track every DOT requirement, alert you before deadlines, and keep organized digital records ready for auditors. Many customers report passing audits with zero findings.",
     },
 ];
 
@@ -100,7 +100,7 @@ export default function PricingPage() {
 
     const handleCheckout = async (planKey: string) => {
         if (planKey === "fleet") {
-            window.location.href = "mailto:sales@greenlightdot.com?subject=Fleet Plan Inquiry";
+            window.location.href = "mailto:sales@greenlightusdot.com?subject=Fleet Plan Inquiry";
             return;
         }
 
@@ -125,7 +125,7 @@ export default function PricingPage() {
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
                     <GreenlightLogo size={40} />
-                    <span className={styles.logoText}>Greenlight DOT</span>
+                    <span className={styles.logoText}>Greenlight USDOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/" className={styles.navLink}>Home</Link>
@@ -142,7 +142,7 @@ export default function PricingPage() {
                     14-Day Free Trial — No Credit Card Required
                 </div>
                 <h1 className={styles.heroTitle}>
-                    One fine from the DOT costs $11,000. Greenlight DOT costs $49 a month.
+                    One fine from the DOT costs $11,000. Greenlight USDOT costs $49 a month.
                 </h1>
                 <p className={styles.heroSubtitle}>
                     Choose the plan that fits your fleet. All plans include a 14-day free trial. No credit card required.
@@ -234,9 +234,9 @@ export default function PricingPage() {
 
             {/* CTA */}
             <div className={styles.ctaSection}>
-                <h2 className={styles.ctaTitle}>One FMCSA Violation = $11,000+ in Fines</h2>
+                <h2 className={styles.ctaTitle}>One DOT Violation = $11,000+ in Fines</h2>
                 <p className={styles.ctaSubtitle}>
-                    Our Starter plan costs $588/year — that&apos;s a 19:1 ROI on avoiding just one violation. Start your free trial and protect your business today.
+                    Our Starter plan costs $588/year. One violation costs $11,000+. The math is simple. Start your free trial and protect your business today.
                 </p>
                 <Link href="/register" className={styles.ctaBtn}>
                     Start Your Free Trial

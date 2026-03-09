@@ -685,7 +685,7 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                             </div>
 
                                             <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "1.25rem", lineHeight: 1.5 }}>
-                                                {integration.authType === "api_key" && `Enter your ${integration.name} API token to connect. This token gives Greenlight DOT read access to your fleet data.`}
+                                                {integration.authType === "api_key" && `Enter your ${integration.name} API token to connect. This token gives Greenlight USDOT read access to your fleet data.`}
                                                 {integration.authType === "oauth" && `Enter your OAuth 2.0 credentials from the ${integration.name} developer portal. We'll use these to securely authorize the connection.`}
                                                 {integration.authType === "credentials" && `Enter your ${integration.name} login credentials. These are the same credentials you use to log into ${integration.name}.`}
                                             </p>

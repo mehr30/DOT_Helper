@@ -28,7 +28,7 @@ export default function Page() {
             <h2>Alternatives for Small Fleets</h2>
             <p><strong>Part-time or shared compliance person.</strong> Some small carriers share a safety manager with another company, or hire someone part-time. This works if the person is experienced and your fleet is basic (no hazmat, no specialized operations).</p>
             <p><strong>Outsourced compliance consultants.</strong> Monthly retainer of <strong>$500-$2,000</strong> depending on fleet size and scope. They&apos;ll manage your DQFs, log reviews, and audit prep. Good option for 5-20 truck fleets.</p>
-            <p><strong>Compliance management software.</strong> Tools like Greenlight DOT cost <strong>$49-99/month</strong> and automate the tracking, alerting, and documentation that a compliance officer does manually. You still need someone to act on the alerts, but the tracking is handled for you.</p>
+            <p><strong>Compliance management software.</strong> Tools like Greenlight USDOT cost <strong>$49-99/month</strong> and automate the tracking, alerting, and documentation that a compliance officer does manually. You still need someone to act on the alerts, but the tracking is handled for you.</p>
 
             <h2>When You Really Do Need a Dedicated Person</h2>
             <ul>

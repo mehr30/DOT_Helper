@@ -16,7 +16,7 @@ interface BlogPostLayoutProps {
 export default function BlogPostLayout({
     category,
     title,
-    author = "Greenlight DOT Team",
+    author = "Greenlight USDOT Team",
     date,
     readTime,
     children,
@@ -27,7 +27,7 @@ export default function BlogPostLayout({
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
                     <GreenlightLogo size={36} />
-                    <span className={styles.logoText}>Greenlight DOT</span>
+                    <span className={styles.logoText}>Greenlight USDOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/blog" className={styles.navLink}>
@@ -95,10 +95,10 @@ export default function BlogPostLayout({
                 )}
 
                 <div className={styles.articleCta}>
-                    <h3>Stop Risking Fines. Start Managing Compliance.</h3>
-                    <p>Greenlight DOT automates compliance tracking so you can focus on running your fleet.</p>
+                    <h3>Put Your USDOT Compliance on Autopilot</h3>
+                    <p>Greenlight USDOT handles the tracking, reminders, and paperwork so you can focus on running your business.</p>
                     <Link href="/pricing" className={styles.articleCtaBtn}>
-                        Try Greenlight DOT Free <ArrowRight size={16} />
+                        Try Greenlight USDOT Free <ArrowRight size={16} />
                     </Link>
                 </div>
             </article>

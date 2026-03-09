@@ -5,8 +5,8 @@ import GreenlightLogo from "../components/GreenlightLogo";
 import styles from "./blog.module.css";
 
 export const metadata: Metadata = {
-    title: "DOT Compliance Blog — Tips, Guides & Regulations for Small Fleets",
-    description: "Expert guides on DOT compliance, FMCSA regulations, HOS rules, driver qualification files, and audit preparation for small business fleet owners.",
+    title: "USDOT Compliance Guides — Plain English Help for Small Fleets",
+    description: "Step-by-step guides to getting and staying DOT compliant. Written in plain English for business owners who are new to USDOT compliance or just want it handled.",
     alternates: { canonical: "/blog" },
 };
 
@@ -149,7 +149,7 @@ export default function BlogIndexPage() {
             <nav className={styles.nav}>
                 <Link href="/" className={styles.logoLink}>
                     <GreenlightLogo size={36} />
-                    <span className={styles.logoText}>Greenlight DOT</span>
+                    <span className={styles.logoText}>Greenlight USDOT</span>
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/" className={styles.navLink}>Home</Link>
@@ -160,9 +160,9 @@ export default function BlogIndexPage() {
             </nav>
 
             <div className={styles.blogHero}>
-                <h1 className={styles.blogTitle}>DOT Compliance Blog</h1>
+                <h1 className={styles.blogTitle}>USDOT Compliance Guides</h1>
                 <p className={styles.blogSubtitle}>
-                    Expert guides, checklists, and regulatory updates to help small fleet owners stay compliant, avoid fines, and pass audits with confidence.
+                    New to DOT compliance? We&apos;ve got you. Plain English guides that walk you through everything — whether you&apos;re just getting started or want to put compliance on autopilot.
                 </p>
             </div>
 
@@ -172,7 +172,7 @@ export default function BlogIndexPage() {
                     📚 Comprehensive Guides
                 </h2>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "var(--space-6)", fontSize: "0.9375rem" }}>
-                    Our in-depth compliance guides cover everything you need to know about each major area of DOT regulation.
+                    Start here. These guides break down each area of DOT compliance into simple, actionable steps.
                 </p>
             </div>
             <div className={styles.postsGrid}>
@@ -205,7 +205,7 @@ export default function BlogIndexPage() {
                     📝 All Articles
                 </h2>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "var(--space-6)", fontSize: "0.9375rem" }}>
-                    Focused guides on specific compliance topics — from USDOT numbers to brake inspections to drug testing panels.
+                    Answers to the specific questions that come up as you get your fleet compliant.
                 </p>
             </div>
             <div className={styles.postsGrid}>
@@ -235,7 +235,7 @@ export default function BlogIndexPage() {
             <div className={styles.footerCta}>
                 <h2 className={styles.footerCtaTitle}>Ready to Simplify Your DOT Compliance?</h2>
                 <p className={styles.footerCtaText}>
-                    Stop worrying about audits and fines. Greenlight DOT keeps your fleet compliant 24/7.
+                    Stop worrying about audits and fines. Greenlight USDOT keeps your fleet compliant 24/7.
                 </p>
                 <Link href="/pricing" className={styles.footerCtaBtn}>
                     Start Free Trial
