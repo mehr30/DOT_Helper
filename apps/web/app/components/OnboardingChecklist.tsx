@@ -6,6 +6,7 @@ import { Check, ArrowRight, CheckCircle, ListChecks } from "lucide-react";
 import styles from "./OnboardingChecklist.module.css";
 
 const PERMANENT_DISMISS_KEY = "greenlight_checklist_dismissed";
+const SESSION_DISMISS_KEY = "greenlight_checklist_session_dismissed";
 
 interface OnboardingChecklistProps {
     hasCompany: boolean;
@@ -35,8 +36,19 @@ export default function OnboardingChecklist({
 
     useEffect(() => {
         setMounted(true);
+        // Only permanently dismissed if user completed ALL items previously
         const permanentlyDismissed = localStorage.getItem(PERMANENT_DISMISS_KEY) === "true";
-        setDismissed(permanentlyDismissed);
+        // Session dismiss = user clicked "I'll do this later" (resets on new browser session)
+        const sessionDismissed = sessionStorage.getItem(SESSION_DISMISS_KEY) === "true";
+        setDismissed(permanentlyDismissed || sessionDismissed);
+
+        // Clear any stale permanent dismiss if items aren't all done
+        // (handles case where user dismissed in old version)
+        if (permanentlyDismissed && !sessionDismissed) {
+            // We'll check allDone below and clear if needed
+            localStorage.removeItem(PERMANENT_DISMISS_KEY);
+            setDismissed(sessionDismissed);
+        }
     }, []);
 
     const totalCompanyDocs = companyDocsNeeded + companyDocsComplete;
@@ -62,12 +74,13 @@ export default function OnboardingChecklist({
 
     if (!mounted) return null;
 
-    // Only show the collapsed button if permanently dismissed AND not all done
+    // Show collapsed "reopen" button only if session-dismissed
     if (dismissed && !allDone) {
         return (
             <button
                 className={styles.reopenButton}
                 onClick={() => {
+                    sessionStorage.removeItem(SESSION_DISMISS_KEY);
                     localStorage.removeItem(PERMANENT_DISMISS_KEY);
                     setDismissed(false);
                 }}
@@ -81,7 +94,13 @@ export default function OnboardingChecklist({
     if (dismissed) return null;
 
     const handleDismiss = () => {
-        localStorage.setItem(PERMANENT_DISMISS_KEY, "true");
+        if (allDone) {
+            // Permanently dismiss — everything is complete
+            localStorage.setItem(PERMANENT_DISMISS_KEY, "true");
+        } else {
+            // Session-only dismiss — guide comes back next visit
+            sessionStorage.setItem(SESSION_DISMISS_KEY, "true");
+        }
         setDismissed(true);
     };
 

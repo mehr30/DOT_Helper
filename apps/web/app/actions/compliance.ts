@@ -220,7 +220,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             label: "No active drivers",
             regulation: "49 CFR 391",
             status: "not_applicable",
-            detail: "Add drivers to track DQ compliance",
+            detail: "Add your drivers to start tracking their compliance",
         });
     }
 
@@ -278,7 +278,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             label: "No active vehicles",
             regulation: "49 CFR 396",
             status: "not_applicable",
-            detail: "Add vehicles to track maintenance compliance",
+            detail: "Add your vehicles to start tracking inspections and maintenance",
         });
     }
 
@@ -334,7 +334,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             label: "No CDL drivers",
             regulation: "49 CFR 382",
             status: "not_applicable",
-            detail: "Drug & alcohol testing only applies to CDL drivers",
+            detail: "Drug & alcohol testing applies when you add CDL holders",
         });
     }
 
