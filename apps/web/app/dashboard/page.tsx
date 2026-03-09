@@ -1,7 +1,7 @@
 import { getServerSession } from "../../lib/session";
 import { prisma } from "@repo/database";
 import DashboardContent from "./DashboardContent";
-import type { SearchableEntity } from "./DashboardContent";
+import type { SearchableEntity, UpcomingItem } from "./DashboardContent";
 import type { DashboardStats } from "../actions/dashboard";
 import { generateAlerts } from "../actions/alerts";
 import { getComplianceScores, type ComplianceScores } from "../actions/compliance";
@@ -11,6 +11,7 @@ export default async function DashboardPage() {
     let stats: DashboardStats | null = null;
     let complianceScores: ComplianceScores | null = null;
     const searchEntities: SearchableEntity[] = [];
+    const upcomingItems: UpcomingItem[] = [];
 
     if (session?.user) {
         const user = await prisma.user.findUnique({
@@ -25,7 +26,7 @@ export default async function DashboardPage() {
             try { await generateAlerts(); } catch { /* ok */ }
 
             const now = new Date();
-            const sixtyDaysFromNow = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
+            const ninetyDaysFromNow = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
             const [driverCount, vehicleCount, activeAlerts, expiringDrivers, expiringVehicles, allDrivers, allVehicles] =
                 await Promise.all([
@@ -37,8 +38,8 @@ export default async function DashboardPage() {
                             companyId,
                             status: "ACTIVE",
                             OR: [
-                                { cdlExpiration: { lte: sixtyDaysFromNow } },
-                                { medicalCardExpiration: { lte: sixtyDaysFromNow } },
+                                { cdlExpiration: { lte: ninetyDaysFromNow } },
+                                { medicalCardExpiration: { lte: ninetyDaysFromNow } },
                             ],
                         },
                         select: {
@@ -50,7 +51,7 @@ export default async function DashboardPage() {
                         where: {
                             companyId,
                             status: "ACTIVE",
-                            annualInspectionDue: { lte: sixtyDaysFromNow },
+                            annualInspectionDue: { lte: ninetyDaysFromNow },
                         },
                         select: { id: true, unitNumber: true, annualInspectionDue: true },
                     }),
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
             for (const d of expiringDrivers) {
                 if (d.cdlExpiration) {
                     const cdlDays = Math.ceil((d.cdlExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    if (cdlDays <= 60) {
+                    if (cdlDays <= 90) {
                         upcomingExpirations.push({
                             id: `cdl-${d.id}`, title: `License Expiration — ${d.firstName} ${d.lastName}`,
                             date: d.cdlExpiration.toISOString(), type: "driver", daysLeft: cdlDays,
@@ -81,9 +82,9 @@ export default async function DashboardPage() {
                 }
                 if (d.medicalCardExpiration) {
                     const medDays = Math.ceil((d.medicalCardExpiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    if (medDays <= 60) {
+                    if (medDays <= 90) {
                         upcomingExpirations.push({
-                            id: `med-${d.id}`, title: `Medical Card — ${d.firstName} ${d.lastName}`,
+                            id: `med-${d.id}`, title: `DOT Physical — ${d.firstName} ${d.lastName}`,
                             date: d.medicalCardExpiration.toISOString(), type: "driver", daysLeft: medDays,
                         });
                     }
@@ -103,6 +104,19 @@ export default async function DashboardPage() {
             upcomingExpirations.sort((a, b) => a.daysLeft - b.daysLeft);
 
             stats = { driverCount, vehicleCount, activeAlerts, upcomingExpirations };
+
+            // Build "upcoming deadlines" — items due in 30-90 days (currently fine)
+            for (const exp of upcomingExpirations) {
+                if (exp.daysLeft > 30 && exp.daysLeft <= 90) {
+                    upcomingItems.push({
+                        id: exp.id,
+                        title: exp.title,
+                        date: exp.date,
+                        daysLeft: exp.daysLeft,
+                        href: exp.type === "driver" ? "/dashboard/drivers" : "/dashboard/vehicles",
+                    });
+                }
+            }
 
             // Build searchable entities for dashboard search
             for (const d of allDrivers) {
@@ -139,5 +153,14 @@ export default async function DashboardPage() {
         || session?.user?.email?.split("@")[0]
         || "there";
 
-    return <DashboardContent stats={stats} hasCompany={hasCompany} complianceScores={complianceScores} userName={userName} searchEntities={searchEntities} />;
+    return (
+        <DashboardContent
+            stats={stats}
+            hasCompany={hasCompany}
+            complianceScores={complianceScores}
+            userName={userName}
+            searchEntities={searchEntities}
+            upcomingItems={upcomingItems}
+        />
+    );
 }

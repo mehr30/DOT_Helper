@@ -6,19 +6,20 @@ import {
     Clock,
     Users,
     Truck,
-    Bell,
     ArrowRight,
     Shield,
     Info,
     Plus,
-    RefreshCw,
     Search,
+    Upload,
+    Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect, useMemo } from "react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../components/DemoModeContext";
 import OnboardingChecklist from "../components/OnboardingChecklist";
+import { humanize } from "../../lib/plain-english";
 import type { DashboardStats } from "../actions/dashboard";
 import type { ComplianceScores } from "../actions/compliance";
 
@@ -52,6 +53,60 @@ function getScoreColor(score: number): string {
     return "#ef4444";
 }
 
+/** Map a compliance/attention title to a friendly, de-jargoned label. */
+function friendlyTitle(title: string): string {
+    // Try the plain-english map first
+    const mapped = humanize(title);
+    if (mapped !== title) return mapped;
+
+    // Extra dashboard-specific overrides
+    const extra: Record<string, string> = {
+        "MVR on File": "Driving Record",
+        "Clearinghouse Query": "Drug Testing Check",
+        "Clearinghouse Consent": "Drug Testing Authorization",
+        "BOC-3 Process Agent": "Legal Agent Designation",
+        "MCS-150 Biennial Update": "Federal Business Update",
+        "Unified Carrier Registration (UCR)": "Annual Federal Registration",
+        "IFTA License": "Fuel Tax License",
+        "Insurance Policy on File": "Insurance Policy",
+        "Operating Authority on File": "Operating Authority",
+        "Pre-Employment Test": "Drug Test Result",
+        "Medical Card": "DOT Physical",
+        "Medical Card Expiring": "DOT Physical Expiring",
+    };
+    return extra[title] ?? title;
+}
+
+/** Generate helpful detail text based on item state. */
+function getHelpfulDetail(item: AttentionItem): string {
+    if (item.daysLeft < 0) {
+        const overdue = Math.abs(item.daysLeft);
+        const where = item.type === "driver" ? "driver profile" : item.type === "vehicle" ? "vehicle profile" : "compliance page";
+        return `Overdue by ${overdue} day${overdue !== 1 ? "s" : ""} — update on ${where}`;
+    }
+    if (item.daysLeft <= 30 && item.detail) {
+        return `Due in ${item.daysLeft} day${item.daysLeft !== 1 ? "s" : ""} — ${item.detail}`;
+    }
+    // Missing items (no date, typically compliance items)
+    const lower = item.title.toLowerCase();
+    if (lower.includes("upload") || lower.includes("insurance") || lower.includes("authority") || lower.includes("ucr") || lower.includes("ifta") || lower.includes("fuel tax") || lower.includes("registration")) {
+        return "Upload this document to stay compliant";
+    }
+    if (lower.includes("form") || lower.includes("mcs") || lower.includes("boc") || lower.includes("legal agent") || lower.includes("federal business")) {
+        return "Fill out this form to complete your records";
+    }
+    // Default — use existing detail or generic
+    return item.detail || "Needs attention";
+}
+
+/** Plain-English score message */
+function getScoreMessage(score: number, issueCount: number): string {
+    if (score >= 100) return "You're fully DOT-ready!";
+    if (score >= 90) return `Almost there — just ${issueCount} small thing${issueCount !== 1 ? "s" : ""} to fix.`;
+    if (score >= 70) return `${issueCount} thing${issueCount !== 1 ? "s" : ""} to fix before you're DOT-ready.`;
+    return `${issueCount} item${issueCount !== 1 ? "s" : ""} need attention — let's get started.`;
+}
+
 // ---------------------------------------------------------------------------
 // Attention item — unified type for the merged list
 // ---------------------------------------------------------------------------
@@ -71,65 +126,78 @@ interface AttentionItem {
 
 // Map attention item labels to actionable links
 function getActionForAttentionItem(item: AttentionItem): { href: string; label: string } | null {
-    const lower = item.title.toLowerCase();
+    const lower = friendlyTitle(item.title).toLowerCase();
+    const origLower = item.title.toLowerCase();
 
     // Driver-related
-    if (lower.includes("license") || lower.includes("cdl")) {
-        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    if (origLower.includes("license") || origLower.includes("cdl")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update" };
     }
-    if (lower.includes("medical") || lower.includes("dot physical")) {
-        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    if (origLower.includes("medical") || origLower.includes("dot physical")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update" };
     }
-    if (lower.includes("clearinghouse") || lower.includes("drug testing database")) {
-        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    if (origLower.includes("clearinghouse") || lower.includes("drug testing")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Update" };
     }
-    if (lower.includes("mvr") || lower.includes("driving record")) {
+    if (origLower.includes("mvr") || lower.includes("driving record")) {
         const driverParam = item.driverId ? `&driver=${item.driverId}` : "";
-        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out" };
+        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out Form" };
     }
-    if (lower.includes("employment application")) {
+    if (origLower.includes("employment application")) {
         const driverParam = item.driverId ? `&driver=${item.driverId}` : "";
-        return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out" };
+        return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out Form" };
     }
-    if (lower.includes("drug test") || lower.includes("pre-employment test")) {
+    if (origLower.includes("drug test") || origLower.includes("pre-employment test")) {
         const params = new URLSearchParams({ upload: "DRUG_TEST_RESULT" });
         if (item.driverId) params.set("driver", item.driverId);
         return { href: `/dashboard/documents?${params.toString()}`, label: "Upload" };
     }
 
     // Vehicle-related
-    if (lower.includes("annual inspection")) {
-        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    if (origLower.includes("annual inspection")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update" };
     }
-    if (lower.includes("preventive maintenance")) {
-        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    if (origLower.includes("preventive maintenance")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update" };
     }
-    if (lower.includes("registration")) {
-        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    if (origLower.includes("registration")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update" };
     }
 
     // Company docs
-    if (lower.includes("mcs-150") || lower.includes("federal business update")) {
-        return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out" };
+    if (origLower.includes("mcs-150") || lower.includes("federal business")) {
+        return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out Form" };
     }
-    if (lower.includes("boc-3") || lower.includes("legal agent")) {
-        return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out" };
+    if (origLower.includes("boc-3") || lower.includes("legal agent")) {
+        return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out Form" };
     }
-    if (lower.includes("operating authority")) {
+    if (origLower.includes("operating authority")) {
         return { href: "/dashboard/documents?upload=OPERATING_AUTHORITY", label: "Upload" };
     }
-    if (lower.includes("ucr") || lower.includes("federal registration")) {
+    if (origLower.includes("ucr") || lower.includes("federal registration")) {
         return { href: "/dashboard/documents?upload=UCR", label: "Upload" };
     }
-    if (lower.includes("insurance")) {
+    if (origLower.includes("insurance")) {
         return { href: "/dashboard/documents?upload=INSURANCE_POLICY", label: "Upload" };
     }
-    if (lower.includes("ifta") || lower.includes("fuel tax")) {
+    if (origLower.includes("ifta") || lower.includes("fuel tax")) {
         return { href: "/dashboard/documents?upload=IFTA_LICENSE", label: "Upload" };
     }
 
     // Fallback — go to compliance page
     return { href: "/dashboard/compliance", label: "View" };
+}
+
+// ---------------------------------------------------------------------------
+// Upcoming deadline item (passed from server)
+// ---------------------------------------------------------------------------
+
+export interface UpcomingItem {
+    id: string;
+    title: string;
+    date: string;
+    daysLeft: number;
+    href: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -155,11 +223,17 @@ const mockAttentionItems: AttentionItem[] = [
     { id: "m5", title: "MCS-150 Update", detail: "Biennial update due Jun 15", daysLeft: 100, severity: "info", type: "compliance" },
 ];
 
+const mockUpcomingItems: UpcomingItem[] = [
+    { id: "u1", title: "CDL Renewal — Mike Johnson", date: "2026-05-12", daysLeft: 65, href: "/dashboard/drivers" },
+    { id: "u2", title: "Annual Inspection — Unit 105", date: "2026-04-20", daysLeft: 43, href: "/dashboard/vehicles" },
+    { id: "u3", title: "DOT Physical — Sarah Wilson", date: "2026-05-28", daysLeft: 81, href: "/dashboard/drivers" },
+];
+
 const quickActions = [
     { label: "Add Driver", href: "/dashboard/drivers/new", icon: Plus },
     { label: "Add Vehicle", href: "/dashboard/vehicles/new", icon: Plus },
-    { label: "Run Compliance Check", href: "/dashboard/documents/wizard", icon: RefreshCw },
-    { label: "Compliance", href: "/dashboard/compliance", icon: Shield },
+    { label: "Upload Document", href: "/dashboard/documents", icon: Upload },
+    { label: "View Compliance", href: "/dashboard/compliance", icon: Shield },
 ];
 
 // ---------------------------------------------------------------------------
@@ -192,12 +266,14 @@ export default function DashboardContent({
     complianceScores,
     userName,
     searchEntities,
+    upcomingItems: upcomingItemsProp,
 }: {
     stats: DashboardStats | null;
     hasCompany: boolean;
     complianceScores?: ComplianceScores | null;
     userName?: string;
     searchEntities?: SearchableEntity[];
+    upcomingItems?: UpcomingItem[];
 }) {
     const { isDemoMode } = useDemoMode();
     const showChecklist = !isDemoMode && hasCompany;
@@ -262,7 +338,7 @@ export default function DashboardContent({
         return items;
     })();
 
-    const visibleItems = attentionItems.slice(0, 7);
+    const visibleItems = attentionItems.slice(0, 10);
     const totalAttention = attentionItems.length;
 
     // ---- Count driver / vehicle specific issues for stat subtitles ----
@@ -271,12 +347,9 @@ export default function DashboardContent({
 
     const driverCount = isDemoMode ? 12 : (stats?.driverCount ?? 0);
     const vehicleCount = isDemoMode ? 8 : (stats?.vehicleCount ?? 0);
-    const alertCount = isDemoMode ? 4 : (stats?.activeAlerts ?? 0);
 
-    // ---- Summary line for health bar ----
-    const summaryLine = totalAttention > 0
-        ? `${totalAttention} item${totalAttention !== 1 ? "s" : ""} need${totalAttention === 1 ? "s" : ""} your attention`
-        : "You're all caught up";
+    // ---- Upcoming items ----
+    const upcomingItems = isDemoMode ? mockUpcomingItems : (upcomingItemsProp ?? []);
 
     // ---- Search ----
     const [searchQuery, setSearchQuery] = useState("");
@@ -355,7 +428,7 @@ export default function DashboardContent({
                 </div>
             </header>
 
-            {/* Quick Actions (above the fold) */}
+            {/* Quick Actions */}
             <section className={styles.quickActionsSlim}>
                 {quickActions.map((action) => {
                     const Icon = action.icon;
@@ -385,13 +458,13 @@ export default function DashboardContent({
                 </div>
             )}
 
-            {/* 2. Compliance Health Bar (hero) */}
+            {/* 4. Compact DOT Readiness Score Bar */}
             <Link href="/dashboard/compliance" className={styles.healthBarLink}>
                 <section className={`${styles.healthBar} ${isDemoMode ? "demoWrapper" : ""}`}>
                     {overallScore === 0 && !isDemoMode ? (
                         <div className={styles.healthBarEmpty}>
-                            <Shield size={32} style={{ opacity: 0.4 }} />
-                            <p>Add your drivers and vehicles to see your compliance score</p>
+                            <Shield size={28} style={{ opacity: 0.4 }} />
+                            <p>Add your drivers and vehicles to see your DOT readiness score</p>
                         </div>
                     ) : (
                         <div className={styles.healthBarContent}>
@@ -407,77 +480,24 @@ export default function DashboardContent({
                                 </div>
                             </div>
                             <div className={styles.healthBarRight}>
-                                <h3 className={styles.healthBarTitle}>Compliance Health</h3>
-                                <div className={styles.categoryBars}>
-                                    {(scores?.categories ?? []).map((cat) => (
-                                        <div key={cat.name} className={styles.catBarRow}>
-                                            <span className={styles.catBarLabel}>{cat.name}</span>
-                                            <div className={styles.catBarTrack}>
-                                                <div
-                                                    className={styles.catBarFill}
-                                                    style={{ width: `${cat.score}%`, background: getScoreColor(cat.score) }}
-                                                />
-                                            </div>
-                                            <span className={styles.catBarValue}>{cat.score}%</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <p className={styles.healthBarSummary}>
-                                    {totalAttention > 0 ? <AlertTriangle size={14} /> : <CheckCircle size={14} />}
-                                    {summaryLine}
+                                <h3 className={styles.healthBarTitle}>DOT Readiness Score</h3>
+                                <p className={styles.healthBarMessage}>
+                                    {getScoreMessage(overallScore, totalAttention)}
                                 </p>
+                                <span className={styles.healthBarCta}>
+                                    View full compliance details <ArrowRight size={14} />
+                                </span>
                             </div>
                         </div>
                     )}
                 </section>
             </Link>
 
-            {/* 3. Stat Cards (3) */}
-            <section className={isDemoMode ? "demoWrapper" : ""}>
-                <div className={styles.statsGrid}>
-                    <Link href="/dashboard/drivers" className={`${styles.statCard} ${styles.primary}`}>
-                        <div className={styles.statIcon}><Users size={22} /></div>
-                        <div className={styles.statContent}>
-                            <span className={styles.statValue}>{driverCount}</span>
-                            <span className={styles.statLabel}>Drivers</span>
-                            {driverIssues > 0 && (
-                                <span className={styles.statAlert}>{driverIssues} need{driverIssues === 1 ? "s" : ""} attention</span>
-                            )}
-                        </div>
-                        <ArrowRight size={16} className={styles.statArrow} />
-                    </Link>
-
-                    <Link href="/dashboard/vehicles" className={`${styles.statCard} ${styles.success}`}>
-                        <div className={styles.statIcon}><Truck size={22} /></div>
-                        <div className={styles.statContent}>
-                            <span className={styles.statValue}>{vehicleCount}</span>
-                            <span className={styles.statLabel}>Vehicles</span>
-                            {vehicleIssues > 0 && (
-                                <span className={styles.statAlert}>{vehicleIssues} need{vehicleIssues === 1 ? "s" : ""} attention</span>
-                            )}
-                        </div>
-                        <ArrowRight size={16} className={styles.statArrow} />
-                    </Link>
-
-                    <Link href="/dashboard/compliance" className={`${styles.statCard} ${alertCount > 0 ? styles.warning : styles.success}`}>
-                        <div className={styles.statIcon}><Bell size={22} /></div>
-                        <div className={styles.statContent}>
-                            <span className={styles.statValue}>{alertCount}</span>
-                            <span className={styles.statLabel}>Alerts</span>
-                            {alertCount > 0 && (
-                                <span className={styles.statAlert}>Active</span>
-                            )}
-                        </div>
-                        <ArrowRight size={16} className={styles.statArrow} />
-                    </Link>
-                </div>
-            </section>
-
-            {/* 4. What Needs Attention */}
+            {/* 5. What Needs Attention — THE STAR */}
             <section className={`${styles.attentionPanel} ${isDemoMode ? "demoWrapper" : ""}`}>
                 <div className={styles.panelHeader}>
                     <h3 className={styles.sectionTitle}>What Needs Attention</h3>
-                    {totalAttention > 7 && (
+                    {totalAttention > 10 && (
                         <Link href="/dashboard/compliance" className={styles.viewAll}>
                             View all <ArrowRight size={14} />
                         </Link>
@@ -494,6 +514,8 @@ export default function DashboardContent({
                         {visibleItems.map((item) => {
                             const sev = item.severity === "expired" ? "urgent" : item.severity;
                             const action = getActionForAttentionItem(item);
+                            const title = friendlyTitle(item.title);
+                            const detail = getHelpfulDetail(item);
                             const inner = (
                                 <>
                                     <div className={`${styles.attentionIcon} ${styles[sev]}`}>
@@ -503,8 +525,8 @@ export default function DashboardContent({
                                          <Info size={16} />}
                                     </div>
                                     <div className={styles.attentionContent}>
-                                        <span className={styles.attentionTitle}>{item.title}</span>
-                                        <span className={styles.attentionDetail}>{item.detail}</span>
+                                        <span className={styles.attentionTitle}>{title}</span>
+                                        <span className={styles.attentionDetail}>{detail}</span>
                                     </div>
                                     <span className={`${styles.daysBadge} ${styles[sev]}`}>
                                         {item.daysLeft < 0
@@ -536,11 +558,67 @@ export default function DashboardContent({
                     </div>
                 )}
 
-                {totalAttention > 7 && (
+                {totalAttention > 10 && (
                     <Link href="/dashboard/compliance" className={styles.viewAllBottom}>
                         View all on Compliance page <ArrowRight size={14} />
                     </Link>
                 )}
+            </section>
+
+            {/* 6. Upcoming Deadlines */}
+            {upcomingItems.length > 0 && (
+                <section className={`${styles.upcomingPanel} ${isDemoMode ? "demoWrapper" : ""}`}>
+                    <div className={styles.panelHeader}>
+                        <h3 className={styles.sectionTitle}>Upcoming Deadlines</h3>
+                    </div>
+                    <div className={styles.upcomingList}>
+                        {upcomingItems.slice(0, 5).map((item) => (
+                            <Link key={item.id} href={item.href} className={styles.upcomingItem}>
+                                <div className={styles.upcomingIcon}>
+                                    <Calendar size={16} />
+                                </div>
+                                <div className={styles.upcomingContent}>
+                                    <span className={styles.upcomingTitle}>{friendlyTitle(item.title)}</span>
+                                    <span className={styles.upcomingDate}>{formatDateShort(item.date)}</span>
+                                </div>
+                                <span className={styles.upcomingBadge}>{item.daysLeft}d</span>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* 7. Fleet Snapshot — 2 cards */}
+            <section className={isDemoMode ? "demoWrapper" : ""}>
+                <div className={styles.statsGrid}>
+                    <Link href="/dashboard/drivers" className={`${styles.statCard} ${styles.primary}`}>
+                        <div className={styles.statIcon}><Users size={22} /></div>
+                        <div className={styles.statContent}>
+                            <span className={styles.statValue}>{driverCount}</span>
+                            <span className={styles.statLabel}>Drivers</span>
+                            <span className={styles.statAlert}>
+                                {driverIssues > 0
+                                    ? `${driverIssues} need${driverIssues === 1 ? "s" : ""} attention`
+                                    : driverCount > 0 ? "All compliant" : ""}
+                            </span>
+                        </div>
+                        <ArrowRight size={16} className={styles.statArrow} />
+                    </Link>
+
+                    <Link href="/dashboard/vehicles" className={`${styles.statCard} ${styles.success}`}>
+                        <div className={styles.statIcon}><Truck size={22} /></div>
+                        <div className={styles.statContent}>
+                            <span className={styles.statValue}>{vehicleCount}</span>
+                            <span className={styles.statLabel}>Vehicles</span>
+                            <span className={styles.statAlert}>
+                                {vehicleIssues > 0
+                                    ? `${vehicleIssues} need${vehicleIssues === 1 ? "s" : ""} attention`
+                                    : vehicleCount > 0 ? "All compliant" : ""}
+                            </span>
+                        </div>
+                        <ArrowRight size={16} className={styles.statArrow} />
+                    </Link>
+                </div>
             </section>
 
         </div>

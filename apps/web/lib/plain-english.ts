@@ -42,7 +42,15 @@ export const labels: Record<string, string> = {
 
   // Form labels
   "Annual MVR Review": "Annual Driving Record Review",
-  "MVR on File": "Driving Record on File",
+  "MVR on File": "Driving Record",
+
+  // Compliance item labels → friendly
+  "Insurance Policy on File": "Insurance Policy",
+  "Operating Authority on File": "Operating Authority",
+  "Pre-Employment Test": "Drug Test Result",
+  "Medical Card": "DOT Physical",
+  "Medical Card Expiring": "DOT Physical Expiring",
+  "Medical Card Expiration": "DOT Physical",
 
   // Compliance badges
   "Action Needed": "Needs Attention",
