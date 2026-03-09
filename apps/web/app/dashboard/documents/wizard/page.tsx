@@ -81,6 +81,7 @@ function WizardContent() {
     const [signingLinkSending, setSigningLinkSending] = useState(false);
     const [signingLinkCopied, setSigningLinkCopied] = useState(false);
     const { profile, addAddress, removeAddress } = useCompanyProfile();
+    const companyId = profile.companyId || undefined;
 
     // Driver/vehicle selection state
     const [availableDrivers, setAvailableDrivers] = useState<WizardDriverOption[]>([]);
@@ -160,7 +161,7 @@ function WizardContent() {
                 if (vehicleIdParam && availableVehicles.length === 0) return;
 
                 // Load any existing saved data
-                const existingDoc = getDocumentByFormId(formId);
+                const existingDoc = getDocumentByFormId(formId, companyId);
                 const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
 
                 // Auto-fill company fields and today's date
@@ -203,7 +204,7 @@ function WizardContent() {
                 setStep("fillForm");
             }
         }
-    }, [searchParams, availableDrivers, availableVehicles, entityLoaded, profile]);
+    }, [searchParams, availableDrivers, availableVehicles, entityLoaded, profile, companyId]);
 
     // ─── Assessment Logic ──────────────────
 
@@ -283,7 +284,7 @@ function WizardContent() {
 
     const startForm = (form: DOTForm) => {
         // Load any existing saved data
-        const existingDoc = getDocumentByFormId(form.id);
+        const existingDoc = getDocumentByFormId(form.id, companyId);
         const initialData: Record<string, string | boolean> = existingDoc ? { ...existingDoc.data } : {};
 
         // Auto-fill company fields and today's date for common date fields
@@ -387,10 +388,11 @@ function WizardContent() {
                 completedFields,
                 totalFields,
                 status: isComplete ? "completed" : "draft",
+                companyId,
             };
 
             // Check if we already saved this form — update instead of creating new
-            const existing = getDocumentByFormId(activeForm.id);
+            const existing = getDocumentByFormId(activeForm.id, companyId);
             if (existing) {
                 doc.id = existing.id;
             }

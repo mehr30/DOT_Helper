@@ -3,7 +3,7 @@
 import { prisma } from "@repo/database";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getServerSession } from "../../lib/session";
+import { getServerSession, requireCompanyUser } from "../../lib/session";
 import { companyOnboardingSchema, companyUpdateSchema } from "../../lib/validations/company";
 
 type CompanyActionResult = { success?: boolean; error?: string };
@@ -234,4 +234,68 @@ export async function getUserCompanies() {
         location: [m.company.city, m.company.state].filter(Boolean).join(", ") || null,
         role: m.role,
     }));
+}
+
+/**
+ * Delete the current company. Only the OWNER can do this.
+ * Requires typing the company name as confirmation.
+ */
+export async function deleteCompany(confirmName: string): Promise<CompanyActionResult> {
+    const { userId, companyId } = await requireCompanyUser();
+
+    // Verify the user is OWNER
+    const membership = await prisma.companyMember.findUnique({
+        where: {
+            userId_companyId: { userId, companyId },
+        },
+    });
+
+    if (!membership || membership.role !== "OWNER") {
+        return { error: "Only the company owner can delete a company" };
+    }
+
+    // Verify company name matches
+    const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { name: true },
+    });
+
+    if (!company) {
+        return { error: "Company not found" };
+    }
+
+    if (company.name.trim().toLowerCase() !== confirmName.trim().toLowerCase()) {
+        return { error: "Company name does not match" };
+    }
+
+    // Delete the company — all child records cascade-delete automatically
+    await prisma.company.delete({ where: { id: companyId } });
+
+    // Find another company the user belongs to
+    const remaining = await prisma.companyMember.findFirst({
+        where: { userId },
+        select: { companyId: true, role: true },
+    });
+
+    if (remaining) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                activeCompanyId: remaining.companyId,
+                companyId: remaining.companyId,
+                role: remaining.role,
+            },
+        });
+    } else {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                activeCompanyId: null,
+                companyId: null,
+            },
+        });
+    }
+
+    revalidatePath("/dashboard");
+    return { success: true };
 }

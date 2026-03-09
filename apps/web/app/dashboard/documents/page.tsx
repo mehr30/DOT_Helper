@@ -28,6 +28,7 @@ import {
 import styles from "./page.module.css";
 import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
 import { useDemoMode } from "../../components/DemoModeContext";
+import { useCompanyProfile } from "../../components/CompanyProfileContext";
 import DocumentUpload from "../../components/DocumentUpload";
 import SignDocumentModal from "../../components/SignDocumentModal";
 import { getDocuments, deleteDocumentRecord, getDriversForWizard, getVehiclesForWizard, type DocumentData } from "../../actions/documents";
@@ -110,6 +111,8 @@ const wizardForms = [
 
 function DocumentsPageInner() {
     const { isDemoMode } = useDemoMode();
+    const { profile } = useCompanyProfile();
+    const companyId = profile.companyId || undefined;
     const searchParams = useSearchParams();
     const uploadDocType = searchParams.get("upload") || undefined;
     const uploadDriverId = searchParams.get("driver") || undefined;
@@ -143,15 +146,15 @@ function DocumentsPageInner() {
     }, []);
 
     useEffect(() => {
-        setSavedDocs(getSavedDocuments());
+        setSavedDocs(getSavedDocuments(companyId));
         if (!isDemoMode) {
             loadRealDocs();
         }
-    }, [isDemoMode, loadRealDocs]);
+    }, [isDemoMode, loadRealDocs, companyId]);
 
     const handleDeleteSavedDoc = (id: string) => {
         deleteDocument(id);
-        setSavedDocs(getSavedDocuments());
+        setSavedDocs(getSavedDocuments(companyId));
     };
 
     const handleDeleteRealDoc = (docId: string) => {
@@ -337,7 +340,7 @@ function DocumentsPageInner() {
                         </h3>
                         <button
                             onClick={() => {
-                                const docs = getSavedDocuments();
+                                const docs = getSavedDocuments(companyId);
                                 if (docs.length === 0) return;
                                 downloadCompliancePacket(docs as SavedFormData[]);
                             }}

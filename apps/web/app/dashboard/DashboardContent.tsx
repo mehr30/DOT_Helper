@@ -415,40 +415,7 @@ export default function DashboardContent({
                 />
             )}
 
-            {/* 4. Fleet Snapshot — Drivers & Vehicles */}
-            <section>
-                <div className={styles.statsGrid}>
-                    <Link href="/dashboard/drivers" className={`${styles.statCard} ${styles.primary}`}>
-                        <div className={styles.statIcon}><Users size={22} /></div>
-                        <div className={styles.statContent}>
-                            <span className={styles.statValue}>{driverCount}</span>
-                            <span className={styles.statLabel}>Drivers</span>
-                            <span className={styles.statAlert}>
-                                {driverIssues > 0
-                                    ? `${driverIssues} need${driverIssues === 1 ? "s" : ""} attention`
-                                    : driverCount > 0 ? "All compliant" : ""}
-                            </span>
-                        </div>
-                        <ArrowRight size={16} className={styles.statArrow} />
-                    </Link>
-
-                    <Link href="/dashboard/vehicles" className={`${styles.statCard} ${styles.success}`}>
-                        <div className={styles.statIcon}><Truck size={22} /></div>
-                        <div className={styles.statContent}>
-                            <span className={styles.statValue}>{vehicleCount}</span>
-                            <span className={styles.statLabel}>Vehicles</span>
-                            <span className={styles.statAlert}>
-                                {vehicleIssues > 0
-                                    ? `${vehicleIssues} need${vehicleIssues === 1 ? "s" : ""} attention`
-                                    : vehicleCount > 0 ? "All compliant" : ""}
-                            </span>
-                        </div>
-                        <ArrowRight size={16} className={styles.statArrow} />
-                    </Link>
-                </div>
-            </section>
-
-            {/* 5. DOT Readiness Score Bar */}
+            {/* 4. DOT Readiness Score Bar */}
             <Link href="/dashboard/compliance" className={styles.healthBarLink}>
                 <section className={styles.healthBar}>
                     {overallScore === 0 ? (
@@ -482,6 +449,39 @@ export default function DashboardContent({
                     )}
                 </section>
             </Link>
+
+            {/* 5. Fleet Snapshot — Drivers & Vehicles */}
+            <section>
+                <div className={styles.statsGrid}>
+                    <Link href="/dashboard/drivers" className={`${styles.statCard} ${styles.primary}`}>
+                        <div className={styles.statIcon}><Users size={22} /></div>
+                        <div className={styles.statContent}>
+                            <span className={styles.statValue}>{driverCount}</span>
+                            <span className={styles.statLabel}>Drivers</span>
+                            <span className={styles.statAlert}>
+                                {driverIssues > 0
+                                    ? `${driverIssues} need${driverIssues === 1 ? "s" : ""} attention`
+                                    : driverCount > 0 ? "All compliant" : ""}
+                            </span>
+                        </div>
+                        <ArrowRight size={16} className={styles.statArrow} />
+                    </Link>
+
+                    <Link href="/dashboard/vehicles" className={`${styles.statCard} ${styles.success}`}>
+                        <div className={styles.statIcon}><Truck size={22} /></div>
+                        <div className={styles.statContent}>
+                            <span className={styles.statValue}>{vehicleCount}</span>
+                            <span className={styles.statLabel}>Vehicles</span>
+                            <span className={styles.statAlert}>
+                                {vehicleIssues > 0
+                                    ? `${vehicleIssues} need${vehicleIssues === 1 ? "s" : ""} attention`
+                                    : vehicleCount > 0 ? "All compliant" : ""}
+                            </span>
+                        </div>
+                        <ArrowRight size={16} className={styles.statArrow} />
+                    </Link>
+                </div>
+            </section>
 
             {/* 6. What Needs Attention */}
             <section className={styles.attentionPanel}>

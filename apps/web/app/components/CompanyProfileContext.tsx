@@ -15,6 +15,7 @@ export interface SavedAddress {
 }
 
 export interface CompanyProfile {
+    companyId: string;
     companyName: string;
     usdotNumber: string;
     phone: string;
@@ -25,6 +26,7 @@ export interface CompanyProfile {
 }
 
 const DEFAULT_PROFILE: CompanyProfile = {
+    companyId: "",
     companyName: "",
     usdotNumber: "",
     phone: "",
@@ -68,6 +70,7 @@ export function CompanyProfileProvider({ children }: { children: ReactNode }) {
                     if (company && !cancelled) {
                         setProfile(prev => ({
                             ...prev,
+                            companyId: company.id || "",
                             companyName: company.name || "",
                             usdotNumber: company.usdotNumber || "",
                             phone: company.phone || "",

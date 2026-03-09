@@ -13,15 +13,19 @@ export interface SavedDocument {
     completedFields: number;
     totalFields: number;
     status: "draft" | "completed";
+    companyId?: string;
 }
 
 const STORAGE_KEY = "dot_helper_saved_documents";
 
-export function getSavedDocuments(): SavedDocument[] {
+export function getSavedDocuments(companyId?: string): SavedDocument[] {
     if (typeof window === "undefined") return [];
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        const docs: SavedDocument[] = raw ? JSON.parse(raw) : [];
+        if (!companyId) return docs;
+        // Filter to docs belonging to this company, or legacy docs with no companyId
+        return docs.filter(d => d.companyId === companyId || !d.companyId);
     } catch {
         return [];
     }
@@ -43,6 +47,6 @@ export function deleteDocument(id: string): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
 }
 
-export function getDocumentByFormId(formId: string): SavedDocument | undefined {
-    return getSavedDocuments().find(d => d.formId === formId);
+export function getDocumentByFormId(formId: string, companyId?: string): SavedDocument | undefined {
+    return getSavedDocuments(companyId).find(d => d.formId === formId);
 }

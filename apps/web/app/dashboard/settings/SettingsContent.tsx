@@ -16,9 +16,11 @@ import {
     WifiOff,
     Save,
     MapPin,
+    Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { updateCompany } from "../../actions/company";
+import { useRouter } from "next/navigation";
+import { updateCompany, deleteCompany } from "../../actions/company";
 import { formatPhone } from "../../../lib/formatPhone";
 import { useCompanyProfile } from "../../components/CompanyProfileContext";
 
@@ -211,6 +213,7 @@ const US_STATES = [
 
 /* ─── Main Component ─── */
 export default function SettingsContent({ company }: { company: CompanyData | null }) {
+    const router = useRouter();
     const { updateProfile } = useCompanyProfile();
     const [connections, setConnections] = useState<SavedConnection[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -219,6 +222,12 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
     const [isConnecting, setIsConnecting] = useState(false);
     const [connectionError, setConnectionError] = useState<string | null>(null);
     const [settingsModal, setSettingsModal] = useState<string | null>(null);
+
+    // Delete company state
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleteConfirmName, setDeleteConfirmName] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     // Company form state
     const [companyForm, setCompanyForm] = useState({
@@ -538,6 +547,99 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                         fontSize: "0.85rem", color: "#64748b", cursor: "pointer",
                     }}>Cancel</button>
                 </div>
+
+                {/* Danger Zone — Delete Company */}
+                {company && (
+                    <div style={{
+                        marginTop: "2rem", padding: "1.25rem", borderRadius: "12px",
+                        border: "1px solid #fecaca", background: "#fef2f2",
+                    }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                            <AlertTriangle size={18} style={{ color: "#dc2626" }} />
+                            <span style={{ fontSize: "1rem", fontWeight: 700, color: "#991b1b" }}>Danger Zone</span>
+                        </div>
+                        <p style={{ fontSize: "0.85rem", color: "#7f1d1d", lineHeight: 1.5, margin: "0 0 1rem" }}>
+                            This will permanently delete <strong>{company.name}</strong> and all associated data
+                            (drivers, vehicles, documents, team members). This action cannot be undone.
+                        </p>
+
+                        {!showDeleteConfirm ? (
+                            <button
+                                onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmName(""); setDeleteError(null); }}
+                                style={{
+                                    display: "flex", alignItems: "center", gap: "0.4rem",
+                                    padding: "0.55rem 1.25rem", borderRadius: "8px",
+                                    border: "1px solid #dc2626", background: "white",
+                                    color: "#dc2626", fontSize: "0.85rem", fontWeight: 600,
+                                    cursor: "pointer",
+                                }}
+                            >
+                                <Trash2 size={14} />
+                                Delete Company
+                            </button>
+                        ) : (
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "#991b1b", marginBottom: "0.35rem" }}>
+                                    Type &ldquo;{company.name}&rdquo; to confirm
+                                </label>
+                                <input
+                                    value={deleteConfirmName}
+                                    onChange={(e) => setDeleteConfirmName(e.target.value)}
+                                    placeholder={company.name}
+                                    style={{
+                                        width: "100%", padding: "0.6rem 0.75rem", border: "1px solid #fecaca",
+                                        borderRadius: "8px", fontSize: "0.9rem", marginBottom: "0.75rem",
+                                    }}
+                                    autoFocus
+                                />
+                                {deleteError && (
+                                    <div style={{
+                                        display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.75rem",
+                                        padding: "0.5rem 0.75rem", background: "#fff1f2", borderRadius: "8px",
+                                        fontSize: "0.8rem", color: "#dc2626",
+                                    }}>
+                                        <AlertTriangle size={14} /> {deleteError}
+                                    </div>
+                                )}
+                                <div style={{ display: "flex", gap: "0.5rem" }}>
+                                    <button
+                                        onClick={async () => {
+                                            setIsDeleting(true);
+                                            setDeleteError(null);
+                                            const result = await deleteCompany(deleteConfirmName);
+                                            setIsDeleting(false);
+                                            if (result.error) {
+                                                setDeleteError(result.error);
+                                            } else {
+                                                router.push("/dashboard");
+                                            }
+                                        }}
+                                        disabled={isDeleting || deleteConfirmName.trim().toLowerCase() !== company.name.trim().toLowerCase()}
+                                        style={{
+                                            display: "flex", alignItems: "center", gap: "0.4rem",
+                                            padding: "0.55rem 1.25rem", borderRadius: "8px",
+                                            border: "none",
+                                            background: deleteConfirmName.trim().toLowerCase() === company.name.trim().toLowerCase() ? "#dc2626" : "#fca5a5",
+                                            color: "white", fontSize: "0.85rem", fontWeight: 600,
+                                            cursor: isDeleting || deleteConfirmName.trim().toLowerCase() !== company.name.trim().toLowerCase() ? "not-allowed" : "pointer",
+                                        }}
+                                    >
+                                        {isDeleting ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Trash2 size={14} />}
+                                        {isDeleting ? "Deleting..." : "Permanently Delete"}
+                                    </button>
+                                    <button
+                                        onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); }}
+                                        style={{
+                                            padding: "0.55rem 1rem", borderRadius: "8px",
+                                            border: "1px solid #e2e8f0", background: "white",
+                                            fontSize: "0.85rem", color: "#64748b", cursor: "pointer",
+                                        }}
+                                    >Cancel</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
