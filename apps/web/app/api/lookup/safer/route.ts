@@ -4,56 +4,74 @@ import { NextRequest, NextResponse } from "next/server";
  * GET /api/lookup/safer?dot=XXXXXXX
  *
  * Queries the FMCSA SAFER Web Services API to look up carrier information
- * by USDOT number. Returns company name, address, MC number, and
- * operation classification so onboarding can auto-populate fields.
+ * by USDOT number. Hits 3 endpoints in parallel:
+ *   1. /carriers/{dot}                     — name, address, phone, status
+ *   2. /carriers/{dot}/docket-numbers      — MC number
+ *   3. /carriers/{dot}/operation-classification — for-hire / private / exempt
+ *
+ * Returns a unified response so onboarding can auto-populate fields.
  */
 
-const FMCSA_API_KEY = "fe1988b215cfc307fd41a8f71c2e41659ec82352";
+const FMCSA_API_KEY = process.env.FMCSA_WEB_KEY || "fe1988b215cfc307fd41a8f71c2e41659ec82352";
 const FMCSA_BASE = "https://mobile.fmcsa.dot.gov/qc/services/carriers";
 
-interface FMCSACarrierResult {
-    content?: {
-        carrier?: {
-            legalName?: string;
-            dbaName?: string;
-            dotNumber?: number;
-            mcNumber?: string;
-            phyStreet?: string;
-            phyCity?: string;
-            phyState?: string;
-            phyZipcode?: string;
-            phone?: string;
-            email?: string;
-            carrierOperation?: string; // e.g. "A" = Auth For Hire, "B" = Exempt For Hire, "C" = Private
-            hmFlag?: string;
-            statusCode?: string;
-            oosDate?: string;
-            // Operation classification fields
-            authForHire?: string;     // "Y" or "N"
-            contractAuth?: string;
-            brokerAuth?: string;
-            commonAuth?: string;
-            privatePassenger?: string;
-            privateProperty?: string;
-            exemptForHire?: string;
-        };
-    };
+// --- Types matching FMCSA JSON responses ---
+
+interface FMCSACarrier {
+    legalName?: string;
+    dbaName?: string;
+    dotNumber?: number;
+    phyStreet?: string;
+    phyCity?: string;
+    phyState?: string;
+    phyZipcode?: string;
+    phone?: string;
+    email?: string;
+    hmFlag?: string;
+    statusCode?: string;
+    allowedToOperate?: string;
+    // carrierOperation can be a string ("A") OR an object ({ carrierOperationCode, carrierOperationDesc })
+    carrierOperation?: string | {
+        carrierOperationCode?: string;
+        carrierOperationDesc?: string; // e.g. "Interstate", "Intrastate Only", "Intrastate HM"
+    } | null;
 }
 
-function classifyOperationType(carrier: NonNullable<NonNullable<FMCSACarrierResult["content"]>["carrier"]>): string | null {
-    if (!carrier) return null;
-    const op = carrier.carrierOperation?.toUpperCase();
-    // A = Auth For Hire, B = Exempt For Hire, C = Private (Property), D = Private (Passenger)
-    if (op === "A") return "FOR_HIRE";
-    if (op === "B") return "EXEMPT";
-    if (op === "C" || op === "D") return "PRIVATE";
+interface FMCSADocketEntry {
+    prefix?: string;       // "MC", "FF", "MX"
+    docketNumber?: number;
+}
 
-    // Fallback: check individual flags
-    if (carrier.authForHire === "Y" || carrier.commonAuth === "Y" || carrier.contractAuth === "Y") return "FOR_HIRE";
-    if (carrier.exemptForHire === "Y") return "EXEMPT";
-    if (carrier.privateProperty === "Y" || carrier.privatePassenger === "Y") return "PRIVATE";
+interface FMCSAOperationClass {
+    operationClassDesc?: string; // "Authorized For Hire", "Exempt For Hire", "Private(Property)", etc.
+    id?: { operationClassId?: number };
+}
 
+// --- Helpers ---
+
+function classifyFromOperationDescs(descs: string[]): string | null {
+    for (const d of descs) {
+        const lower = d.toLowerCase();
+        if (lower.includes("authorized for hire") || lower.includes("common") || lower.includes("contract")) {
+            return "FOR_HIRE";
+        }
+        if (lower.includes("exempt")) return "EXEMPT";
+        if (lower.includes("private")) return "PRIVATE";
+    }
     return null;
+}
+
+async function fetchJSON<T>(url: string): Promise<T | null> {
+    try {
+        const res = await fetch(url, {
+            headers: { Accept: "application/json" },
+            next: { revalidate: 3600 },
+        });
+        if (!res.ok) return null;
+        return await res.json() as T;
+    } catch {
+        return null;
+    }
 }
 
 export async function GET(request: NextRequest) {
@@ -67,27 +85,21 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const url = `${FMCSA_BASE}/${dot}?webKey=${FMCSA_API_KEY}`;
-        const res = await fetch(url, {
-            headers: { Accept: "application/json" },
-            next: { revalidate: 3600 }, // cache for 1 hour
-        });
+        // Hit all three endpoints in parallel
+        const key = `webKey=${FMCSA_API_KEY}`;
+        const [carrierRes, docketRes, opClassRes] = await Promise.all([
+            fetchJSON<{ content?: { carrier?: FMCSACarrier } }>(
+                `${FMCSA_BASE}/${dot}?${key}`
+            ),
+            fetchJSON<{ content?: FMCSADocketEntry[] }>(
+                `${FMCSA_BASE}/${dot}/docket-numbers?${key}`
+            ),
+            fetchJSON<{ content?: FMCSAOperationClass[] }>(
+                `${FMCSA_BASE}/${dot}/operation-classification?${key}`
+            ),
+        ]);
 
-        if (!res.ok) {
-            if (res.status === 404) {
-                return NextResponse.json(
-                    { error: "No carrier found for this USDOT number." },
-                    { status: 404 }
-                );
-            }
-            return NextResponse.json(
-                { error: "FMCSA service temporarily unavailable. Try again later." },
-                { status: 502 }
-            );
-        }
-
-        const data: FMCSACarrierResult = await res.json();
-        const carrier = data?.content?.carrier;
+        const carrier = carrierRes?.content?.carrier;
 
         if (!carrier) {
             return NextResponse.json(
@@ -96,27 +108,53 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Format MC number (FMCSA may return it without prefix)
-        let mcNumber = carrier.mcNumber || null;
-        if (mcNumber && !mcNumber.startsWith("MC")) {
-            mcNumber = `MC-${mcNumber}`;
+        // Extract MC number from docket entries
+        let mcNumber: string | null = null;
+        const dockets = docketRes?.content;
+        if (Array.isArray(dockets)) {
+            const mcEntry = dockets.find(d => d.prefix === "MC");
+            if (mcEntry?.docketNumber) {
+                mcNumber = `MC-${mcEntry.docketNumber}`;
+            }
         }
 
-        const operationType = classifyOperationType(carrier);
+        // Classify operation type from the operation-classification endpoint
+        let operationType: string | null = null;
+        const opClasses = opClassRes?.content;
+        if (Array.isArray(opClasses) && opClasses.length > 0) {
+            const descs = opClasses
+                .map(c => c.operationClassDesc)
+                .filter((d): d is string => !!d);
+            operationType = classifyFromOperationDescs(descs);
+        }
+
+        // Extract operation scope from carrierOperation (when it's an object with desc)
+        let operationScope: string | null = null;
+        const carrierOp = carrier.carrierOperation;
+        if (carrierOp && typeof carrierOp === "object") {
+            const desc = carrierOp.carrierOperationDesc?.toLowerCase() ?? "";
+            if (desc.includes("interstate") && desc.includes("intrastate")) {
+                operationScope = "BOTH";
+            } else if (desc.includes("intrastate")) {
+                operationScope = "INTRASTATE";
+            } else if (desc.includes("interstate")) {
+                operationScope = "INTERSTATE";
+            }
+        }
 
         return NextResponse.json({
             dotNumber: String(carrier.dotNumber || dot),
             name: carrier.legalName || carrier.dbaName || null,
             dbaName: carrier.dbaName || null,
             mcNumber,
-            address: carrier.phyStreet || null,
+            address: carrier.phyStreet?.trim() || null,
             city: carrier.phyCity || null,
             state: carrier.phyState || null,
             zip: carrier.phyZipcode || null,
             phone: carrier.phone || null,
             email: carrier.email || null,
             operationType,
-            operationScope: null, // FMCSA doesn't expose this directly; user picks
+            operationScope,
             hazmat: carrier.hmFlag === "Y",
             statusCode: carrier.statusCode || null,
         });
