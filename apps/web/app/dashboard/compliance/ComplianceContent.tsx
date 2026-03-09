@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,6 +19,8 @@ import {
     ArrowRight,
     ClipboardList,
     Info,
+    RefreshCw,
+    X,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { useDemoMode } from "../../components/DemoModeContext";
@@ -26,6 +28,7 @@ import EmptyState from "../../components/EmptyState";
 import type { ComplianceScores } from "../../actions/compliance";
 import { humanize, humanizeRegulation } from "../../../lib/plain-english";
 import { downloadComplianceReport } from "../../../lib/pdf";
+import { completeComplianceReview } from "../../actions/company";
 
 // --- Demo mock data ---
 const mockScores: ComplianceScores = {
@@ -208,12 +211,208 @@ function friendlyLabel(label: string): string {
         .replace("IFTA License", "Fuel Tax License");
 }
 
-export default function ComplianceContent({ scores }: { scores: ComplianceScores | null }) {
+// ---------------------------------------------------------------------------
+// Compliance Review Questionnaire
+// ---------------------------------------------------------------------------
+
+const reviewQuestions = [
+    {
+        id: "fleet",
+        question: "Has your fleet changed?",
+        description: "Added or removed vehicles, trailers, or changed vehicle types",
+        settingsField: null,
+    },
+    {
+        id: "interstate",
+        question: "Did your travel change?",
+        description: "Started or stopped crossing state lines (affects fuel tax, UCR, and other registrations)",
+        settingsField: "operationScope",
+    },
+    {
+        id: "forhire",
+        question: "Changed who you haul for?",
+        description: "Started or stopped hauling for other businesses (affects operating authority requirements)",
+        settingsField: "operationType",
+    },
+    {
+        id: "hazmat",
+        question: "Any hazmat changes?",
+        description: "Started or stopped carrying hazardous materials",
+        settingsField: "hazmat",
+    },
+    {
+        id: "drivers",
+        question: "Any driver changes?",
+        description: "New CDL drivers, or drivers who changed license type (CDL to regular or vice versa)",
+        settingsField: null,
+    },
+];
+
+function ComplianceReviewModal({ onClose, onComplete }: { onClose: () => void; onComplete: () => void }) {
+    const router = useRouter();
+    const [answers, setAnswers] = useState<Record<string, boolean | null>>({});
+    const [saving, setSaving] = useState(false);
+    const [done, setDone] = useState(false);
+
+    const allAnswered = reviewQuestions.every(q => answers[q.id] !== undefined && answers[q.id] !== null);
+    const hasYes = Object.values(answers).some(v => v === true);
+
+    const handleSubmit = async () => {
+        setSaving(true);
+        await completeComplianceReview();
+        setSaving(false);
+
+        if (hasYes) {
+            // Redirect to settings to update
+            router.push("/dashboard/settings");
+            onClose();
+        } else {
+            setDone(true);
+            setTimeout(() => {
+                onComplete();
+            }, 2000);
+        }
+    };
+
+    return (
+        <div style={{
+            position: "fixed", inset: 0, zIndex: 1000,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)",
+        }}
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div style={{
+                background: "white", borderRadius: "16px", width: "100%", maxWidth: 520,
+                maxHeight: "90vh", overflow: "auto", padding: "1.75rem",
+                boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
+            }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+                    <div>
+                        <h2 style={{ fontSize: "1.15rem", fontWeight: 700, margin: 0, color: "#0f172a" }}>
+                            Quick Compliance Check-In
+                        </h2>
+                        <p style={{ fontSize: "0.8rem", color: "#64748b", margin: "0.25rem 0 0" }}>
+                            Has anything changed since your last review? This takes about 30 seconds.
+                        </p>
+                    </div>
+                    <button onClick={onClose} style={{
+                        border: "none", background: "none", cursor: "pointer",
+                        color: "#94a3b8", padding: "0.25rem",
+                    }}>
+                        <X size={20} />
+                    </button>
+                </div>
+
+                {done ? (
+                    <div style={{
+                        textAlign: "center", padding: "2rem 1rem",
+                    }}>
+                        <CheckCircle size={48} style={{ color: "#22c55e", marginBottom: "0.75rem" }} />
+                        <h3 style={{ fontSize: "1.1rem", fontWeight: 600, color: "#0f172a", margin: "0 0 0.25rem" }}>
+                            All good!
+                        </h3>
+                        <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
+                            Your compliance profile is up to date. We&apos;ll check in again in 6 months.
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                            {reviewQuestions.map(q => (
+                                <div key={q.id} style={{
+                                    padding: "0.75rem 1rem", borderRadius: "10px",
+                                    border: `1px solid ${answers[q.id] === true ? "#fde68a" : answers[q.id] === false ? "#bbf7d0" : "#e2e8f0"}`,
+                                    background: answers[q.id] === true ? "#fffbeb" : answers[q.id] === false ? "#f0fdf4" : "white",
+                                    transition: "all 0.15s ease",
+                                }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: "0.88rem", color: "#0f172a" }}>{q.question}</div>
+                                            <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.15rem", lineHeight: 1.4 }}>{q.description}</div>
+                                        </div>
+                                        <div style={{ display: "flex", gap: "0.35rem", flexShrink: 0 }}>
+                                            <button
+                                                onClick={() => setAnswers(prev => ({ ...prev, [q.id]: false }))}
+                                                style={{
+                                                    padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", fontWeight: 600,
+                                                    border: `1.5px solid ${answers[q.id] === false ? "#16a34a" : "#e2e8f0"}`,
+                                                    background: answers[q.id] === false ? "#dcfce7" : "white",
+                                                    color: answers[q.id] === false ? "#15803d" : "#64748b",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                No
+                                            </button>
+                                            <button
+                                                onClick={() => setAnswers(prev => ({ ...prev, [q.id]: true }))}
+                                                style={{
+                                                    padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", fontWeight: 600,
+                                                    border: `1.5px solid ${answers[q.id] === true ? "#d97706" : "#e2e8f0"}`,
+                                                    background: answers[q.id] === true ? "#fef3c7" : "white",
+                                                    color: answers[q.id] === true ? "#92400e" : "#64748b",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                Yes
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {hasYes && (
+                            <div style={{
+                                marginTop: "0.75rem", padding: "0.6rem 0.85rem", borderRadius: "8px",
+                                background: "#fffbeb", border: "1px solid #fde68a",
+                                fontSize: "0.78rem", color: "#92400e",
+                            }}>
+                                Since something changed, we&apos;ll take you to Settings after completing this review so you can update your company profile. Your compliance items will automatically adjust.
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleSubmit}
+                            disabled={!allAnswered || saving}
+                            style={{
+                                width: "100%", marginTop: "1rem",
+                                padding: "0.65rem", borderRadius: "10px", border: "none",
+                                background: allAnswered ? "linear-gradient(135deg, #165C30, #0F2E1A)" : "#e2e8f0",
+                                color: allAnswered ? "white" : "#94a3b8",
+                                fontWeight: 600, fontSize: "0.9rem", cursor: allAnswered ? "pointer" : "not-allowed",
+                                opacity: saving ? 0.7 : 1,
+                            }}
+                        >
+                            {saving ? "Saving..." : hasYes ? "Complete & Go to Settings" : "Looks Good — Complete Review"}
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default function ComplianceContent({
+    scores,
+    lastReviewAt,
+    openReview,
+}: {
+    scores: ComplianceScores | null;
+    lastReviewAt?: string | null;
+    openReview?: boolean;
+}) {
     const { isDemoMode } = useDemoMode();
     const data = isDemoMode ? mockScores : scores;
     const router = useRouter();
 
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Driver Qualification", "Vehicle Maintenance"]));
+    const [showReview, setShowReview] = useState(false);
+
+    // Auto-open review modal if ?review=true
+    useEffect(() => {
+        if (openReview) setShowReview(true);
+    }, [openReview]);
 
     if (!data || (!isDemoMode && data.summary.totalItems === 0)) {
         return (
@@ -262,6 +461,19 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                     </p>
                 </div>
                 <div className={styles.headerActions}>
+                    <button
+                        onClick={() => setShowReview(true)}
+                        style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                            padding: "0.55rem 0.9rem", borderRadius: "8px",
+                            background: "white", border: "1px solid #e2e8f0",
+                            color: "#475569", fontWeight: 600, fontSize: "0.8rem",
+                            cursor: "pointer", whiteSpace: "nowrap",
+                        }}
+                    >
+                        <RefreshCw size={14} />
+                        Something Changed?
+                    </button>
                     <Link
                         href="/dashboard/documents/wizard"
                         style={{
@@ -284,6 +496,17 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                     </button>
                 </div>
             </div>
+
+            {/* Last review timestamp */}
+            {!isDemoMode && lastReviewAt && (
+                <div style={{
+                    display: "flex", alignItems: "center", gap: "0.4rem",
+                    marginBottom: "0.5rem", fontSize: "0.78rem", color: "#94a3b8",
+                }}>
+                    <CheckCircle size={13} />
+                    Last compliance review: {new Date(lastReviewAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </div>
+            )}
 
             {/* Demo data banner */}
             {isDemoMode && (
@@ -436,6 +659,17 @@ export default function ComplianceContent({ scores }: { scores: ComplianceScores
                     })}
                 </div>
             </div>
+
+            {/* Compliance Review Modal */}
+            {showReview && (
+                <ComplianceReviewModal
+                    onClose={() => setShowReview(false)}
+                    onComplete={() => {
+                        setShowReview(false);
+                        router.refresh();
+                    }}
+                />
+            )}
 
         </div>
     );

@@ -240,6 +240,54 @@ export async function getUserCompanies() {
 }
 
 /**
+ * Get compliance review status for the current company.
+ */
+export async function getComplianceReviewStatus() {
+    const { companyId } = await requireCompanyUser();
+
+    const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { lastComplianceReviewAt: true, createdAt: true },
+    });
+
+    if (!company) return { lastReviewAt: null, isDue: false, daysSinceLastReview: null };
+
+    const now = new Date();
+    const companyAge = Math.ceil((now.getTime() - company.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (!company.lastComplianceReviewAt) {
+        // Never reviewed — due if company is older than 30 days
+        return { lastReviewAt: null, isDue: companyAge > 30, daysSinceLastReview: null };
+    }
+
+    const daysSince = Math.ceil(
+        (now.getTime() - company.lastComplianceReviewAt.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    return {
+        lastReviewAt: company.lastComplianceReviewAt.toISOString(),
+        isDue: daysSince >= 180, // 6 months
+        daysSinceLastReview: daysSince,
+    };
+}
+
+/**
+ * Mark the compliance review as complete for the current company.
+ */
+export async function completeComplianceReview() {
+    const { companyId } = await requireCompanyUser();
+
+    await prisma.company.update({
+        where: { id: companyId },
+        data: { lastComplianceReviewAt: new Date() },
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/compliance");
+    return { success: true };
+}
+
+/**
  * Delete the current company. Only the OWNER can do this.
  * Requires typing the company name as confirmation.
  */

@@ -13,6 +13,7 @@ import {
     Search,
     Upload,
     Calendar,
+    RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -228,6 +229,7 @@ export default function DashboardContent({
     userName,
     searchEntities,
     upcomingItems: upcomingItemsProp,
+    reviewDue,
 }: {
     stats: DashboardStats | null;
     hasCompany: boolean;
@@ -235,6 +237,7 @@ export default function DashboardContent({
     userName?: string;
     searchEntities?: SearchableEntity[];
     upcomingItems?: UpcomingItem[];
+    reviewDue?: boolean;
 }) {
     const showChecklist = hasCompany;
 
@@ -413,6 +416,35 @@ export default function DashboardContent({
                     companyDocsNeeded={companyAuthCategory ? companyAuthCategory.items.filter(i => i.status === "action_needed" || i.status === "expired").length : 0}
                     companyDocsComplete={companyAuthCategory ? companyAuthCategory.items.filter(i => i.status === "compliant").length : 0}
                 />
+            )}
+
+            {/* Compliance Review Banner */}
+            {reviewDue && (
+                <Link href="/dashboard/compliance?review=true" style={{ textDecoration: "none" }}>
+                    <section style={{
+                        display: "flex", alignItems: "center", gap: "0.75rem",
+                        padding: "0.85rem 1.25rem", borderRadius: "12px",
+                        background: "linear-gradient(135deg, #fefce8, #fef9c3)",
+                        border: "1px solid #fde68a",
+                    }}>
+                        <RefreshCw size={20} style={{ color: "#d97706", flexShrink: 0 }} />
+                        <div style={{ flex: 1 }}>
+                            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "#92400e" }}>
+                                Time for a compliance check-in
+                            </span>
+                            <span style={{ display: "block", fontSize: "0.78rem", color: "#a16207", marginTop: "0.1rem" }}>
+                                It&apos;s been a while — take 30 seconds to confirm nothing has changed in your fleet or operations.
+                            </span>
+                        </div>
+                        <span style={{
+                            padding: "0.35rem 0.75rem", borderRadius: "8px",
+                            background: "#fbbf24", color: "#78350f",
+                            fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
+                        }}>
+                            Review Now
+                        </span>
+                    </section>
+                </Link>
             )}
 
             {/* 4. DOT Readiness Score Bar */}

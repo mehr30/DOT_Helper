@@ -5,11 +5,13 @@ import type { SearchableEntity, UpcomingItem } from "./DashboardContent";
 import type { DashboardStats } from "../actions/dashboard";
 import { generateAlerts } from "../actions/alerts";
 import { getComplianceScores, type ComplianceScores } from "../actions/compliance";
+import { getComplianceReviewStatus } from "../actions/company";
 
 export default async function DashboardPage() {
     const session = await getServerSession();
     let stats: DashboardStats | null = null;
     let complianceScores: ComplianceScores | null = null;
+    let reviewDue = false;
     const searchEntities: SearchableEntity[] = [];
     const upcomingItems: UpcomingItem[] = [];
 
@@ -143,6 +145,14 @@ export default async function DashboardPage() {
             } catch {
                 // ok — compliance data may not be available yet
             }
+
+            // Check if compliance review is due
+            try {
+                const reviewStatus = await getComplianceReviewStatus();
+                reviewDue = reviewStatus.isDue;
+            } catch {
+                // ok
+            }
         }
     }
 
@@ -161,6 +171,7 @@ export default async function DashboardPage() {
             userName={userName}
             searchEntities={searchEntities}
             upcomingItems={upcomingItems}
+            reviewDue={reviewDue}
         />
     );
 }
