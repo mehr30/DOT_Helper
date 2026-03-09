@@ -227,6 +227,7 @@ model Driver {
   documents             Document[]
   inspections           Inspection[]
   signingRequests       SigningRequest[]
+  employmentHistory     EmploymentHistory[]
 
   companyId             String
   company               Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -246,6 +247,36 @@ enum DriverStatus {
   INACTIVE
   SUSPENDED
   TERMINATED
+}
+
+// ============================================================================
+// EMPLOYMENT HISTORY & VERIFICATION
+// ============================================================================
+
+model EmploymentHistory {
+  id                       String    @id @default(cuid())
+  employerName             String
+  contactName              String?
+  contactPhone             String?
+  contactEmail             String?
+  position                 String?
+  startDate                DateTime
+  endDate                  DateTime?
+  reasonForLeaving         String?
+  verificationSent         Boolean   @default(false)
+  verificationSentDate     DateTime?
+  verificationReceived     Boolean   @default(false)
+  verificationReceivedDate DateTime?
+  verificationNotes        String?
+  wasDOTRegulated          Boolean   @default(false)
+  drugTestingInquirySent     Boolean @default(false)
+  drugTestingInquiryReceived Boolean @default(false)
+
+  driverId                 String
+  driver                   Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 }
 
 // ============================================================================

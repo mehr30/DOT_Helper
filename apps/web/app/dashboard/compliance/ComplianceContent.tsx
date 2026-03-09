@@ -166,6 +166,9 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     if (lower.includes("d&a policy acknowledgment") || lower.includes("drug & alcohol policy")) {
         return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Fill Out Form" };
     }
+    if (lower.includes("previous employment verified")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "View Driver" };
+    }
 
     // Drug test — upload the result with driver context
     if (lower.includes("pre-employment test") || lower.includes("drug test")) {

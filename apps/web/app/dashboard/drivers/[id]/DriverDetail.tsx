@@ -20,10 +20,13 @@ import {
     Save,
     X,
     Loader2,
+    Briefcase,
+    Plus,
+    Trash2,
 } from "lucide-react";
 import DocumentUpload from "../../../components/DocumentUpload";
 import SignDocumentModal from "../../../components/SignDocumentModal";
-import { updateDriver } from "../../../actions/drivers";
+import { updateDriver, addEmploymentHistory, updateEmploymentHistory, deleteEmploymentHistory } from "../../../actions/drivers";
 import { formatPhone } from "../../../../lib/formatPhone";
 
 interface DriverData {
@@ -60,6 +63,25 @@ interface DriverData {
         violationDate: string;
         severity: string;
         resolved: boolean;
+    }>;
+    employmentHistory: Array<{
+        id: string;
+        employerName: string;
+        contactName: string | null;
+        contactPhone: string | null;
+        contactEmail: string | null;
+        position: string | null;
+        startDate: string;
+        endDate: string | null;
+        reasonForLeaving: string | null;
+        verificationSent: boolean;
+        verificationSentDate: string | null;
+        verificationReceived: boolean;
+        verificationReceivedDate: string | null;
+        verificationNotes: string | null;
+        wasDOTRegulated: boolean;
+        drugTestingInquirySent: boolean;
+        drugTestingInquiryReceived: boolean;
     }>;
 }
 
@@ -287,6 +309,13 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
     const [signingDoc, setSigningDoc] = useState<{ id: string; name: string; url: string } | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const router = useRouter();
+    const [showEmpForm, setShowEmpForm] = useState(false);
+    const [empSaving, setEmpSaving] = useState(false);
+    const [empForm, setEmpForm] = useState({
+        employerName: "", contactName: "", contactPhone: "", contactEmail: "",
+        position: "", startDate: "", endDate: "", reasonForLeaving: "",
+        wasDOTRegulated: false,
+    });
 
     // Inline edit state
     const [editing, setEditing] = useState(false);
@@ -828,6 +857,281 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                     </div>
                 );
             })()}
+
+            {/* Employment History — CDL drivers only */}
+            {isCDL && (
+                <div style={{
+                    background: "white", borderRadius: "12px", padding: "1.25rem",
+                    border: "1px solid #e2e8f0", marginBottom: "1.5rem",
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Briefcase size={18} style={{ color: "#7c3aed" }} />
+                            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Previous Employment</h3>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            {driver.employmentHistory.length > 0 && (
+                                <span style={{ fontSize: "0.78rem", color: "#64748b" }}>
+                                    {driver.employmentHistory.length} employer{driver.employmentHistory.length !== 1 ? "s" : ""} —{" "}
+                                    {driver.employmentHistory.filter(e => e.verificationReceived).length} verified,{" "}
+                                    {driver.employmentHistory.filter(e => !e.verificationReceived).length} pending
+                                </span>
+                            )}
+                            <button
+                                onClick={() => setShowEmpForm(!showEmpForm)}
+                                style={{
+                                    display: "flex", alignItems: "center", gap: "0.3rem",
+                                    padding: "0.35rem 0.7rem", borderRadius: "8px",
+                                    border: "1px solid #e2e8f0", background: "white",
+                                    cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+                                    color: "#7c3aed",
+                                }}
+                            >
+                                <Plus size={14} /> Add
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Add employer form */}
+                    {showEmpForm && (
+                        <div style={{
+                            padding: "1rem", borderRadius: "10px", background: "#faf5ff",
+                            border: "1px solid #e9d5ff", marginBottom: "0.75rem",
+                        }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                                {[
+                                    { key: "employerName", label: "Employer Name *", type: "text" },
+                                    { key: "position", label: "Position / Title", type: "text" },
+                                    { key: "contactName", label: "Contact Name", type: "text" },
+                                    { key: "contactPhone", label: "Contact Phone", type: "tel" },
+                                    { key: "contactEmail", label: "Contact Email", type: "email" },
+                                    { key: "startDate", label: "Start Date *", type: "date" },
+                                    { key: "endDate", label: "End Date", type: "date" },
+                                    { key: "reasonForLeaving", label: "Reason for Leaving", type: "text" },
+                                ].map(({ key, label, type }) => (
+                                    <div key={key}>
+                                        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 500, color: "#475569", marginBottom: "0.2rem" }}>
+                                            {label}
+                                        </label>
+                                        <input
+                                            type={type}
+                                            value={empForm[key as keyof typeof empForm] as string}
+                                            onChange={(e) => setEmpForm(prev => ({ ...prev, [key]: type === "tel" ? formatPhone(e.target.value) : e.target.value }))}
+                                            style={{
+                                                width: "100%", padding: "0.4rem 0.6rem",
+                                                border: "1px solid #e2e8f0", borderRadius: "7px",
+                                                fontSize: "0.85rem",
+                                            }}
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <label style={{
+                                display: "flex", alignItems: "center", gap: "0.5rem",
+                                marginTop: "0.75rem", fontSize: "0.82rem", fontWeight: 500,
+                                color: "#334155", cursor: "pointer",
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={empForm.wasDOTRegulated}
+                                    onChange={(e) => setEmpForm(prev => ({ ...prev, wasDOTRegulated: e.target.checked }))}
+                                    style={{ width: 16, height: 16, accentColor: "#7c3aed" }}
+                                />
+                                This employer was DOT-regulated (requires drug testing inquiry)
+                            </label>
+                            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem", justifyContent: "flex-end" }}>
+                                <button onClick={() => setShowEmpForm(false)} style={{
+                                    padding: "0.4rem 0.75rem", borderRadius: "7px",
+                                    border: "1px solid #e2e8f0", background: "white",
+                                    cursor: "pointer", fontSize: "0.8rem", color: "#64748b",
+                                }}>
+                                    Cancel
+                                </button>
+                                <button
+                                    disabled={empSaving || !empForm.employerName || !empForm.startDate}
+                                    onClick={async () => {
+                                        setEmpSaving(true);
+                                        await addEmploymentHistory({ driverId: driver.id, ...empForm });
+                                        setEmpSaving(false);
+                                        setShowEmpForm(false);
+                                        setEmpForm({ employerName: "", contactName: "", contactPhone: "", contactEmail: "", position: "", startDate: "", endDate: "", reasonForLeaving: "", wasDOTRegulated: false });
+                                        router.refresh();
+                                    }}
+                                    style={{
+                                        padding: "0.4rem 0.9rem", borderRadius: "7px",
+                                        border: "none", background: "#7c3aed",
+                                        cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+                                        color: "white", opacity: empSaving ? 0.7 : 1,
+                                    }}
+                                >
+                                    {empSaving ? "Saving..." : "Add Employer"}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Employment list */}
+                    {driver.employmentHistory.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                            {driver.employmentHistory.map(eh => (
+                                <div key={eh.id} style={{
+                                    padding: "0.75rem", borderRadius: "10px",
+                                    border: `1px solid ${eh.verificationReceived ? "#bbf7d0" : eh.verificationSent ? "#fde68a" : "#e2e8f0"}`,
+                                    background: eh.verificationReceived ? "#f0fdf4" : eh.verificationSent ? "#fffbeb" : "white",
+                                }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: "0.88rem", color: "#0f172a" }}>
+                                                {eh.employerName}
+                                                {eh.wasDOTRegulated && (
+                                                    <span style={{
+                                                        marginLeft: "0.4rem", fontSize: "0.65rem", fontWeight: 600,
+                                                        padding: "0.1rem 0.35rem", borderRadius: "4px",
+                                                        background: "#ede9fe", color: "#7c3aed",
+                                                    }}>DOT</span>
+                                                )}
+                                            </div>
+                                            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.15rem" }}>
+                                                {eh.position && `${eh.position} · `}
+                                                {formatDate(eh.startDate)} — {eh.endDate ? formatDate(eh.endDate) : "Present"}
+                                            </div>
+                                            {eh.contactName && (
+                                                <div style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.2rem" }}>
+                                                    Contact: {eh.contactName}
+                                                    {eh.contactPhone && ` · ${eh.contactPhone}`}
+                                                    {eh.contactEmail && ` · ${eh.contactEmail}`}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexShrink: 0 }}>
+                                            {eh.verificationReceived ? (
+                                                <span style={{
+                                                    display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                                                    fontSize: "0.72rem", fontWeight: 600, padding: "0.2rem 0.5rem",
+                                                    borderRadius: "6px", background: "#dcfce7", color: "#15803d",
+                                                }}>
+                                                    <CheckCircle size={12} /> Verified
+                                                </span>
+                                            ) : eh.verificationSent ? (
+                                                <span style={{
+                                                    fontSize: "0.72rem", fontWeight: 600, padding: "0.2rem 0.5rem",
+                                                    borderRadius: "6px", background: "#fef3c7", color: "#92400e",
+                                                }}>
+                                                    Sent — Awaiting Response
+                                                </span>
+                                            ) : (
+                                                <span style={{
+                                                    fontSize: "0.72rem", fontWeight: 600, padding: "0.2rem 0.5rem",
+                                                    borderRadius: "6px", background: "#f1f5f9", color: "#64748b",
+                                                }}>
+                                                    Not Verified
+                                                </span>
+                                            )}
+                                            <button
+                                                onClick={async () => {
+                                                    if (confirm(`Delete employment record for ${eh.employerName}?`)) {
+                                                        await deleteEmploymentHistory(eh.id, driver.id);
+                                                        router.refresh();
+                                                    }
+                                                }}
+                                                title="Delete"
+                                                style={{
+                                                    display: "flex", padding: "0.25rem", border: "none",
+                                                    background: "none", cursor: "pointer", color: "#94a3b8",
+                                                }}
+                                            >
+                                                <Trash2 size={13} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {/* Quick action buttons */}
+                                    <div style={{ display: "flex", gap: "0.35rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+                                        {!eh.verificationSent && (
+                                            <button
+                                                onClick={async () => {
+                                                    await updateEmploymentHistory({
+                                                        id: eh.id, driverId: driver.id,
+                                                        verificationSent: true,
+                                                        verificationSentDate: new Date().toISOString(),
+                                                    });
+                                                    router.refresh();
+                                                }}
+                                                style={{
+                                                    padding: "0.25rem 0.55rem", borderRadius: "6px", fontSize: "0.72rem",
+                                                    fontWeight: 600, border: "1px solid #e2e8f0",
+                                                    background: "white", cursor: "pointer", color: "#475569",
+                                                }}
+                                            >
+                                                Mark Sent
+                                            </button>
+                                        )}
+                                        {eh.verificationSent && !eh.verificationReceived && (
+                                            <button
+                                                onClick={async () => {
+                                                    await updateEmploymentHistory({
+                                                        id: eh.id, driverId: driver.id,
+                                                        verificationReceived: true,
+                                                        verificationReceivedDate: new Date().toISOString(),
+                                                    });
+                                                    router.refresh();
+                                                }}
+                                                style={{
+                                                    padding: "0.25rem 0.55rem", borderRadius: "6px", fontSize: "0.72rem",
+                                                    fontWeight: 600, border: "1px solid #bbf7d0",
+                                                    background: "#f0fdf4", cursor: "pointer", color: "#15803d",
+                                                }}
+                                            >
+                                                Mark Received
+                                            </button>
+                                        )}
+                                        {eh.wasDOTRegulated && !eh.drugTestingInquirySent && (
+                                            <button
+                                                onClick={async () => {
+                                                    await updateEmploymentHistory({
+                                                        id: eh.id, driverId: driver.id,
+                                                        drugTestingInquirySent: true,
+                                                    });
+                                                    router.refresh();
+                                                }}
+                                                style={{
+                                                    padding: "0.25rem 0.55rem", borderRadius: "6px", fontSize: "0.72rem",
+                                                    fontWeight: 600, border: "1px solid #e9d5ff",
+                                                    background: "#faf5ff", cursor: "pointer", color: "#7c3aed",
+                                                }}
+                                            >
+                                                Send Drug Testing Inquiry
+                                            </button>
+                                        )}
+                                        {eh.wasDOTRegulated && eh.drugTestingInquirySent && !eh.drugTestingInquiryReceived && (
+                                            <button
+                                                onClick={async () => {
+                                                    await updateEmploymentHistory({
+                                                        id: eh.id, driverId: driver.id,
+                                                        drugTestingInquiryReceived: true,
+                                                    });
+                                                    router.refresh();
+                                                }}
+                                                style={{
+                                                    padding: "0.25rem 0.55rem", borderRadius: "6px", fontSize: "0.72rem",
+                                                    fontWeight: 600, border: "1px solid #e9d5ff",
+                                                    background: "#faf5ff", cursor: "pointer", color: "#7c3aed",
+                                                }}
+                                            >
+                                                Drug Inquiry Received
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : !showEmpForm ? (
+                        <p style={{ color: "#94a3b8", fontSize: "0.82rem", margin: 0 }}>
+                            No previous employers on file. CDL drivers must have their last 10 years of employment verified.
+                        </p>
+                    ) : null}
+                </div>
+            )}
 
             {/* Documents */}
             <div id="driver-documents" style={{

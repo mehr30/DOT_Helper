@@ -58,6 +58,14 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 lastDrugTestDate: true,
                 hireDate: true,
                 _count: { select: { documents: true } },
+                employmentHistory: {
+                    select: {
+                        id: true,
+                        verificationReceived: true,
+                        wasDOTRegulated: true,
+                        drugTestingInquiryReceived: true,
+                    },
+                },
             },
         }),
         prisma.vehicle.findMany({
@@ -404,6 +412,23 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             status: hasDAPolicyAck ? "compliant" : "action_needed",
             detail: hasDAPolicyAck ? "On file" : "Missing signed policy acknowledgment",
             reason: `${name} holds a CDL — they must sign acknowledging your drug & alcohol policy`,
+            driverId: d.id,
+        });
+
+        // Previous Employment Verification — 49 CFR 391.23
+        const empHistory = d.employmentHistory ?? [];
+        const allVerified = empHistory.length > 0 && empHistory.every(eh => eh.verificationReceived);
+        const pendingCount = empHistory.filter(eh => !eh.verificationReceived).length;
+        dqItems.push({
+            label: `Previous Employment Verified — ${name}`,
+            regulation: "49 CFR 391.23",
+            status: allVerified ? "compliant" : "action_needed",
+            detail: empHistory.length === 0
+                ? "No previous employers on file"
+                : allVerified
+                ? `${empHistory.length} employer${empHistory.length !== 1 ? "s" : ""} verified`
+                : `${pendingCount} of ${empHistory.length} still pending verification`,
+            reason: `${name} holds a CDL — you must verify their employment history for the past 10 years`,
             driverId: d.id,
         });
     }

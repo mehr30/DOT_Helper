@@ -46,6 +46,9 @@ export default async function DriverPage({
                 take: 10,
                 select: { id: true, description: true, violationDate: true, severity: true, resolved: true },
             },
+            employmentHistory: {
+                orderBy: { startDate: "desc" },
+            },
         },
     });
 
@@ -84,6 +87,25 @@ export default async function DriverPage({
         violations: driver.violations.map(v => ({
             ...v,
             violationDate: v.violationDate.toISOString(),
+        })),
+        employmentHistory: driver.employmentHistory.map(eh => ({
+            id: eh.id,
+            employerName: eh.employerName,
+            contactName: eh.contactName,
+            contactPhone: eh.contactPhone,
+            contactEmail: eh.contactEmail,
+            position: eh.position,
+            startDate: eh.startDate.toISOString(),
+            endDate: eh.endDate?.toISOString() ?? null,
+            reasonForLeaving: eh.reasonForLeaving,
+            verificationSent: eh.verificationSent,
+            verificationSentDate: eh.verificationSentDate?.toISOString() ?? null,
+            verificationReceived: eh.verificationReceived,
+            verificationReceivedDate: eh.verificationReceivedDate?.toISOString() ?? null,
+            verificationNotes: eh.verificationNotes,
+            wasDOTRegulated: eh.wasDOTRegulated,
+            drugTestingInquirySent: eh.drugTestingInquirySent,
+            drugTestingInquiryReceived: eh.drugTestingInquiryReceived,
         })),
     };
 

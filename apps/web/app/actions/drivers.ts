@@ -108,6 +108,107 @@ export async function updateDriver(formData: unknown) {
     return { success: true };
 }
 
+// ── Employment History ──
+
+export async function addEmploymentHistory(data: {
+    driverId: string;
+    employerName: string;
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    position?: string;
+    startDate: string;
+    endDate?: string;
+    reasonForLeaving?: string;
+    wasDOTRegulated?: boolean;
+}) {
+    const { companyId } = await requireCompanyUser();
+
+    // Verify driver ownership
+    const driver = await prisma.driver.findFirst({
+        where: { id: data.driverId, companyId },
+    });
+    if (!driver) return { error: "Driver not found" };
+
+    await prisma.employmentHistory.create({
+        data: {
+            employerName: data.employerName,
+            contactName: data.contactName || null,
+            contactPhone: data.contactPhone || null,
+            contactEmail: data.contactEmail || null,
+            position: data.position || null,
+            startDate: new Date(data.startDate),
+            endDate: data.endDate ? new Date(data.endDate) : null,
+            reasonForLeaving: data.reasonForLeaving || null,
+            wasDOTRegulated: data.wasDOTRegulated ?? false,
+            driverId: data.driverId,
+        },
+    });
+
+    revalidatePath(`/dashboard/drivers/${data.driverId}`);
+    return { success: true };
+}
+
+export async function updateEmploymentHistory(data: {
+    id: string;
+    driverId: string;
+    verificationSent?: boolean;
+    verificationSentDate?: string;
+    verificationReceived?: boolean;
+    verificationReceivedDate?: string;
+    verificationNotes?: string;
+    drugTestingInquirySent?: boolean;
+    drugTestingInquiryReceived?: boolean;
+}) {
+    const { companyId } = await requireCompanyUser();
+
+    // Verify driver ownership
+    const driver = await prisma.driver.findFirst({
+        where: { id: data.driverId, companyId },
+    });
+    if (!driver) return { error: "Driver not found" };
+
+    const existing = await prisma.employmentHistory.findFirst({
+        where: { id: data.id, driverId: data.driverId },
+    });
+    if (!existing) return { error: "Employment record not found" };
+
+    await prisma.employmentHistory.update({
+        where: { id: data.id },
+        data: {
+            ...(data.verificationSent !== undefined && { verificationSent: data.verificationSent }),
+            ...(data.verificationSentDate !== undefined && { verificationSentDate: data.verificationSentDate ? new Date(data.verificationSentDate) : null }),
+            ...(data.verificationReceived !== undefined && { verificationReceived: data.verificationReceived }),
+            ...(data.verificationReceivedDate !== undefined && { verificationReceivedDate: data.verificationReceivedDate ? new Date(data.verificationReceivedDate) : null }),
+            ...(data.verificationNotes !== undefined && { verificationNotes: data.verificationNotes || null }),
+            ...(data.drugTestingInquirySent !== undefined && { drugTestingInquirySent: data.drugTestingInquirySent }),
+            ...(data.drugTestingInquiryReceived !== undefined && { drugTestingInquiryReceived: data.drugTestingInquiryReceived }),
+        },
+    });
+
+    revalidatePath(`/dashboard/drivers/${data.driverId}`);
+    return { success: true };
+}
+
+export async function deleteEmploymentHistory(id: string, driverId: string) {
+    const { companyId } = await requireCompanyUser();
+
+    const driver = await prisma.driver.findFirst({
+        where: { id: driverId, companyId },
+    });
+    if (!driver) return { error: "Driver not found" };
+
+    const existing = await prisma.employmentHistory.findFirst({
+        where: { id, driverId },
+    });
+    if (!existing) return { error: "Employment record not found" };
+
+    await prisma.employmentHistory.delete({ where: { id } });
+
+    revalidatePath(`/dashboard/drivers/${driverId}`);
+    return { success: true };
+}
+
 export async function deleteDriver(id: string) {
     const { companyId } = await requireCompanyUser();
 
