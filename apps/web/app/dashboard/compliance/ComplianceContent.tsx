@@ -150,12 +150,21 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
         return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Get Consent" };
     }
 
-    // MVR / Employment app — link to wizard for filling out with driver pre-selected
+    // MVR / Employment app / Road test / Annual cert / D&A policy — link to wizard
     if (lower.includes("mvr") || lower.includes("driving record")) {
         return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out Form" };
     }
     if (lower.includes("employment application")) {
         return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out Form" };
+    }
+    if (lower.includes("road test certificate")) {
+        return { href: `/dashboard/documents/wizard?form=roadTestCert${driverParam}`, label: "Fill Out Form" };
+    }
+    if (lower.includes("annual certification of violations")) {
+        return { href: `/dashboard/documents/wizard?form=annualCertViolations${driverParam}`, label: "Fill Out Form" };
+    }
+    if (lower.includes("d&a policy acknowledgment") || lower.includes("drug & alcohol policy")) {
+        return { href: `/dashboard/documents/wizard?form=drugAlcoholPolicy${driverParam}`, label: "Fill Out Form" };
     }
 
     // Drug test — upload the result with driver context
@@ -208,7 +217,9 @@ function friendlyLabel(label: string): string {
         .replace("BOC-3 Process Agent", "Legal Agent Designation")
         .replace("MCS-150 Biennial Update", "Federal Business Update")
         .replace("Unified Carrier Registration (UCR)", "Annual Federal Registration")
-        .replace("IFTA License", "Fuel Tax License");
+        .replace("IFTA License", "Fuel Tax License")
+        .replace("D&A Policy Acknowledgment", "Drug & Alcohol Policy Acknowledgment")
+        .replace("Annual Certification of Violations", "Yearly Violations Certification");
 }
 
 // ---------------------------------------------------------------------------

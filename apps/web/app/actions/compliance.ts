@@ -79,7 +79,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                     { vehicle: { companyId } },
                 ],
             },
-            select: { documentType: true, driverId: true, vehicleId: true, companyId: true, expirationDate: true },
+            select: { documentType: true, fileName: true, driverId: true, vehicleId: true, companyId: true, expirationDate: true, createdAt: true },
         }),
         prisma.company.findUnique({
             where: { id: companyId },
@@ -115,6 +115,19 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             if (opts?.driverId) return d.driverId === opts.driverId;
             if (opts?.vehicleId) return d.vehicleId === opts.vehicleId;
             return d.companyId === companyId;
+        });
+    };
+
+    // Helper: check if a wizard-generated document exists by fileName prefix
+    const hasWizardDoc = (formId: string, opts?: { driverId?: string; currentYear?: boolean }) => {
+        const prefix = `wizard_${formId}`;
+        return documents.some((d) => {
+            if (!d.fileName?.startsWith(prefix)) return false;
+            if (opts?.driverId && d.driverId !== opts.driverId) return false;
+            if (opts?.currentYear && d.createdAt) {
+                return d.createdAt.getFullYear() === now.getFullYear();
+            }
+            return true;
         });
     };
 
@@ -228,6 +241,33 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 status: hasApp ? "compliant" : "action_needed",
                 detail: hasApp ? "On file" : "Missing",
                 reason: `${name} operates a commercial vehicle — DOT requires a signed employment application on file`,
+                driverId: d.id,
+            });
+        }
+
+        // Road Test Certificate — required for CDL and CMV operators (49 CFR 391.31)
+        if (needsDOTPhysical) {
+            const hasRoadTest = hasDoc("ROAD_TEST_CERTIFICATE", { driverId: d.id }) ||
+                hasWizardDoc("roadTestCert", { driverId: d.id });
+            dqItems.push({
+                label: `Road Test Certificate — ${name}`,
+                regulation: "49 CFR 391.31",
+                status: hasRoadTest ? "compliant" : "action_needed",
+                detail: hasRoadTest ? "On file" : "Missing",
+                reason: `${name} operates a commercial vehicle — a road test certificate must be on file`,
+                driverId: d.id,
+            });
+        }
+
+        // Annual Certification of Violations — required for CDL and CMV operators (49 CFR 391.27)
+        if (needsDOTPhysical) {
+            const hasAnnualCert = hasWizardDoc("annualCertViolations", { driverId: d.id, currentYear: true });
+            dqItems.push({
+                label: `Annual Certification of Violations — ${name}`,
+                regulation: "49 CFR 391.27",
+                status: hasAnnualCert ? "compliant" : "action_needed",
+                detail: hasAnnualCert ? "Completed this year" : "Not completed this year",
+                reason: `${name} must certify their violations (or lack of) once per year`,
                 driverId: d.id,
             });
         }
@@ -353,6 +393,17 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
             status: hasConsent ? "compliant" : "action_needed",
             detail: hasConsent ? "On file" : "Missing signed consent form",
             reason: `${name} holds a CDL — you need their signed consent to run Clearinghouse queries`,
+            driverId: d.id,
+        });
+
+        // D&A Policy Acknowledgment — 49 CFR 382.601
+        const hasDAPolicyAck = hasWizardDoc("drugAlcoholPolicy", { driverId: d.id });
+        daItems.push({
+            label: `D&A Policy Acknowledgment — ${name}`,
+            regulation: "49 CFR 382.601",
+            status: hasDAPolicyAck ? "compliant" : "action_needed",
+            detail: hasDAPolicyAck ? "On file" : "Missing signed policy acknowledgment",
+            reason: `${name} holds a CDL — they must sign acknowledging your drug & alcohol policy`,
             driverId: d.id,
         });
     }
