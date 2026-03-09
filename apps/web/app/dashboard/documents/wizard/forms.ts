@@ -267,11 +267,11 @@ export const US_STATE_OPTIONS = [
 export const dotForms: DOTForm[] = [
     {
         id: "mcs150",
-        title: "MCS-150 — Motor Carrier Identification Report",
-        shortTitle: "MCS-150 Biennial Update",
+        title: "Federal Business Update (MCS-150)",
+        shortTitle: "Federal Business Update",
         cfrReference: "49 CFR §390.19",
         category: "company",
-        description: "Required every 24 months for all motor carriers. Updates your USDOT registration information including address, fleet size, and operation type.",
+        description: "Every 2 years, you must update your business info with the federal government. Fill this out here, then submit it on the FMCSA website (login.fmcsa.dot.gov) or mail it in. We'll help you prepare the information — you just need to file it.",
         estimatedTime: "15 min",
         sections: [
             {
@@ -311,18 +311,20 @@ export const dotForms: DOTForm[] = [
                 title: "Operations Information",
                 fields: [
                     {
-                        id: "operationType", label: "Operation Classification", type: "select", required: true, options: [
+                        id: "operationType", label: "Operation Classification", type: "select", required: true,
+                        helpText: "For-Hire = you haul other people's goods/passengers for pay. Private = you only haul your own company's goods or employees. Exempt = agricultural or other federally exempt hauling.",
+                        options: [
                             { value: "", label: "Select..." },
-                            { value: "authCarrier", label: "Authorized For-Hire Carrier" },
-                            { value: "exemptCarrier", label: "Exempt For-Hire Carrier" },
-                            { value: "privateProperty", label: "Private (Property)" },
-                            { value: "privatePassenger", label: "Private (Passengers)" },
+                            { value: "authCarrier", label: "For-Hire (you haul for customers)" },
+                            { value: "exemptCarrier", label: "For-Hire Exempt (farm/ag hauling)" },
+                            { value: "privateProperty", label: "Private — hauling your own goods" },
+                            { value: "privatePassenger", label: "Private — transporting your own employees" },
                         ]
                     },
                     { id: "cargoTypes", label: "Types of Cargo Carried", type: "textarea", placeholder: "e.g., General freight, building materials, HVAC equipment" },
                     { id: "totalDrivers", label: "Total Number of Drivers", type: "number", required: true, halfWidth: true },
-                    { id: "totalVehicles", label: "Total Power Units", type: "number", required: true, halfWidth: true },
-                    { id: "interstate", label: "Interstate operations?", type: "checkbox" },
+                    { id: "totalVehicles", label: "Total Vehicles (trucks, trailers, vans)", type: "number", required: true, halfWidth: true, helpText: "Count every commercial vehicle your company operates, including trailers" },
+                    { id: "interstate", label: "Do you operate across state lines?", type: "checkbox" },
                 ],
             },
         ],

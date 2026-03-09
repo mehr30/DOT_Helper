@@ -712,7 +712,25 @@
     border-top: 1px solid #e2e8f0;
 }
 
-.saveButton,
+.saveButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    background: #22c55e;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.saveButton:hover {
+    background: #16a34a;
+}
+
 .backToResults {
     display: flex;
     align-items: center;
@@ -728,7 +746,6 @@
     transition: all 0.15s;
 }
 
-.saveButton:hover,
 .backToResults:hover {
     border-color: #93c5fd;
     color: #3b82f6;
@@ -739,19 +756,20 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.6rem 1.25rem;
-    border: none;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    background: #3b82f6;
-    color: white;
+    background: white;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
+    color: #475569;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: all 0.15s;
     margin-left: auto;
 }
 
 .downloadButton:hover {
-    background: #2563eb;
+    border-color: #93c5fd;
+    color: #3b82f6;
 }
 
 .savedNotice {
