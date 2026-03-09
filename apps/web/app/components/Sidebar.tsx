@@ -224,9 +224,9 @@ export default function Sidebar() {
                                     {getInitials(activeCompany.name)}
                                 </div>
                                 <div className={styles.companyDetails}>
-                                    <span className={styles.companyName}>{activeCompany.name}</span>
+                                    <span className={styles.companyName}>{profile.companyName || activeCompany.name}</span>
                                     <span className={styles.usdot}>
-                                        {activeCompany.usdotNumber ? `USDOT: ${activeCompany.usdotNumber}` : "USDOT: Pending"}
+                                        {(profile.usdotNumber || activeCompany.usdotNumber) ? `USDOT: ${profile.usdotNumber || activeCompany.usdotNumber}` : "USDOT: Pending"}
                                     </span>
                                 </div>
                                 {(hasMultipleCompanies || !isDemoMode) && (

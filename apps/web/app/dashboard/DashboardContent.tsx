@@ -63,6 +63,73 @@ interface AttentionItem {
     daysLeft: number;
     severity: "expired" | "urgent" | "warning" | "info";
     type: "driver" | "vehicle" | "compliance";
+    actionHref?: string;
+    actionLabel?: string;
+    driverId?: string;
+    vehicleId?: string;
+}
+
+// Map attention item labels to actionable links
+function getActionForAttentionItem(item: AttentionItem): { href: string; label: string } | null {
+    const lower = item.title.toLowerCase();
+
+    // Driver-related
+    if (lower.includes("license") || lower.includes("cdl")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    }
+    if (lower.includes("medical") || lower.includes("dot physical")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    }
+    if (lower.includes("clearinghouse") || lower.includes("drug testing database")) {
+        return { href: item.driverId ? `/dashboard/drivers/${item.driverId}` : "/dashboard/drivers", label: "Fix" };
+    }
+    if (lower.includes("mvr") || lower.includes("driving record")) {
+        const driverParam = item.driverId ? `&driver=${item.driverId}` : "";
+        return { href: `/dashboard/documents/wizard?form=annualMVRReview${driverParam}`, label: "Fill Out" };
+    }
+    if (lower.includes("employment application")) {
+        const driverParam = item.driverId ? `&driver=${item.driverId}` : "";
+        return { href: `/dashboard/documents/wizard?form=driverApp${driverParam}`, label: "Fill Out" };
+    }
+    if (lower.includes("drug test") || lower.includes("pre-employment test")) {
+        const params = new URLSearchParams({ upload: "DRUG_TEST_RESULT" });
+        if (item.driverId) params.set("driver", item.driverId);
+        return { href: `/dashboard/documents?${params.toString()}`, label: "Upload" };
+    }
+
+    // Vehicle-related
+    if (lower.includes("annual inspection")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    }
+    if (lower.includes("preventive maintenance")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    }
+    if (lower.includes("registration")) {
+        return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Fix" };
+    }
+
+    // Company docs
+    if (lower.includes("mcs-150") || lower.includes("federal business update")) {
+        return { href: "/dashboard/documents/wizard?form=mcs150", label: "Fill Out" };
+    }
+    if (lower.includes("boc-3") || lower.includes("legal agent")) {
+        return { href: "/dashboard/documents/wizard?form=boc3", label: "Fill Out" };
+    }
+    if (lower.includes("operating authority")) {
+        return { href: "/dashboard/documents?upload=OPERATING_AUTHORITY", label: "Upload" };
+    }
+    if (lower.includes("ucr") || lower.includes("federal registration")) {
+        return { href: "/dashboard/documents?upload=UCR", label: "Upload" };
+    }
+    if (lower.includes("insurance")) {
+        return { href: "/dashboard/documents?upload=INSURANCE_POLICY", label: "Upload" };
+    }
+    if (lower.includes("ifta") || lower.includes("fuel tax")) {
+        return { href: "/dashboard/documents?upload=IFTA_LICENSE", label: "Upload" };
+    }
+
+    // Fallback — go to compliance page
+    return { href: "/dashboard/compliance", label: "View" };
 }
 
 // ---------------------------------------------------------------------------
@@ -182,6 +249,8 @@ export default function DashboardContent({
                             daysLeft: item.status === "expired" ? -1 : 30,
                             severity: item.status === "expired" ? "expired" : "warning",
                             type: item.driverId ? "driver" : item.vehicleId ? "vehicle" : "compliance",
+                            driverId: item.driverId,
+                            vehicleId: item.vehicleId,
                         });
                     }
                 }
@@ -424,8 +493,9 @@ export default function DashboardContent({
                     <div className={styles.attentionList}>
                         {visibleItems.map((item) => {
                             const sev = item.severity === "expired" ? "urgent" : item.severity;
-                            return (
-                                <div key={item.id} className={styles.attentionItem}>
+                            const action = getActionForAttentionItem(item);
+                            const inner = (
+                                <>
                                     <div className={`${styles.attentionIcon} ${styles[sev]}`}>
                                         {item.severity === "expired" ? <AlertTriangle size={16} /> :
                                          item.severity === "urgent" ? <AlertTriangle size={16} /> :
@@ -441,6 +511,25 @@ export default function DashboardContent({
                                             ? `${Math.abs(item.daysLeft)}d overdue`
                                             : `${item.daysLeft}d left`}
                                     </span>
+                                    {action && (
+                                        <span className={styles.attentionAction}>
+                                            {action.label} <ArrowRight size={14} />
+                                        </span>
+                                    )}
+                                </>
+                            );
+
+                            if (action) {
+                                return (
+                                    <Link key={item.id} href={action.href} className={`${styles.attentionItem} ${styles.attentionItemClickable}`}>
+                                        {inner}
+                                    </Link>
+                                );
+                            }
+
+                            return (
+                                <div key={item.id} className={styles.attentionItem}>
+                                    {inner}
                                 </div>
                             );
                         })}

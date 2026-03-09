@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeft,
@@ -65,6 +65,7 @@ type WizardStep = "assessment" | "results" | "fillForm";
 
 function WizardContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const [step, setStep] = useState<WizardStep>(() => searchParams.get("form") ? "fillForm" : "assessment");
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -427,6 +428,12 @@ function WizardContent() {
                 }
             }
         }
+    };
+
+    const handleSaveAndClose = async () => {
+        await handleSaveForm();
+        // If save succeeded (saveNotice will be true), navigate back to documents
+        router.push("/dashboard/documents");
     };
 
     const handleSendForSignature = async () => {
@@ -991,8 +998,8 @@ function WizardContent() {
                         })}
 
                         <div className={styles.sidebarActions}>
-                            <button className={styles.saveButton} onClick={handleSaveForm}>
-                                <Save size={16} /> Save to Documents
+                            <button className={styles.saveButton} onClick={handleSaveAndClose}>
+                                <Save size={16} /> Save & Close
                             </button>
                             <button className={styles.backToResults} onClick={() => setStep("results")}>
                                 <ArrowLeft size={16} /> All Documents
@@ -1107,8 +1114,8 @@ function WizardContent() {
 
                         {/* Bottom actions */}
                         <div className={styles.formBottomActions}>
-                            <button className={styles.saveButton} onClick={handleSaveForm}>
-                                <Save size={16} /> Save to Documents
+                            <button className={styles.saveButton} onClick={handleSaveAndClose}>
+                                <Save size={16} /> Save & Close
                             </button>
                             <button className={styles.downloadButton} onClick={() => {
                                 const missing = getRequiredMissing();
@@ -1118,7 +1125,7 @@ function WizardContent() {
                                 }
                                 window.print();
                             }}>
-                                <Printer size={16} /> Print / Save as PDF
+                                <Printer size={16} /> Print / PDF
                             </button>
                             {(activeForm.category === "driver" || activeForm.category === "safety") && (
                                 <button

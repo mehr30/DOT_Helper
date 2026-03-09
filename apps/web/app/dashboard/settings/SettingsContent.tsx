@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { updateCompany } from "../../actions/company";
 import { formatPhone } from "../../../lib/formatPhone";
+import { useCompanyProfile } from "../../components/CompanyProfileContext";
 
 /* ─── Company Data Type ─── */
 interface CompanyData {
@@ -208,6 +209,7 @@ const US_STATES = [
 
 /* ─── Main Component ─── */
 export default function SettingsContent({ company }: { company: CompanyData | null }) {
+    const { updateProfile } = useCompanyProfile();
     const [connections, setConnections] = useState<SavedConnection[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [connectingId, setConnectingId] = useState<string | null>(null);
@@ -294,8 +296,15 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
         if (result.error) {
             setCompanyMessage({ type: "error", text: result.error });
         } else {
-            setCompanyMessage({ type: "success", text: "Company profile updated" });
-            setTimeout(() => setCompanyMessage(null), 3000);
+            // Update the shared profile context so the sidebar reflects changes immediately
+            updateProfile({
+                companyName: companyForm.name,
+                usdotNumber: companyForm.usdotNumber,
+                phone: companyForm.phone,
+                email: companyForm.email,
+            });
+            // Close the modal on success
+            setSettingsModal(null);
         }
     };
 

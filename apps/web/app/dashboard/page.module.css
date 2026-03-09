@@ -581,6 +581,32 @@
     color: var(--color-primary-600);
 }
 
+.attentionItemClickable {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.attentionItemClickable:hover {
+    background: var(--bg-tertiary);
+}
+
+.attentionItemClickable:hover .attentionAction {
+    color: var(--color-primary-600);
+}
+
+.attentionAction {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary-500);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color var(--transition-fast);
+}
+
 /* ---- 5. Quick Actions (slim pills) ---- */
 .quickActionsSlim {
     display: flex;
