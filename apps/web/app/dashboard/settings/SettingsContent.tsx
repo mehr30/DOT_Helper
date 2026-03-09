@@ -357,30 +357,37 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                         />
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                        <div>
-                            <label style={labelStyle}>USDOT Number</label>
-                            <input
-                                value={companyForm.usdotNumber}
-                                onChange={(e) => setCompanyForm(p => ({ ...p, usdotNumber: e.target.value.replace(/\D/g, "").slice(0, 8) }))}
-                                placeholder="1234567"
-                                style={{ ...inputStyle, fontFamily: "monospace" }}
-                                disabled={!company}
-                            />
-                            <span style={helpStyle}>Your 7-8 digit FMCSA registration number</span>
-                        </div>
-                        <div>
-                            <label style={labelStyle}>MC Number</label>
-                            <input
-                                value={companyForm.mcNumber}
-                                onChange={(e) => setCompanyForm(p => ({ ...p, mcNumber: e.target.value }))}
-                                placeholder="MC-123456"
-                                style={inputStyle}
-                                disabled={!company}
-                            />
-                            <span style={helpStyle}>Motor Carrier number (if applicable)</span>
-                        </div>
-                    </div>
+                    {(() => {
+                        const hideMC = companyForm.operationType === "PRIVATE" || companyForm.operationScope === "INTRASTATE";
+                        return (
+                            <div style={{ display: "grid", gridTemplateColumns: hideMC ? "1fr" : "1fr 1fr", gap: "1rem" }}>
+                                <div>
+                                    <label style={labelStyle}>USDOT Number</label>
+                                    <input
+                                        value={companyForm.usdotNumber}
+                                        onChange={(e) => setCompanyForm(p => ({ ...p, usdotNumber: e.target.value.replace(/\D/g, "").slice(0, 8) }))}
+                                        placeholder="1234567"
+                                        style={{ ...inputStyle, fontFamily: "monospace" }}
+                                        disabled={!company}
+                                    />
+                                    <span style={helpStyle}>Your 7-8 digit FMCSA registration number</span>
+                                </div>
+                                {!hideMC && (
+                                    <div>
+                                        <label style={labelStyle}>MC Number</label>
+                                        <input
+                                            value={companyForm.mcNumber}
+                                            onChange={(e) => setCompanyForm(p => ({ ...p, mcNumber: e.target.value }))}
+                                            placeholder="MC-123456"
+                                            style={inputStyle}
+                                            disabled={!company}
+                                        />
+                                        <span style={helpStyle}>Motor Carrier number (for-hire interstate only)</span>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div>
