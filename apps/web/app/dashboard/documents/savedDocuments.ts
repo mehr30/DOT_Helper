@@ -24,8 +24,8 @@ export function getSavedDocuments(companyId?: string): SavedDocument[] {
         const raw = localStorage.getItem(STORAGE_KEY);
         const docs: SavedDocument[] = raw ? JSON.parse(raw) : [];
         if (!companyId) return docs;
-        // Filter to docs belonging to this company, or legacy docs with no companyId
-        return docs.filter(d => d.companyId === companyId || !d.companyId);
+        // Strictly filter to docs belonging to this company only
+        return docs.filter(d => d.companyId === companyId);
     } catch {
         return [];
     }

@@ -497,6 +497,51 @@ export default function ComplianceContent({
                 </div>
             </div>
 
+            {/* Urgent Filing Callouts — prominent banners for company filings that need action */}
+            {!isDemoMode && data.categories
+                .filter(c => c.name === "Company & Authority")
+                .flatMap(c => c.items.filter(i => i.status === "action_needed" || i.status === "expired"))
+                .map((item, idx) => {
+                    const action = getActionForItem(item);
+                    const isExpired = item.status === "expired";
+                    return (
+                        <div key={`filing-${idx}`} style={{
+                            display: "flex", alignItems: "center", gap: "0.75rem",
+                            padding: "0.85rem 1.25rem", borderRadius: "12px",
+                            marginBottom: "0.5rem",
+                            background: isExpired ? "linear-gradient(135deg, #fef2f2, #fee2e2)" : "linear-gradient(135deg, #fffbeb, #fef3c7)",
+                            border: `1px solid ${isExpired ? "#fecaca" : "#fde68a"}`,
+                        }}>
+                            {isExpired ? (
+                                <XCircle size={22} style={{ color: "#dc2626", flexShrink: 0 }} />
+                            ) : (
+                                <AlertTriangle size={22} style={{ color: "#d97706", flexShrink: 0 }} />
+                            )}
+                            <div style={{ flex: 1 }}>
+                                <span style={{ fontWeight: 700, fontSize: "0.9rem", color: isExpired ? "#991b1b" : "#92400e" }}>
+                                    {friendlyLabel(item.label)}
+                                </span>
+                                <span style={{ display: "block", fontSize: "0.78rem", color: isExpired ? "#b91c1c" : "#a16207", marginTop: "0.1rem" }}>
+                                    {item.detail}
+                                    {item.reason ? ` — ${item.reason}` : ""}
+                                </span>
+                            </div>
+                            {action && (
+                                <Link href={action.href} style={{
+                                    padding: "0.4rem 0.85rem", borderRadius: "8px",
+                                    background: isExpired ? "#dc2626" : "#d97706",
+                                    color: "white", fontSize: "0.8rem", fontWeight: 600,
+                                    textDecoration: "none", whiteSpace: "nowrap",
+                                    display: "inline-flex", alignItems: "center", gap: "0.3rem",
+                                }}>
+                                    {action.label} <ArrowRight size={14} />
+                                </Link>
+                            )}
+                        </div>
+                    );
+                })
+            }
+
             {/* Last review timestamp */}
             {!isDemoMode && lastReviewAt && (
                 <div style={{

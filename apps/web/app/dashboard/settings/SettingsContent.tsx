@@ -409,11 +409,11 @@ export default function SettingsContent({ company }: { company: CompanyData | nu
                                 disabled={!company}
                             >
                                 <option value="">Not sure yet</option>
-                                <option value="FOR_HIRE">I haul or transport for other people/businesses</option>
-                                <option value="PRIVATE">I only use my vehicles for my own business</option>
+                                <option value="FOR_HIRE">I haul or transport for other people or businesses (For-Hire)</option>
+                                <option value="PRIVATE">I haul my own goods, employees, or equipment (Private)</option>
                                 <option value="EXEMPT">Farm, government, or other exempt use</option>
                             </select>
-                            <span style={helpStyle}>Most service companies (pest control, plumbing, etc.) are &quot;Private&quot;</span>
+                            <span style={helpStyle}>Most service companies (pest control, plumbing, HVAC, etc.) are &quot;Private&quot; — you use your trucks for your own business, not to transport other people&apos;s stuff.</span>
                         </div>
                         <div>
                             <label style={labelStyle}>Do you drive across state lines?</label>

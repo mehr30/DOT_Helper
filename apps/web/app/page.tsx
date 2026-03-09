@@ -256,9 +256,9 @@ const testimonials = [
     rating: 5
   },
   {
-    quote: "We had no idea our HVAC vans needed DOT compliance until we got a violation. Greenlight USDOT made it easy to get everything organized.",
+    quote: "We had no idea our service vans needed DOT compliance until we got a violation. Greenlight USDOT made it easy to get everything organized.",
     author: "Sarah Chen",
-    role: "Operations Manager, Chen Heating & Air",
+    role: "Operations Manager, Chen Services",
     company: "12 Service Vans • California",
     rating: 5
   },
@@ -335,7 +335,7 @@ const faqs = [
   },
   {
     question: "Is my data secure?",
-    answer: "We use bank-level encryption (AES-256) and are SOC 2 compliant. Your data is backed up daily and stored in secure US data centers."
+    answer: "We use bank-level encryption (AES-256) and your data is backed up daily and stored in secure US data centers."
   }
 ];
 
@@ -405,7 +405,7 @@ export default function HomePage() {
             <span className={styles.heroGradient}>Not to drown in DOT paperwork.</span>
           </h1>
           <p className={styles.heroDescription}>
-            Trucking, HVAC, plumbing, landscaping — if you have commercial vehicles,
+            Trucking, delivery, service fleets — if you have commercial vehicles,
             the DOT has rules for you. Miss one deadline and it&apos;s a $16,000 fine.
             Greenlight USDOT tracks every expiration, every document, every requirement.
             We tell you exactly what needs attention. Plain English. Zero guesswork.
@@ -437,9 +437,9 @@ export default function HomePage() {
           <span className={styles.socialProofLabel}>Trusted by small businesses across America</span>
           <div className={styles.socialProofLogos}>
             <span>🚛 Trucking & Freight</span>
-            <span>🔧 HVAC & Plumbing</span>
-            <span>🌿 Landscaping & Construction</span>
-            <span>⚡ Electrical & Home Services</span>
+            <span>📦 Delivery & Logistics</span>
+            <span>🏗️ Construction & Trades</span>
+            <span>🔧 Service Fleets</span>
           </div>
         </div>
       </section>
