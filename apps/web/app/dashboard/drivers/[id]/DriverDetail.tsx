@@ -101,6 +101,111 @@ function friendlyDocType(type: string): string {
     return DOC_TYPE_LABELS[type] ?? type.replace(/_/g, " ");
 }
 
+interface DQFileItem {
+    label: string;
+    docType?: string;
+    wizardFormId?: string;
+    status: "on_file" | "missing";
+    href: string;
+}
+
+function getDQFileItems(driver: DriverData): DQFileItem[] {
+    const items: DQFileItem[] = [];
+    const isCDL = driver.licenseType === "CDL";
+    const needsDOTPhysical = isCDL || driver.operatesCMV;
+    const docTypes = new Set(driver.documents.map(d => d.documentType));
+    const hasWizardDoc = (formId: string) =>
+        driver.documents.some(d => d.fileName?.startsWith(`wizard_${formId}`));
+
+    // License copy — required for everyone
+    items.push({
+        label: "License Copy",
+        docType: "CDL",
+        status: docTypes.has("CDL") ? "on_file" : "missing",
+        href: "#documents",
+    });
+
+    if (!needsDOTPhysical) return items;
+
+    // Employment Application — CDL + CMV
+    items.push({
+        label: "Employment Application",
+        docType: "EMPLOYMENT_APPLICATION",
+        wizardFormId: "driverApp",
+        status: docTypes.has("EMPLOYMENT_APPLICATION") || hasWizardDoc("driverApp") ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=driverApp&driver=${driver.id}`,
+    });
+
+    // Driving Record (MVR) — CDL + CMV
+    items.push({
+        label: "Driving Record (MVR)",
+        docType: "MVR",
+        wizardFormId: "annualMVRReview",
+        status: docTypes.has("MVR") || hasWizardDoc("annualMVRReview") ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=annualMVRReview&driver=${driver.id}`,
+    });
+
+    // Road Test Certificate — CDL + CMV
+    items.push({
+        label: "Road Test Certificate",
+        docType: "ROAD_TEST_CERTIFICATE",
+        wizardFormId: "roadTestCert",
+        status: docTypes.has("ROAD_TEST_CERTIFICATE") || hasWizardDoc("roadTestCert") ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=roadTestCert&driver=${driver.id}`,
+    });
+
+    // Annual Certification of Violations — CDL + CMV
+    const currentYear = new Date().getFullYear();
+    const hasAnnualCert = driver.documents.some(d =>
+        d.fileName?.startsWith("wizard_annualCertViolations")
+    );
+    items.push({
+        label: "Yearly Violations Certification",
+        wizardFormId: "annualCertViolations",
+        status: hasAnnualCert ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=annualCertViolations&driver=${driver.id}`,
+    });
+
+    // DOT Physical Card — CDL + CMV
+    items.push({
+        label: "DOT Physical Card",
+        docType: "MEDICAL_CERTIFICATE",
+        status: docTypes.has("MEDICAL_CERTIFICATE") || !!driver.medicalCardExpiration ? "on_file" : "missing",
+        href: "#edit",
+    });
+
+    if (!isCDL) return items;
+
+    // CDL-only items below
+
+    // Pre-Employment Drug Test — CDL only
+    items.push({
+        label: "Pre-Employment Drug Test",
+        docType: "DRUG_TEST_RESULT",
+        status: docTypes.has("DRUG_TEST_RESULT") ? "on_file" : "missing",
+        href: "#documents",
+    });
+
+    // Clearinghouse Consent — CDL only
+    items.push({
+        label: "Clearinghouse Consent",
+        docType: "CLEARINGHOUSE_CONSENT",
+        wizardFormId: "drugAlcoholPolicy",
+        status: docTypes.has("CLEARINGHOUSE_CONSENT") || hasWizardDoc("drugAlcoholPolicy") ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=drugAlcoholPolicy&driver=${driver.id}`,
+    });
+
+    // D&A Policy Acknowledgment — CDL only
+    items.push({
+        label: "Drug & Alcohol Policy Acknowledgment",
+        wizardFormId: "drugAlcoholPolicy",
+        status: hasWizardDoc("drugAlcoholPolicy") ? "on_file" : "missing",
+        href: `/dashboard/documents/wizard?form=drugAlcoholPolicy&driver=${driver.id}`,
+    });
+
+    return items;
+}
+
 interface ActionItem {
     severity: "red" | "yellow" | "blue";
     label: string;
@@ -624,6 +729,105 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                 </div>
             </div>
             )}
+
+            {/* DQ File Checklist */}
+            {(() => {
+                const dqItems = getDQFileItems(driver);
+                const onFile = dqItems.filter(i => i.status === "on_file").length;
+                const total = dqItems.length;
+                const pct = total > 0 ? Math.round((onFile / total) * 100) : 100;
+                return (
+                    <div style={{
+                        background: "white", borderRadius: "12px", padding: "1.25rem",
+                        border: "1px solid #e2e8f0", marginBottom: "1.5rem",
+                    }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                <Shield size={18} style={{ color: "#165C30" }} />
+                                <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>DQ File</h3>
+                            </div>
+                            <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>
+                                {onFile} of {total} items on file
+                            </span>
+                        </div>
+                        {/* Progress bar */}
+                        <div style={{
+                            height: 6, borderRadius: 3, background: "#f1f5f9",
+                            marginBottom: "0.75rem", overflow: "hidden",
+                        }}>
+                            <div style={{
+                                height: "100%", borderRadius: 3,
+                                width: `${pct}%`,
+                                background: pct === 100 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#ef4444",
+                                transition: "width 0.3s ease",
+                            }} />
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                            {dqItems.map((item, i) => (
+                                <div key={i} style={{
+                                    display: "flex", alignItems: "center", gap: "0.6rem",
+                                    padding: "0.4rem 0.5rem", borderRadius: "8px",
+                                    background: item.status === "on_file" ? "#f0fdf4" : "#fffbeb",
+                                }}>
+                                    {item.status === "on_file" ? (
+                                        <CheckCircle size={15} style={{ color: "#22c55e", flexShrink: 0 }} />
+                                    ) : (
+                                        <AlertTriangle size={15} style={{ color: "#f59e0b", flexShrink: 0 }} />
+                                    )}
+                                    <span style={{
+                                        flex: 1, fontSize: "0.82rem", fontWeight: 500,
+                                        color: item.status === "on_file" ? "#15803d" : "#92400e",
+                                    }}>
+                                        {item.label}
+                                    </span>
+                                    <span style={{
+                                        fontSize: "0.72rem", fontWeight: 600,
+                                        color: item.status === "on_file" ? "#16a34a" : "#d97706",
+                                    }}>
+                                        {item.status === "on_file" ? "On file" : "Missing"}
+                                    </span>
+                                    {item.status === "missing" && (
+                                        item.href === "#documents" ? (
+                                            <button
+                                                onClick={() => document.getElementById("driver-documents")?.scrollIntoView({ behavior: "smooth" })}
+                                                style={{
+                                                    padding: "0.2rem 0.5rem", borderRadius: "5px", fontSize: "0.7rem",
+                                                    fontWeight: 600, border: "none", cursor: "pointer",
+                                                    background: "#fef3c7", color: "#d97706",
+                                                }}
+                                            >
+                                                Upload
+                                            </button>
+                                        ) : item.href === "#edit" ? (
+                                            <button
+                                                onClick={() => setEditing(true)}
+                                                style={{
+                                                    padding: "0.2rem 0.5rem", borderRadius: "5px", fontSize: "0.7rem",
+                                                    fontWeight: 600, border: "none", cursor: "pointer",
+                                                    background: "#fef3c7", color: "#d97706",
+                                                }}
+                                            >
+                                                Add
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={item.href}
+                                                style={{
+                                                    padding: "0.2rem 0.5rem", borderRadius: "5px", fontSize: "0.7rem",
+                                                    fontWeight: 600, textDecoration: "none",
+                                                    background: "#fef3c7", color: "#d97706",
+                                                }}
+                                            >
+                                                Fill Out
+                                            </Link>
+                                        )
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Documents */}
             <div id="driver-documents" style={{
