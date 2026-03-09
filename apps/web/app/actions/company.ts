@@ -21,11 +21,11 @@ export async function createCompany(formData: unknown): Promise<CompanyActionRes
 
     const data = parsed.data;
 
-    // Check for duplicate USDOT (only if one was provided)
+    // Check for duplicate USDOT (only if one was provided, skip soft-deleted)
     const usdot = data.usdotNumber?.trim() || null;
     if (usdot) {
-        const existing = await prisma.company.findUnique({
-            where: { usdotNumber: usdot },
+        const existing = await prisma.company.findFirst({
+            where: { usdotNumber: usdot, deletedAt: null },
         });
         if (existing) {
             return { error: "A company with this USDOT number already exists" };
@@ -99,10 +99,10 @@ export async function updateCompany(formData: unknown) {
     const data = parsed.data;
     const usdot = data.usdotNumber?.trim() || null;
 
-    // Check for duplicate USDOT (only if changed and provided)
+    // Check for duplicate USDOT (only if changed and provided, skip soft-deleted)
     if (usdot) {
-        const existing = await prisma.company.findUnique({
-            where: { usdotNumber: usdot },
+        const existing = await prisma.company.findFirst({
+            where: { usdotNumber: usdot, deletedAt: null },
         });
         if (existing && existing.id !== companyId) {
             return { error: "A different company already has this USDOT number" };
@@ -146,8 +146,8 @@ export async function getCompanyForUser() {
     const companyId = user?.activeCompanyId || user?.companyId;
     if (!companyId) return null;
 
-    return prisma.company.findUnique({
-        where: { id: companyId },
+    return prisma.company.findFirst({
+        where: { id: companyId, deletedAt: null },
         select: {
             id: true,
             name: true,
@@ -211,7 +211,10 @@ export async function getUserCompanies() {
     if (!session?.user) return [];
 
     const memberships = await prisma.companyMember.findMany({
-        where: { userId: session.user.id },
+        where: {
+            userId: session.user.id,
+            company: { deletedAt: null },
+        },
         select: {
             role: true,
             company: {
@@ -268,8 +271,18 @@ export async function deleteCompany(confirmName: string): Promise<CompanyActionR
         return { error: "Company name does not match" };
     }
 
-    // Delete the company — all child records cascade-delete automatically
-    await prisma.company.delete({ where: { id: companyId } });
+    // Soft-delete: mark as deleted (retained 30 days for recovery)
+    // Null out usdotNumber to free the unique constraint for re-creation
+    await prisma.company.update({
+        where: { id: companyId },
+        data: {
+            deletedAt: new Date(),
+            usdotNumber: null,
+        },
+    });
+
+    // Remove all memberships so the company disappears from user lists
+    await prisma.companyMember.deleteMany({ where: { companyId } });
 
     // Find another company the user belongs to
     const remaining = await prisma.companyMember.findFirst({
