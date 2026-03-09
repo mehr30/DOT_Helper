@@ -242,6 +242,9 @@ export default function DashboardContent({
     const scores = complianceScores;
     const overallScore = scores?.overall ?? 0;
 
+    // Extract the Company & Authority category for the setup guide
+    const companyAuthCategory = scores?.categories.find(c => c.name === "Company & Authority") ?? null;
+
     // ---- Build attention items ----
     const attentionItems: AttentionItem[] = (() => {
         const map = new Map<string, AttentionItem>();
@@ -407,6 +410,8 @@ export default function DashboardContent({
                     hasCompany={hasCompany}
                     driverCount={stats?.driverCount ?? 0}
                     vehicleCount={stats?.vehicleCount ?? 0}
+                    companyDocsNeeded={companyAuthCategory ? companyAuthCategory.items.filter(i => i.status === "action_needed" || i.status === "expired").length : 0}
+                    companyDocsComplete={companyAuthCategory ? companyAuthCategory.items.filter(i => i.status === "compliant").length : 0}
                 />
             )}
 

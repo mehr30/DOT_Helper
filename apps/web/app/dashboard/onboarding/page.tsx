@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -45,6 +46,7 @@ interface SAFERData {
 type OnboardingPath = "new" | "existing" | null;
 
 export default function OnboardingPage() {
+    const router = useRouter();
     const [path, setPath] = useState<OnboardingPath>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState<Partial<FormData>>({});
@@ -68,6 +70,9 @@ export default function OnboardingPage() {
                     setCurrentStep(1);
                 }
                 setIsSubmitting(false);
+            } else {
+                // Success — navigate to dashboard
+                router.push("/dashboard");
             }
         } catch {
             setServerError("Something went wrong. Please try again.");

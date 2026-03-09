@@ -6,7 +6,9 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "../../lib/session";
 import { companyOnboardingSchema, companyUpdateSchema } from "../../lib/validations/company";
 
-export async function createCompany(formData: unknown) {
+type CompanyActionResult = { success?: boolean; error?: string };
+
+export async function createCompany(formData: unknown): Promise<CompanyActionResult> {
     const session = await getServerSession();
     if (!session?.user) {
         return { error: "Not authenticated" };
@@ -70,7 +72,7 @@ export async function createCompany(formData: unknown) {
     });
 
     revalidatePath("/dashboard");
-    redirect("/dashboard");
+    return { success: true };
 }
 
 export async function updateCompany(formData: unknown) {

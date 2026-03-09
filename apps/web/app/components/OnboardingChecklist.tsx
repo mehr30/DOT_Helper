@@ -5,13 +5,16 @@ import Link from "next/link";
 import { Check, ArrowRight, CheckCircle, ListChecks } from "lucide-react";
 import styles from "./OnboardingChecklist.module.css";
 
-const SESSION_DISMISS_KEY = "greenlight_checklist_session_dismissed";
 const PERMANENT_DISMISS_KEY = "greenlight_checklist_dismissed";
 
 interface OnboardingChecklistProps {
     hasCompany: boolean;
     driverCount: number;
     vehicleCount: number;
+    /** Number of Company & Authority compliance items that still need action */
+    companyDocsNeeded?: number;
+    /** Number of Company & Authority compliance items that are compliant */
+    companyDocsComplete?: number;
 }
 
 interface ChecklistItem {
@@ -20,22 +23,37 @@ interface ChecklistItem {
     href?: string;
 }
 
-export default function OnboardingChecklist({ hasCompany, driverCount, vehicleCount }: OnboardingChecklistProps) {
-    const [dismissed, setDismissed] = useState(true); // start hidden to avoid flash
+export default function OnboardingChecklist({
+    hasCompany,
+    driverCount,
+    vehicleCount,
+    companyDocsNeeded = 0,
+    companyDocsComplete = 0,
+}: OnboardingChecklistProps) {
+    const [dismissed, setDismissed] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
         const permanentlyDismissed = localStorage.getItem(PERMANENT_DISMISS_KEY) === "true";
-        const sessionDismissed = sessionStorage.getItem(SESSION_DISMISS_KEY) === "true";
-        setDismissed(permanentlyDismissed || sessionDismissed);
+        setDismissed(permanentlyDismissed);
     }, []);
+
+    const totalCompanyDocs = companyDocsNeeded + companyDocsComplete;
+    const hasUploadedDocs = companyDocsComplete > 0;
 
     const items: ChecklistItem[] = [
         { label: "Create your account", done: true },
         { label: "Set up your company", done: hasCompany, href: "/dashboard/onboarding" },
         { label: "Add your first driver", done: driverCount > 0, href: "/dashboard/drivers/new" },
         { label: "Add your first vehicle", done: vehicleCount > 0, href: "/dashboard/vehicles/new" },
+        {
+            label: hasUploadedDocs
+                ? `Upload compliance documents (${companyDocsComplete}/${totalCompanyDocs} done)`
+                : "Upload key compliance documents",
+            done: companyDocsNeeded === 0 && totalCompanyDocs > 0,
+            href: "/dashboard/compliance",
+        },
         { label: "Review your compliance dashboard", done: hasCompany && driverCount > 0 && vehicleCount > 0, href: "/dashboard/compliance" },
     ];
 
@@ -44,13 +62,13 @@ export default function OnboardingChecklist({ hasCompany, driverCount, vehicleCo
 
     if (!mounted) return null;
 
-    // Show a small "reopen" button when dismissed but not all done
+    // Only show the collapsed button if permanently dismissed AND not all done
     if (dismissed && !allDone) {
         return (
             <button
                 className={styles.reopenButton}
                 onClick={() => {
-                    sessionStorage.removeItem(SESSION_DISMISS_KEY);
+                    localStorage.removeItem(PERMANENT_DISMISS_KEY);
                     setDismissed(false);
                 }}
             >
@@ -63,13 +81,7 @@ export default function OnboardingChecklist({ hasCompany, driverCount, vehicleCo
     if (dismissed) return null;
 
     const handleDismiss = () => {
-        if (allDone) {
-            // Permanently dismiss once all items complete
-            localStorage.setItem(PERMANENT_DISMISS_KEY, "true");
-        } else {
-            // Only dismiss for this browser session — comes back on next login
-            sessionStorage.setItem(SESSION_DISMISS_KEY, "true");
-        }
+        localStorage.setItem(PERMANENT_DISMISS_KEY, "true");
         setDismissed(true);
     };
 
