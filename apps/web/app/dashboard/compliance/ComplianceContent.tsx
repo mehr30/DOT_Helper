@@ -29,6 +29,35 @@ import type { ComplianceScores } from "../../actions/compliance";
 import { humanize, humanizeRegulation } from "../../../lib/plain-english";
 import { downloadComplianceReport } from "../../../lib/pdf";
 import { completeComplianceReview } from "../../actions/company";
+import { generateRandomSelections, updateSelectionStatus } from "../../actions/drug-testing";
+
+interface TestingSelection {
+    id: string;
+    testingPeriod: string;
+    testType: string;
+    driverName: string;
+    driverId: string;
+    status: string;
+    selectionDate: string;
+    testDate: string | null;
+    result: string | null;
+    notes: string | null;
+}
+
+interface TestingStats {
+    poolSize: number;
+    drugTestedCount: number;
+    drugTestedPct: number;
+    alcoholTestedCount: number;
+    alcoholTestedPct: number;
+    drugTarget: number;
+    alcoholTarget: number;
+}
+
+interface TestingData {
+    selections: TestingSelection[];
+    stats: TestingStats;
+}
 
 // --- Demo mock data ---
 const mockScores: ComplianceScores = {
@@ -411,10 +440,12 @@ export default function ComplianceContent({
     scores,
     lastReviewAt,
     openReview,
+    testingData,
 }: {
     scores: ComplianceScores | null;
     lastReviewAt?: string | null;
     openReview?: boolean;
+    testingData?: TestingData | null;
 }) {
     const { isDemoMode } = useDemoMode();
     const data = isDemoMode ? mockScores : scores;
@@ -422,6 +453,7 @@ export default function ComplianceContent({
 
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Driver Qualification", "Vehicle Maintenance"]));
     const [showReview, setShowReview] = useState(false);
+    const [generating, setGenerating] = useState(false);
 
     // Auto-open review modal if ?review=true
     useEffect(() => {
@@ -718,6 +750,167 @@ export default function ComplianceContent({
                     })}
                 </div>
             </div>
+
+            {/* Random Drug & Alcohol Testing */}
+            {!isDemoMode && testingData && testingData.stats.poolSize > 0 && (
+                <div style={{
+                    background: "white", borderRadius: "14px", padding: "1.25rem",
+                    border: "1px solid #e2e8f0", marginTop: "1rem",
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Activity size={18} style={{ color: "#7c3aed" }} />
+                            <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}>Random Testing Pool</h3>
+                        </div>
+                        <button
+                            disabled={generating}
+                            onClick={async () => {
+                                setGenerating(true);
+                                const year = new Date().getFullYear();
+                                const quarter = Math.ceil((new Date().getMonth() + 1) / 3);
+                                const period = `${year}-Q${quarter}`;
+                                await generateRandomSelections(period, "DRUG");
+                                setGenerating(false);
+                                router.refresh();
+                            }}
+                            style={{
+                                display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                                padding: "0.45rem 0.85rem", borderRadius: "8px",
+                                background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+                                color: "white", fontWeight: 600, fontSize: "0.8rem",
+                                border: "none", cursor: generating ? "not-allowed" : "pointer",
+                                opacity: generating ? 0.7 : 1,
+                            }}
+                        >
+                            {generating ? "Generating..." : "Run Random Selection"}
+                        </button>
+                    </div>
+
+                    {/* Stats bar */}
+                    <div style={{
+                        display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem",
+                        marginBottom: "1rem",
+                    }}>
+                        <div style={{
+                            padding: "0.65rem 0.85rem", borderRadius: "10px",
+                            background: "#faf5ff", border: "1px solid #e9d5ff",
+                        }}>
+                            <div style={{ fontSize: "0.72rem", color: "#7c3aed", fontWeight: 600, textTransform: "uppercase" as const }}>Pool Size</div>
+                            <div style={{ fontSize: "1.3rem", fontWeight: 700, color: "#0f172a" }}>{testingData.stats.poolSize}</div>
+                            <div style={{ fontSize: "0.72rem", color: "#64748b" }}>CDL drivers</div>
+                        </div>
+                        <div style={{
+                            padding: "0.65rem 0.85rem", borderRadius: "10px",
+                            background: testingData.stats.drugTestedPct >= 50 ? "#f0fdf4" : "#fffbeb",
+                            border: `1px solid ${testingData.stats.drugTestedPct >= 50 ? "#bbf7d0" : "#fde68a"}`,
+                        }}>
+                            <div style={{ fontSize: "0.72rem", color: testingData.stats.drugTestedPct >= 50 ? "#15803d" : "#92400e", fontWeight: 600, textTransform: "uppercase" as const }}>Drug Tested</div>
+                            <div style={{ fontSize: "1.3rem", fontWeight: 700, color: "#0f172a" }}>{testingData.stats.drugTestedPct}%</div>
+                            <div style={{ fontSize: "0.72rem", color: "#64748b" }}>Target: {testingData.stats.drugTarget}%</div>
+                        </div>
+                        <div style={{
+                            padding: "0.65rem 0.85rem", borderRadius: "10px",
+                            background: testingData.stats.alcoholTestedPct >= 10 ? "#f0fdf4" : "#fffbeb",
+                            border: `1px solid ${testingData.stats.alcoholTestedPct >= 10 ? "#bbf7d0" : "#fde68a"}`,
+                        }}>
+                            <div style={{ fontSize: "0.72rem", color: testingData.stats.alcoholTestedPct >= 10 ? "#15803d" : "#92400e", fontWeight: 600, textTransform: "uppercase" as const }}>Alcohol Tested</div>
+                            <div style={{ fontSize: "1.3rem", fontWeight: 700, color: "#0f172a" }}>{testingData.stats.alcoholTestedPct}%</div>
+                            <div style={{ fontSize: "0.72rem", color: "#64748b" }}>Target: {testingData.stats.alcoholTarget}%</div>
+                        </div>
+                    </div>
+
+                    {/* Current quarter selections */}
+                    {testingData.selections.length > 0 && (
+                        <div>
+                            <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "#475569", marginBottom: "0.5rem" }}>
+                                Current Quarter Selections
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                                {testingData.selections.map(sel => (
+                                    <div key={sel.id} style={{
+                                        display: "flex", alignItems: "center", gap: "0.75rem",
+                                        padding: "0.5rem 0.65rem", borderRadius: "8px",
+                                        background: sel.status === "COMPLETED" ? "#f0fdf4" : sel.status === "MISSED" ? "#fef2f2" : "#f8fafc",
+                                        border: `1px solid ${sel.status === "COMPLETED" ? "#bbf7d0" : sel.status === "MISSED" ? "#fecaca" : "#e2e8f0"}`,
+                                    }}>
+                                        <div style={{ flex: 1 }}>
+                                            <span style={{ fontWeight: 600, fontSize: "0.85rem", color: "#0f172a" }}>
+                                                {sel.driverName}
+                                            </span>
+                                            <span style={{
+                                                marginLeft: "0.4rem", fontSize: "0.7rem", fontWeight: 600,
+                                                padding: "0.1rem 0.3rem", borderRadius: "4px",
+                                                background: sel.testType === "DRUG" ? "#ede9fe" : sel.testType === "ALCOHOL" ? "#fff7ed" : "#f0fdf4",
+                                                color: sel.testType === "DRUG" ? "#7c3aed" : sel.testType === "ALCOHOL" ? "#c2410c" : "#15803d",
+                                            }}>
+                                                {sel.testType}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                            <span style={{
+                                                fontSize: "0.72rem", fontWeight: 600, padding: "0.2rem 0.5rem",
+                                                borderRadius: "6px",
+                                                background: sel.status === "COMPLETED" ? "#dcfce7"
+                                                    : sel.status === "MISSED" ? "#fee2e2"
+                                                    : sel.status === "NOTIFIED" ? "#fef3c7" : "#f1f5f9",
+                                                color: sel.status === "COMPLETED" ? "#15803d"
+                                                    : sel.status === "MISSED" ? "#dc2626"
+                                                    : sel.status === "NOTIFIED" ? "#92400e" : "#64748b",
+                                            }}>
+                                                {sel.status === "COMPLETED" ? `Completed${sel.result ? ` — ${sel.result}` : ""}`
+                                                    : sel.status === "MISSED" ? "Missed"
+                                                    : sel.status === "NOTIFIED" ? "Notified"
+                                                    : "Selected"}
+                                            </span>
+                                            {sel.status === "SELECTED" && (
+                                                <button
+                                                    onClick={async () => {
+                                                        await updateSelectionStatus({ id: sel.id, status: "NOTIFIED" });
+                                                        router.refresh();
+                                                    }}
+                                                    style={{
+                                                        padding: "0.2rem 0.45rem", borderRadius: "5px", fontSize: "0.7rem",
+                                                        fontWeight: 600, border: "1px solid #e2e8f0",
+                                                        background: "white", cursor: "pointer", color: "#475569",
+                                                    }}
+                                                >
+                                                    Notify
+                                                </button>
+                                            )}
+                                            {(sel.status === "NOTIFIED" || sel.status === "SELECTED") && (
+                                                <button
+                                                    onClick={async () => {
+                                                        await updateSelectionStatus({
+                                                            id: sel.id,
+                                                            status: "COMPLETED",
+                                                            testDate: new Date().toISOString(),
+                                                            result: "NEGATIVE",
+                                                        });
+                                                        router.refresh();
+                                                    }}
+                                                    style={{
+                                                        padding: "0.2rem 0.45rem", borderRadius: "5px", fontSize: "0.7rem",
+                                                        fontWeight: 600, border: "1px solid #bbf7d0",
+                                                        background: "#f0fdf4", cursor: "pointer", color: "#15803d",
+                                                    }}
+                                                >
+                                                    Complete
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {testingData.selections.length === 0 && (
+                        <p style={{ color: "#94a3b8", fontSize: "0.82rem", margin: 0, textAlign: "center" as const, padding: "0.5rem" }}>
+                            No selections for this quarter yet. Click &quot;Run Random Selection&quot; to generate.
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* Compliance Review Modal */}
             {showReview && (

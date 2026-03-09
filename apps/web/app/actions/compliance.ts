@@ -433,6 +433,30 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
         });
     }
 
+    // Random Testing Program — 49 CFR 382.305
+    if (cdlDrivers.length > 0) {
+        const year = now.getFullYear();
+        const yearPrefix = `${year}-`;
+        const selections = await prisma.randomTestSelection.findMany({
+            where: { companyId, testingPeriod: { startsWith: yearPrefix } },
+            select: { driverId: true, testType: true, status: true },
+        });
+        const completedDrug = new Set(
+            selections.filter(s => s.status === "COMPLETED" && (s.testType === "DRUG" || s.testType === "BOTH"))
+                .map(s => s.driverId)
+        );
+        const drugPct = cdlDrivers.length > 0 ? Math.round((completedDrug.size / cdlDrivers.length) * 100) : 0;
+        daItems.push({
+            label: "Random Testing Program",
+            regulation: "49 CFR 382.305",
+            status: drugPct >= 50 ? "compliant" : "action_needed",
+            detail: drugPct >= 50
+                ? `${drugPct}% of CDL drivers tested this year (target: 50%)`
+                : `${drugPct}% tested — ${50 - drugPct}% more needed to reach 50% minimum`,
+            reason: "Federal law requires that at least 50% of CDL drivers be randomly drug tested each year",
+        });
+    }
+
     if (cdlDrivers.length === 0) {
         daItems.push({
             label: "No CDL drivers",

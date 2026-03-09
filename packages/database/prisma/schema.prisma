@@ -228,6 +228,7 @@ model Driver {
   inspections           Inspection[]
   signingRequests       SigningRequest[]
   employmentHistory     EmploymentHistory[]
+  randomTestSelections  RandomTestSelection[]
 
   companyId             String
   company               Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -277,6 +278,26 @@ model EmploymentHistory {
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
+}
+
+// ============================================================================
+// RANDOM DRUG & ALCOHOL TESTING
+// ============================================================================
+
+model RandomTestSelection {
+  id              String   @id @default(cuid())
+  selectionDate   DateTime @default(now())
+  testingPeriod   String   // "2026-Q1", etc.
+  testType        String   // "DRUG", "ALCOHOL", "BOTH"
+  driverId        String
+  driver          Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  status          String   @default("SELECTED") // SELECTED, NOTIFIED, COMPLETED, MISSED
+  testDate        DateTime?
+  result          String?  // NEGATIVE, POSITIVE, REFUSED
+  notes           String?
+  companyId       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ============================================================================
