@@ -191,6 +191,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
         lastName: driver.lastName,
         email: driver.email || "",
         phone: driver.phone || "",
+        licenseType: driver.licenseType as string,
         operatesCMV: driver.operatesCMV,
         cdlNumber: driver.cdlNumber || "",
         cdlState: driver.cdlState || "",
@@ -201,6 +202,7 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
         clearinghouseQueryDate: driver.clearinghouseQueryDate?.split("T")[0] || "",
         lastDrugTestDate: driver.lastDrugTestDate?.split("T")[0] || "",
     });
+    const editIsCDL = editData.licenseType === "CDL";
     const [editError, setEditError] = useState<string | null>(null);
 
     const handleSaveEdit = async () => {
@@ -374,6 +376,42 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             {editError}
                         </div>
                     )}
+                    {/* License Type Selector */}
+                    <div style={{
+                        marginBottom: "1rem", padding: "0.75rem 1rem",
+                        background: "#f0fdf4", borderRadius: "10px",
+                        border: "1px solid #bbf7d0",
+                    }}>
+                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#15803d", marginBottom: "0.4rem" }}>
+                            What type of license does this driver hold?
+                        </label>
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                            {[
+                                { value: "CDL", label: "CDL (26,001+ lbs)", desc: "Requires drug testing, Clearinghouse, DOT physical" },
+                                { value: "NON_CDL", label: "Regular License", desc: "Standard driver's license" },
+                            ].map(opt => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => setEditData(prev => ({
+                                        ...prev,
+                                        licenseType: opt.value,
+                                        operatesCMV: opt.value === "CDL" ? true : prev.operatesCMV,
+                                    }))}
+                                    style={{
+                                        flex: 1, padding: "0.6rem 0.75rem", borderRadius: "8px",
+                                        border: `2px solid ${editData.licenseType === opt.value ? "#16a34a" : "#e2e8f0"}`,
+                                        background: editData.licenseType === opt.value ? "#f0fdf4" : "white",
+                                        cursor: "pointer", textAlign: "left",
+                                    }}
+                                >
+                                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>{opt.label}</div>
+                                    <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "0.15rem" }}>{opt.desc}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         {[
                             { key: "firstName", label: "First Name", type: "text" },
@@ -382,11 +420,11 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                             { key: "phone", label: "Phone", type: "tel" },
                             { key: "cdlNumber", label: "License Number", type: "text" },
                             { key: "cdlState", label: "Issuing State", type: "text" },
-                            ...(isCDL ? [{ key: "cdlClass", label: "CDL Class", type: "text" }] : []),
+                            ...(editIsCDL ? [{ key: "cdlClass", label: "CDL Class", type: "text" }] : []),
                             { key: "cdlExpiration", label: "License Expiration", type: "date" },
-                            { key: "medicalCardExpiration", label: "DOT Physical Expiration", type: "date" },
+                            ...((editIsCDL || editData.operatesCMV) ? [{ key: "medicalCardExpiration", label: "DOT Physical Expiration", type: "date" }] : []),
                             { key: "hireDate", label: "Hire Date", type: "date" },
-                            ...(isCDL ? [
+                            ...(editIsCDL ? [
                                 { key: "clearinghouseQueryDate", label: "Last Clearinghouse Query", type: "date" },
                                 { key: "lastDrugTestDate", label: "Last Drug Test", type: "date" },
                             ] : []),
@@ -404,16 +442,18 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                         border: "1px solid #e2e8f0", borderRadius: "8px",
                                         fontSize: "0.875rem",
                                     }}
+                                    autoComplete="off"
                                 />
                             </div>
                         ))}
                     </div>
                     {/* CMV toggle — only shown for Non-CDL drivers */}
-                    {!isCDL && (
+                    {!editIsCDL && (
                         <div style={{
                             marginTop: "1rem", padding: "0.75rem 1rem",
-                            background: "#f8fafc", borderRadius: "8px",
-                            border: "1px solid #e2e8f0",
+                            background: editData.operatesCMV ? "#f0fdf4" : "#f8fafc",
+                            borderRadius: "8px",
+                            border: `1px solid ${editData.operatesCMV ? "#bbf7d0" : "#e2e8f0"}`,
                         }}>
                             <label style={{
                                 display: "flex", alignItems: "center", gap: "0.5rem",
@@ -428,8 +468,8 @@ export default function DriverDetail({ driver }: { driver: DriverData }) {
                                 />
                                 This driver operates vehicles over 10,001 lbs
                             </label>
-                            <p style={{ margin: "0.35rem 0 0 1.6rem", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 1.4 }}>
-                                Drivers of vehicles over 10,001 lbs need a DOT physical, driving record, and employment application — but don&apos;t need drug testing or a CDL.
+                            <p style={{ margin: "0.35rem 0 0 1.6rem", fontSize: "0.75rem", color: "#64748b", lineHeight: 1.5 }}>
+                                Check this if the driver uses work trucks, box trucks, or any vehicle + trailer combo over 10,001 lbs GVWR (check the sticker inside the driver&apos;s door). This triggers DOT physical, driving record, and employment application requirements — but <strong>not</strong> drug testing (that&apos;s only for CDL holders driving 26,001+ lbs).
                             </p>
                         </div>
                     )}

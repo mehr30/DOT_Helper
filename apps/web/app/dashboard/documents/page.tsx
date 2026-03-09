@@ -24,6 +24,8 @@ import {
     ChevronDown,
     Square,
     CheckSquare,
+    Archive,
+    RotateCcw,
 } from "lucide-react";
 import styles from "./page.module.css";
 import { getSavedDocuments, deleteDocument, SavedDocument } from "./savedDocuments";
@@ -31,7 +33,7 @@ import { useDemoMode } from "../../components/DemoModeContext";
 import { useCompanyProfile } from "../../components/CompanyProfileContext";
 import DocumentUpload from "../../components/DocumentUpload";
 import SignDocumentModal from "../../components/SignDocumentModal";
-import { getDocuments, deleteDocumentRecord, getDriversForWizard, getVehiclesForWizard, type DocumentData } from "../../actions/documents";
+import { getDocuments, deleteDocumentRecord, getArchivedDocuments, restoreDocumentRecord, getDriversForWizard, getVehiclesForWizard, type DocumentData } from "../../actions/documents";
 import { downloadCompliancePacket, downloadFormPdf, type SavedFormData } from "../../../lib/pdf";
 
 const DOC_TYPE_LABELS: Record<string, string> = {
@@ -127,6 +129,8 @@ function DocumentsPageInner() {
     const [showFormPicker, setShowFormPicker] = useState(false);
     const [driversList, setDriversList] = useState<{ id: string; name: string }[]>([]);
     const [vehiclesList, setVehiclesList] = useState<{ id: string; label: string }[]>([]);
+    const [showArchived, setShowArchived] = useState(false);
+    const [archivedDocs, setArchivedDocs] = useState<DocumentData[]>([]);
 
     const loadRealDocs = useCallback(async () => {
         setLoadingDocs(true);
@@ -158,9 +162,12 @@ function DocumentsPageInner() {
     };
 
     const handleDeleteRealDoc = (docId: string) => {
+        if (!confirm("Archive this document? It will be moved to the archive and can be restored later. DOT requires retention of driver files for 3 years and drug & alcohol records for 5 years.")) return;
         startTransition(async () => {
             await deleteDocumentRecord(docId);
+            const removed = realDocs.find(d => d.id === docId);
             setRealDocs(prev => prev.filter(d => d.id !== docId));
+            if (removed) setArchivedDocs(prev => [removed, ...prev]);
             setSelectedDocs(prev => {
                 const next = new Set(prev);
                 next.delete(docId);
@@ -482,6 +489,33 @@ function DocumentsPageInner() {
                                 Download {selectedDocs.size} Selected
                             </button>
                         )}
+                        <button
+                            onClick={async () => {
+                                if (!showArchived && archivedDocs.length === 0) {
+                                    try {
+                                        const archived = await getArchivedDocuments();
+                                        setArchivedDocs(archived);
+                                    } catch { /* ignore */ }
+                                }
+                                setShowArchived(!showArchived);
+                            }}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "0.4rem",
+                                padding: "0.5rem 0.75rem", borderRadius: "8px",
+                                border: "1px solid #e2e8f0", background: showArchived ? "#f1f5f9" : "white",
+                                color: "#64748b", fontSize: "0.8rem", fontWeight: 500, cursor: "pointer",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            <Archive size={14} />
+                            {showArchived ? "Hide Archive" : "Archive"}
+                            {archivedDocs.length > 0 && (
+                                <span style={{
+                                    background: "#e2e8f0", borderRadius: "10px",
+                                    padding: "0.1rem 0.4rem", fontSize: "0.7rem", fontWeight: 600,
+                                }}>{archivedDocs.length}</span>
+                            )}
+                        </button>
                     </div>
 
                     {/* Documents Table */}
@@ -631,11 +665,11 @@ function DocumentsPageInner() {
                                                         )}
                                                         <button
                                                             className={styles.actionBtn}
-                                                            title="Delete"
+                                                            title="Archive"
                                                             onClick={() => handleDeleteRealDoc(doc.id)}
                                                             disabled={isPending}
                                                         >
-                                                            <Trash2 size={16} />
+                                                            <Archive size={16} />
                                                         </button>
                                                     </div>
                                                 </td>
@@ -662,6 +696,71 @@ function DocumentsPageInner() {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Archived Documents */}
+            {showArchived && !isDemoMode && (
+                <section style={{ marginTop: "1.5rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                        <Archive size={18} style={{ color: "#94a3b8" }} />
+                        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#64748b", margin: 0 }}>
+                            Archived Documents
+                        </h3>
+                        <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                            DOT requires retention of driver files for 3 years and drug/alcohol records for 5 years
+                        </span>
+                    </div>
+                    {archivedDocs.length === 0 ? (
+                        <div style={{
+                            textAlign: "center", padding: "2rem",
+                            background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1",
+                            color: "#94a3b8", fontSize: "0.85rem",
+                        }}>
+                            No archived documents
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: "flex", flexDirection: "column", gap: "0.5rem",
+                        }}>
+                            {archivedDocs.map(doc => (
+                                <div key={doc.id} style={{
+                                    display: "flex", alignItems: "center", gap: "0.75rem",
+                                    padding: "0.75rem 1rem", background: "#f8fafc",
+                                    borderRadius: "10px", border: "1px solid #e2e8f0",
+                                }}>
+                                    <FileText size={18} style={{ color: "#94a3b8", flexShrink: 0 }} />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontSize: "0.85rem", fontWeight: 500, color: "#475569" }}>{doc.name}</div>
+                                        <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                                            {friendlyDocType(doc.documentType)}
+                                            {doc.driverName && ` — ${doc.driverName}`}
+                                            {doc.vehicleName && ` — ${doc.vehicleName}`}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            startTransition(async () => {
+                                                await restoreDocumentRecord(doc.id);
+                                                setArchivedDocs(prev => prev.filter(d => d.id !== doc.id));
+                                                setRealDocs(prev => [doc, ...prev]);
+                                            });
+                                        }}
+                                        disabled={isPending}
+                                        style={{
+                                            display: "flex", alignItems: "center", gap: "0.3rem",
+                                            padding: "0.4rem 0.75rem", borderRadius: "6px",
+                                            border: "1px solid #e2e8f0", background: "white",
+                                            color: "#16a34a", fontSize: "0.75rem", fontWeight: 600,
+                                            cursor: "pointer", whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        <RotateCcw size={12} /> Restore
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
             )}
 
             {/* Demo mode content */}

@@ -52,6 +52,8 @@ model Company {
   invites           CompanyInvite[]
   signingRequests   SigningRequest[]
 
+  lastComplianceReviewAt DateTime? // Last time the owner confirmed their compliance profile is current
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   deletedAt         DateTime?
@@ -546,6 +548,7 @@ model Document {
 
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+  deletedAt         DateTime?    // Soft delete — DOT retention: DQ files 3 years, D&A files 5 years
 }
 
 // E-Signature records — audit trail for who signed what and when

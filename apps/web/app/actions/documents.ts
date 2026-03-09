@@ -61,6 +61,9 @@ export async function getDocuments(opts?: {
         ];
     }
 
+    // Exclude archived documents
+    where.deletedAt = null;
+
     const docs = await prisma.document.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -290,6 +293,7 @@ export async function deleteDocumentRecord(documentId: string) {
     const doc = await prisma.document.findFirst({
         where: {
             id: documentId,
+            deletedAt: null,
             OR: [
                 { companyId },
                 { driver: { companyId } },
@@ -300,8 +304,87 @@ export async function deleteDocumentRecord(documentId: string) {
 
     if (!doc) return { error: "Document not found" };
 
-    await prisma.document.delete({ where: { id: documentId } });
+    // Soft delete — archive instead of permanently removing
+    // DOT retention: DQ files 3 years after driver leaves, D&A records 5 years
+    await prisma.document.update({
+        where: { id: documentId },
+        data: { deletedAt: new Date() },
+    });
 
     revalidatePath("/dashboard/documents");
     revalidatePath("/dashboard");
+    return { success: true };
+}
+
+/**
+ * Get archived (soft-deleted) documents for the current company.
+ */
+export async function getArchivedDocuments(): Promise<DocumentData[]> {
+    const { companyId } = await requireCompanyUser();
+
+    const docs = await prisma.document.findMany({
+        where: {
+            deletedAt: { not: null },
+            OR: [
+                { companyId },
+                { driver: { companyId } },
+                { vehicle: { companyId } },
+            ],
+        },
+        orderBy: { deletedAt: "desc" },
+        take: 100,
+        include: {
+            driver: { select: { firstName: true, lastName: true } },
+            vehicle: { select: { unitNumber: true, make: true, model: true } },
+        },
+    });
+
+    return docs.map((d) => ({
+        id: d.id,
+        name: d.name,
+        description: d.description,
+        documentType: d.documentType,
+        category: d.category,
+        fileName: d.fileName,
+        fileUrl: d.fileUrl,
+        fileSize: d.fileSize,
+        mimeType: d.mimeType,
+        issueDate: d.issueDate?.toISOString() ?? null,
+        expirationDate: d.expirationDate?.toISOString() ?? null,
+        driverId: d.driverId,
+        vehicleId: d.vehicleId,
+        companyId: d.companyId,
+        createdAt: d.createdAt.toISOString(),
+        driverName: d.driver ? `${d.driver.firstName} ${d.driver.lastName}` : null,
+        vehicleName: d.vehicle ? `Unit ${d.vehicle.unitNumber}${d.vehicle.make ? ` — ${d.vehicle.make} ${d.vehicle.model ?? ""}`.trim() : ""}` : null,
+    }));
+}
+
+/**
+ * Restore an archived document.
+ */
+export async function restoreDocumentRecord(documentId: string) {
+    const { companyId } = await requireCompanyUser();
+
+    const doc = await prisma.document.findFirst({
+        where: {
+            id: documentId,
+            deletedAt: { not: null },
+            OR: [
+                { companyId },
+                { driver: { companyId } },
+                { vehicle: { companyId } },
+            ],
+        },
+    });
+
+    if (!doc) return { error: "Document not found" };
+
+    await prisma.document.update({
+        where: { id: documentId },
+        data: { deletedAt: null },
+    });
+
+    revalidatePath("/dashboard/documents");
+    return { success: true };
 }
