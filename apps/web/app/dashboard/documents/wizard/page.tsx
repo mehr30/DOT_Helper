@@ -170,6 +170,9 @@ function WizardContent() {
                     usdotNumber: profile.usdotNumber,
                     carrierName: profile.companyName,
                     companyName: profile.companyName,
+                    legalName: profile.companyName,
+                    phone: profile.phone,
+                    email: profile.email,
                     certDate: today,
                     reviewDate: today,
                     signDate: today,
@@ -293,6 +296,7 @@ function WizardContent() {
             usdotNumber: profile.usdotNumber,
             carrierName: profile.companyName,
             companyName: profile.companyName,
+            legalName: profile.companyName,
             phone: profile.phone,
             email: profile.email,
             certDate: today,
@@ -363,13 +367,13 @@ function WizardContent() {
         return missing;
     };
 
-    const handleSaveForm = async () => {
+    const handleSaveForm = async (): Promise<boolean> => {
         if (activeForm) {
             // Validate required fields before saving
             const missing = getRequiredMissing();
             if (missing.length > 0) {
                 alert(`Please fill out these required fields before saving:\n\n• ${missing.join("\n• ")}`);
-                return;
+                return false;
             }
 
             const totalFields = activeForm.sections.reduce((acc, s) => acc + s.fields.length, 0);
@@ -429,13 +433,16 @@ function WizardContent() {
                     addAddress({ label: `${city}, ${state}`, street, city, state, zip: zip || "" });
                 }
             }
+            return true;
         }
+        return false;
     };
 
     const handleSaveAndClose = async () => {
-        await handleSaveForm();
-        // If save succeeded (saveNotice will be true), navigate back to documents
-        router.push("/dashboard/documents");
+        const saved = await handleSaveForm();
+        if (saved) {
+            router.push("/dashboard/documents");
+        }
     };
 
     const handleSendForSignature = async () => {
