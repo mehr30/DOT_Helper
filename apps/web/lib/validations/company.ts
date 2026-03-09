@@ -26,8 +26,13 @@ export const onboardingStep3Schema = z.object({
     userRole: z.enum(["OWNER", "ADMIN", "DISPATCHER"]),
 });
 
-// Step 4: Optional details
+// Step 4: Optional details (includes USDOT for "Starting Fresh" path)
 export const onboardingStep4Schema = z.object({
+    usdotNumber: z
+        .string()
+        .regex(/^(\d{1,8})?$/, "USDOT number must be 1-8 digits")
+        .optional()
+        .or(z.literal("")),
     mcNumber: z.string().max(20).optional().or(z.literal("")),
     address: z.string().max(500).optional().or(z.literal("")),
     city: z.string().max(100).optional().or(z.literal("")),

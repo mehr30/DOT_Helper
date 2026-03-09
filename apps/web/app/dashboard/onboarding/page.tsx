@@ -204,6 +204,7 @@ export default function OnboardingPage() {
 
                 {currentStep === 4 && (
                     <Step4Details
+                        path={path!}
                         defaultValues={formData}
                         saferData={saferData}
                         isSubmitting={isSubmitting}
@@ -242,7 +243,6 @@ function Step1({
     onBack: () => void;
 }) {
     const isExisting = path === "existing";
-    const [noDot, setNoDot] = useState(!isExisting && !defaultValues.usdotNumber);
     const [lookupLoading, setLookupLoading] = useState(false);
     const [lookupStatus, setLookupStatus] = useState<"idle" | "found" | "not_found" | "error">("idle");
     const [lookupMessage, setLookupMessage] = useState("");
@@ -296,27 +296,17 @@ function Step1({
         setLookupLoading(false);
     }, [dotValue, setValue, onSaferData]);
 
-    const handleNoDotToggle = () => {
-        const next = !noDot;
-        setNoDot(next);
-        if (next) {
-            setValue("usdotNumber", "");
-            onSaferData(null);
-            setLookupStatus("idle");
-        }
-    };
-
     return (
         <>
             <div className={styles.header}>
-                <h1>{isExisting ? "Look up your company" : "Set up your company"}</h1>
+                <h1>{isExisting ? "Look up your company" : "Name your company"}</h1>
                 <p>{isExisting
                     ? "Enter your USDOT number and we'll pull your info from FMCSA."
-                    : "Just your company name to get started."
+                    : "We'll get you set up in just a few steps."
                 }</p>
             </div>
             <form onSubmit={handleSubmit(onNext)}>
-                {/* USDOT field — shown first for existing carriers */}
+                {/* Existing carriers: USDOT lookup first */}
                 {isExisting && (
                     <div className={styles.fieldGroup}>
                         <label className={styles.label}>USDOT Number</label>
@@ -383,60 +373,6 @@ function Step1({
                     />
                     {errors.name && <span className={styles.fieldError}>{errors.name.message}</span>}
                 </div>
-
-                {/* USDOT for new carriers */}
-                {!isExisting && !noDot && (
-                    <div className={styles.fieldGroup}>
-                        <label className={styles.label}>USDOT Number</label>
-                        <input
-                            {...register("usdotNumber")}
-                            placeholder="1234567"
-                            className={styles.input}
-                            inputMode="numeric"
-                        />
-                        {errors.usdotNumber && <span className={styles.fieldError}>{errors.usdotNumber.message}</span>}
-                    </div>
-                )}
-
-                {!isExisting && (
-                    <label style={{
-                        display: "flex", alignItems: "center", gap: "0.5rem",
-                        fontSize: "0.85rem", color: "#64748b", cursor: "pointer",
-                        marginBottom: "0.5rem",
-                    }}>
-                        <input
-                            type="checkbox"
-                            checked={noDot}
-                            onChange={handleNoDotToggle}
-                            style={{ accentColor: "var(--color-brand-green, #22c55e)" }}
-                        />
-                        I don&apos;t have a USDOT number yet
-                    </label>
-                )}
-
-                {noDot && !isExisting && (
-                    <div style={{
-                        padding: "0.75rem 1rem", marginBottom: "1rem",
-                        background: "#f0fdf4", border: "1px solid #bbf7d0",
-                        borderRadius: "8px", fontSize: "0.8rem", color: "#166534",
-                        lineHeight: 1.6,
-                    }}>
-                        <strong>No problem!</strong> You can add it later in Settings. If you need to apply
-                        for a USDOT number, you can do so for free on the FMCSA website:
-                        <br />
-                        <a
-                            href="https://www.fmcsa.dot.gov/registration/getting-started"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                display: "inline-flex", alignItems: "center", gap: "0.25rem",
-                                color: "#15803d", fontWeight: 600, marginTop: "0.25rem",
-                            }}
-                        >
-                            FMCSA Registration — Getting Started <ExternalLink size={12} />
-                        </a>
-                    </div>
-                )}
 
                 <div className={styles.buttonRow}>
                     <button type="button" className={styles.backButton} onClick={onBack}>
@@ -702,6 +638,7 @@ function Step3Fleet({
 /* ─── Step 4: Optional Details ──────────────────────────────────────── */
 
 function Step4Details({
+    path,
     defaultValues,
     saferData,
     isSubmitting,
@@ -709,6 +646,7 @@ function Step4Details({
     onSkip,
     onBack,
 }: {
+    path: OnboardingPath;
     defaultValues: Partial<FormData>;
     saferData: SAFERData | null;
     isSubmitting: boolean;
@@ -716,9 +654,11 @@ function Step4Details({
     onSkip: () => void;
     onBack: () => void;
 }) {
+    const isNew = path === "new";
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<OnboardingStep4Input>({
         resolver: zodResolver(onboardingStep4Schema),
         defaultValues: {
+            usdotNumber: defaultValues.usdotNumber ?? "",
             mcNumber: defaultValues.mcNumber ?? saferData?.mcNumber ?? "",
             address: defaultValues.address ?? saferData?.address ?? "",
             city: defaultValues.city ?? saferData?.city ?? "",
@@ -743,6 +683,40 @@ function Step4Details({
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
+                {/* USDOT — only shown for "Starting Fresh" path */}
+                {isNew && (
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                            USDOT Number
+                            <span
+                                title="Your 7-8 digit registration number from FMCSA. You can apply for one for free at fmcsa.dot.gov."
+                                style={{ cursor: "help", color: "#94a3b8" }}
+                            >
+                                <HelpCircle size={14} />
+                            </span>
+                        </label>
+                        <input
+                            {...register("usdotNumber")}
+                            placeholder="1234567"
+                            className={styles.input}
+                            inputMode="numeric"
+                        />
+                        {errors.usdotNumber && <span className={styles.fieldError}>{errors.usdotNumber.message}</span>}
+                        <span style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.15rem", lineHeight: 1.5 }}>
+                            Don&apos;t have one yet? You can{" "}
+                            <a
+                                href="https://www.fmcsa.dot.gov/registration/getting-started"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "var(--color-brand-green, #22c55e)", fontWeight: 500 }}
+                            >
+                                apply for free on FMCSA.gov
+                            </a>
+                            {" "}or add it later in Settings.
+                        </span>
+                    </div>
+                )}
+
                 <div className={styles.fieldGroup}>
                     <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
                         MC Number
