@@ -279,6 +279,9 @@ export const dotForms: DOTForm[] = [
         category: "company",
         description: "Every 2 years, you must update your business info with the federal government. Fill this out here, then submit it on the FMCSA website (login.fmcsa.dot.gov) or mail it in. We'll help you prepare the information — you just need to file it.",
         estimatedTime: "15 min",
+        filingInstructions: "You've prepared your MCS-150 information. Now you need to file it with FMCSA. You can do this online (fastest) or by mail:\n\n1. Go to the FMCSA portal and log in with your USDOT PIN\n2. Select \"Update MCS-150\" from the menu\n3. Enter the information you prepared here\n4. Submit — you'll get a confirmation number\n\nIf you don't have your PIN, call FMCSA at 1-800-832-5660 to request one. Keep a copy of the confirmation for your records.",
+        filingUrl: "https://login.fmcsa.dot.gov",
+        filingUrlLabel: "Go to FMCSA Portal",
         sections: [
             {
                 id: "companyInfo",

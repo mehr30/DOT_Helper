@@ -213,7 +213,7 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     if (lower.includes("preventive maintenance")) {
         return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
-    if (lower.includes("registration") && !lower.includes("federal registration")) {
+    if (lower.includes("registration") && !lower.includes("federal registration") && !lower.includes("carrier registration")) {
         return { href: item.vehicleId ? `/dashboard/vehicles/${item.vehicleId}` : "/dashboard/vehicles", label: "Update Vehicle" };
     }
 
@@ -227,7 +227,7 @@ function getActionForItem(item: { label: string; status: string; driverId?: stri
     if (lower.includes("operating authority")) {
         return { href: "/dashboard/documents?upload=OPERATING_AUTHORITY", label: "Upload Doc" };
     }
-    if (lower.includes("ucr") || lower.includes("federal registration")) {
+    if (lower.includes("ucr") || lower.includes("carrier registration") || lower.includes("federal registration")) {
         return { href: "/dashboard/documents?upload=UCR", label: "Upload Doc" };
     }
     if (lower.includes("insurance")) {

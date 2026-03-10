@@ -496,7 +496,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
     // UCR — not required for intrastate-only carriers
     if (needsUCR) {
         const hasUCR = hasDoc("UCR");
-        const ucrReason = "Because you operate across state lines, you must register and pay the annual UCR fee";
+        const ucrReason = "Because you operate across state lines, you must register and pay the annual UCR fee at ucr.gov — then upload your receipt here";
         if (company?.ucrDueDate) {
             const days = daysUntil(company.ucrDueDate);
             caItems.push({
@@ -511,7 +511,7 @@ export async function getComplianceScores(): Promise<ComplianceScores> {
                 label: "Unified Carrier Registration (UCR)",
                 regulation: "49 CFR 367",
                 status: hasUCR ? "compliant" : "action_needed",
-                detail: hasUCR ? "On file" : "Upload UCR registration",
+                detail: hasUCR ? "On file" : "Register at ucr.gov, then upload your receipt here",
                 reason: ucrReason,
             });
         }

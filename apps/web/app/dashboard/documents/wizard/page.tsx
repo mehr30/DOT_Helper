@@ -1244,6 +1244,39 @@ function WizardContent() {
                                 Form saved to your <Link href="/dashboard/documents" style={{ color: "#16a34a", fontWeight: 600 }}>Documents</Link>! You can come back to edit it anytime.
                             </div>
                         )}
+
+                        {/* Filing instructions — shown after save for forms that need external filing */}
+                        {saveNotice && activeForm?.filingInstructions && (
+                            <div style={{
+                                marginTop: "0.75rem", padding: "1rem 1.25rem", borderRadius: "12px",
+                                background: "#eff6ff", border: "1px solid #bfdbfe",
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
+                                    <ExternalLink size={16} style={{ color: "#2563eb" }} />
+                                    <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "#1e40af" }}>
+                                        Next Step: File This Online
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: "0.82rem", color: "#1e3a5f", lineHeight: 1.65, whiteSpace: "pre-line" }}>
+                                    {activeForm.filingInstructions}
+                                </div>
+                                {activeForm.filingUrl && (
+                                    <a
+                                        href={activeForm.filingUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                                            marginTop: "0.75rem", padding: "0.5rem 1rem", borderRadius: "8px",
+                                            background: "#2563eb", color: "white", fontSize: "0.85rem",
+                                            fontWeight: 600, textDecoration: "none",
+                                        }}
+                                    >
+                                        {activeForm.filingUrlLabel || "Go to Filing Portal"} <ExternalLink size={14} />
+                                    </a>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
