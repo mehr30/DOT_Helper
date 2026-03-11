@@ -1,15 +1,21 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "UCR Registration Guide: Fees, Deadlines & Requirements (2026)", description: "Complete guide to Unified Carrier Registration for motor carriers. Covers who must register, fee brackets, deadlines, and penalties for non-compliance.", alternates: { canonical: "/blog/ucr-registration-guide" }, openGraph: { title: "UCR Registration Guide: Fees, Deadlines & Requirements (2026)", description: "Complete guide to Unified Carrier Registration for motor carriers. Covers who must register, fee brackets, deadlines, and penalties for non-compliance.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Compliance" title="UCR Registration: What It Is, Who Needs It, and What It Costs" date="February 19, 2026" readTime="6 min read" relatedPosts={[{ slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" }, { slug: "boc-3-filing-guide", title: "BOC-3 Filing Guide" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p><strong>UCR (Unified Carrier Registration)</strong> is required annually for motor carriers, brokers, freight forwarders, and leasing companies that operate in interstate commerce. If you cross state lines with commercial vehicles, you need UCR.</p>
+            </div>
+
             <p>Every year, motor carriers across the country forget about UCR until they get pulled over and hit with fines. It&apos;s one of those &quot;boring but essential&quot; filings that&apos;s easy to overlook — and expensive when you do.</p>
 
             <h2>What Is UCR?</h2>
-            <p>The <strong>Unified Carrier Registration (UCR)</strong> program replaced the old Single State Registration System. It&apos;s an annual registration and fee program for motor carriers, brokers, freight forwarders, and leasing companies operating in interstate or international commerce.</p>
+            <p>The Unified Carrier Registration program replaced the old Single State Registration System. It&apos;s an annual registration and fee program for motor carriers, brokers, freight forwarders, and leasing companies operating in interstate or international commerce.</p>
             <p>Think of it as your annual &quot;permission slip&quot; to operate across state lines. Without it, you&apos;re technically operating illegally.</p>
 
             <h2>Who Must Register?</h2>
@@ -22,7 +28,7 @@ export default function Page() {
             <p>If you only operate within a single state (purely intrastate), you&apos;re exempt. But the moment you cross a state line with a loaded truck, you need UCR.</p>
 
             <h2>2026 Fee Schedule</h2>
-            <p>Fees are based on your fleet size (number of qualifying vehicles):</p>
+            <p>Fees are based on your fleet size (number of <strong>qualifying vehicles — any commercial vehicle that requires a USDOT number, used to determine your fee bracket</strong>):</p>
             <ul>
                 <li><strong>0-2 vehicles:</strong> ~$176</li>
                 <li><strong>3-5 vehicles:</strong> ~$344</li>

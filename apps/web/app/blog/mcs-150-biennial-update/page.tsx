@@ -1,15 +1,21 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "MCS-150 Biennial Update: When, How & Why It Matters", description: "Guide to the FMCSA MCS-150 biennial update. How to file, when it's due, what information to update, and penalties for missing the deadline.", alternates: { canonical: "/blog/mcs-150-biennial-update" }, openGraph: { title: "MCS-150 Biennial Update: When, How & Why It Matters", description: "Guide to the FMCSA MCS-150 biennial update. How to file, when it's due, what information to update, and penalties for missing the deadline.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Compliance" title="MCS-150 Biennial Update: Don't Let Your USDOT Number Go Inactive" date="February 14, 2026" readTime="5 min read" relatedPosts={[{ slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" }, { slug: "usdot-number-requirements", title: "USDOT Number Requirements" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Every motor carrier, broker, and freight forwarder with a USDOT number must file an <strong>MCS-150 (Motor Carrier Service form 150 — the biennial update form used to keep your company information current with the FMCSA)</strong> update every two years. Missing this filing can make your USDOT number inactive.</p>
+            </div>
+
             <p>Here&apos;s a fun fact: thousands of carriers every year have their USDOT number deactivated because they forgot a 10-minute online form. The MCS-150 biennial update isn&apos;t glamorous, but skipping it can ground your entire operation.</p>
 
             <h2>What Is the MCS-150?</h2>
-            <p>The MCS-150 is the form you originally filed to get your USDOT number. FMCSA requires you to update it every <strong>24 months</strong> to keep your company information current — things like number of power units, drivers, annual mileage, and contact info.</p>
+            <p>The MCS-150 is the form you originally filed to get your USDOT number. <strong>FMCSA (Federal Motor Carrier Safety Administration — the federal agency that regulates trucking and bus companies)</strong> requires you to update it every <strong>24 months</strong> to keep your company information current — things like number of power units, drivers, annual mileage, and contact info.</p>
 
             <h2>When Is It Due?</h2>
             <p>Your filing month depends on the <strong>last two digits of your USDOT number</strong>:</p>

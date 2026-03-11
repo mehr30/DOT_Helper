@@ -1,32 +1,38 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Random Drug Testing Requirements: Rates, Selection & Common Errors", description: "Guide to DOT random drug testing — annual testing rates, random selection methods, selection pool requirements, and carrier responsibilities.", alternates: { canonical: "/blog/random-drug-testing-requirements" }, openGraph: { title: "Random Drug Testing Requirements: Rates, Selection & Common Errors", description: "Guide to DOT random drug testing — annual testing rates, random selection methods, selection pool requirements, and carrier responsibilities.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Drug & Alcohol Testing" title="Random Drug Testing: Rates, Selection, and the Mistakes That Get Carriers Fined" date="February 22, 2026" readTime="7 min read" relatedPosts={[{ slug: "drug-alcohol-testing-compliance", title: "Drug & Alcohol Testing Guide" }, { slug: "fmcsa-clearinghouse-guide", title: "FMCSA Clearinghouse Guide" }]}>
-            <p>Random testing sounds simple: pick a percentage of your drivers randomly throughout the year and test them. But the details trip up more carriers than you&apos;d expect. The word &quot;random&quot; is doing a lot of work in that regulation — and FMCSA means it literally.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Random drug and alcohol testing is required for <strong>CDL (Commercial Driver&apos;s License) drivers</strong> who operate <strong>CMVs (commercial motor vehicles — vehicles over 26,001 lbs, 16+ passengers, or hazmat)</strong>. Non-CDL drivers are not subject to <strong>FMCSA (Federal Motor Carrier Safety Administration)</strong> random testing requirements.</p>
+            </div>
+
+            <p>Random testing sounds simple: pick a percentage of your CDL drivers randomly throughout the year and test them. But the details trip up more carriers than you&apos;d expect. The word &quot;random&quot; is doing a lot of work in that regulation — and FMCSA means it literally.</p>
 
             <h2>Annual Testing Rates</h2>
             <ul>
-                <li><strong>Drug testing:</strong> 50% of your average driver pool per year</li>
-                <li><strong>Alcohol testing:</strong> 10% of your average driver pool per year</li>
+                <li><strong>Drug testing:</strong> 50% of your average CDL driver pool per year</li>
+                <li><strong>Alcohol testing:</strong> 10% of your average CDL driver pool per year</li>
             </ul>
-            <p>Your &quot;average driver pool&quot; is calculated by adding the total number of drivers eligible for testing in each quarter and dividing by four. If you started the year with 8 drivers and ended with 12, your average pool is 10 — so you need 5 drug test selections throughout the year.</p>
+            <p>Your &quot;average driver pool&quot; is calculated by adding the total number of CDL drivers eligible for testing in each quarter and dividing by four. If you started the year with 8 CDL drivers and ended with 12, your average pool is 10 — so you need 5 drug test selections throughout the year.</p>
 
             <h2>The Selection Process</h2>
             <p>This is where it gets specific:</p>
             <ul>
                 <li>Selections must use a <strong>scientifically valid random method</strong> — computer-generated random numbers. Drawing names out of a hat? Not compliant (seriously).</li>
-                <li>Every driver must have an <strong>equal chance</strong> of being selected each period.</li>
+                <li>Every CDL driver must have an <strong>equal chance</strong> of being selected each period.</li>
                 <li>A driver selected once can be selected again. Being tested doesn&apos;t remove you from the pool.</li>
                 <li>Selections must be <strong>spread throughout the year</strong>. You can&apos;t batch all selections in Q1 and call it done.</li>
                 <li>Test within a <strong>reasonable time</strong> after selection — same day or next business day is standard.</li>
             </ul>
 
             <h2>Owner-Operators: The Consortium</h2>
-            <p>You can&apos;t have a random pool of one person — you&apos;d be tested every quarter. Owner-operators must join a <strong>consortium</strong> (Third Party Administrator) that manages a larger random pool. Costs around $75-$150/year. The consortium handles selection, scheduling, and documentation.</p>
+            <p>You can&apos;t have a random pool of one person — you&apos;d be tested every quarter. Owner-operators must join a <strong>consortium (also called a TPA, or Third-Party Administrator — an outside company that pools CDL drivers from multiple carriers into a shared random testing pool)</strong> that manages a larger random pool. Costs around $75-$150/year. The consortium handles selection, scheduling, and documentation.</p>
 
             <h2>Documentation</h2>
             <p>Keep records of:</p>
@@ -41,7 +47,7 @@ export default function Page() {
             <ul>
                 <li><strong>Not testing enough:</strong> Miscalculating the pool size and falling short of the 50% rate</li>
                 <li><strong>Batching tests:</strong> All selections in one quarter instead of spreading throughout the year</li>
-                <li><strong>Advance notice:</strong> Telling drivers when selections are coming — this defeats &quot;random&quot;</li>
+                <li><strong>Advance notice:</strong> Telling CDL drivers when selections are coming — this defeats &quot;random&quot;</li>
                 <li><strong>No documentation:</strong> Testing happened but no records to prove it</li>
             </ul>
         </BlogPostLayout>

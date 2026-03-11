@@ -1,17 +1,23 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Trailer Maintenance Requirements: DOT Compliance for Trailers", description: "DOT maintenance requirements specific to trailers — annual inspections, lighting, brakes, tires, fifth wheel, and record keeping for trailer fleets.", alternates: { canonical: "/blog/trailer-maintenance-requirements" }, openGraph: { title: "Trailer Maintenance Requirements: DOT Compliance for Trailers", description: "DOT maintenance requirements specific to trailers — annual inspections, lighting, brakes, tires, fifth wheel, and record keeping for trailer fleets.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Vehicle Compliance" title="Trailer Maintenance: The Compliance Area Everyone Forgets" date="February 6, 2026" readTime="5 min read" relatedPosts={[{ slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance Guide" }, { slug: "annual-dot-inspection-guide", title: "Annual DOT Inspection Guide" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>These requirements apply to any trailer used in commercial service that&apos;s subject to FMCSA (Federal Motor Carrier Safety Administration) regulations. If you pull trailers with your commercial vehicles, these rules apply.</p>
+            </div>
+
             <p>Trailers get neglected. They sit in yards between loads, don&apos;t get the same attention as the tractors, and somehow end up being the unit that causes the OOS violation. Sound familiar? Every fleet we talk to has at least one forgotten trailer out back with expired inspection and bald tires.</p>
 
             <h2>Key Requirements</h2>
             <ul>
                 <li><strong>Annual DOT inspection</strong> — same requirement as tractors. Every trailer needs one.</li>
-                <li><strong>DVIRs</strong> — drivers must include the trailer in their post-trip report when pulling one.</li>
+                <li><strong>DVIRs (Driver Vehicle Inspection Reports &mdash; the pre- and post-trip inspection forms drivers must complete)</strong> — drivers must include the trailer in their post-trip report when pulling one.</li>
                 <li><strong>PM schedule</strong> — trailers need their own maintenance schedule, separate from tractors.</li>
                 <li><strong>Lighting</strong> — all required lights must be operational: markers, tail lights, turn signals, clearance lights, reflectors.</li>
                 <li><strong>Brakes</strong> — trailer brakes go out of adjustment faster than tractor brakes because they&apos;re not used as aggressively (they&apos;re on the rear of load distribution).</li>

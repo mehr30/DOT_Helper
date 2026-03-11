@@ -1,12 +1,18 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "How to Build a DOT-Compliant Preventive Maintenance Program", description: "Step-by-step guide to building a preventive maintenance program that meets FMCSA Part 396 requirements. Includes PM intervals, checklists, and documentation.", alternates: { canonical: "/blog/preventive-maintenance-program-guide" }, openGraph: { title: "How to Build a DOT-Compliant Preventive Maintenance Program", description: "Step-by-step guide to building a preventive maintenance program that meets FMCSA Part 396 requirements. Includes PM intervals, checklists, and documentation.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Vehicle Compliance" title="Building a Preventive Maintenance Program That Actually Works" date="February 16, 2026" readTime="8 min read" relatedPosts={[{ slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance Compliance Guide" }, { slug: "dvir-best-practices", title: "DVIR Best Practices" }]}>
-            <p>FMCSA requires you to have a &quot;systematic inspection, repair, and maintenance program.&quot; Notice they didn&apos;t say &quot;fix stuff when it breaks.&quot; A PM program means scheduled, documented, proactive maintenance. Wing it and you&apos;ll pay for it — in breakdowns, fines, and CSA points.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>A written preventive maintenance program is required for any motor carrier operating CMVs (commercial motor vehicles &mdash; any vehicle over 10,001 lbs GVWR) under FMCSA Part 396 (the federal regulation covering vehicle inspection, repair, and maintenance).</p>
+            </div>
+
+            <p>FMCSA requires you to have a &quot;systematic inspection, repair, and maintenance program.&quot; Notice they didn&apos;t say &quot;fix stuff when it breaks.&quot; A PM (Preventive Maintenance &mdash; scheduled, proactive service designed to catch problems before they cause breakdowns or violations) program means scheduled, documented, proactive maintenance. Wing it and you&apos;ll pay for it — in breakdowns, fines, and CSA points.</p>
 
             <h2>Setting PM Intervals</h2>
             <p>FMCSA doesn&apos;t mandate specific intervals — that&apos;s your call. But here&apos;s what works for most small fleets:</p>

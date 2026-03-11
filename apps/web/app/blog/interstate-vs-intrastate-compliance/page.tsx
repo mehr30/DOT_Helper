@@ -1,11 +1,17 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Interstate vs Intrastate Trucking: Compliance Differences Explained", description: "Key differences between interstate and intrastate trucking compliance. Which regulations apply, exemptions, and how to determine your operation type.", alternates: { canonical: "/blog/interstate-vs-intrastate-compliance" }, openGraph: { title: "Interstate vs Intrastate Trucking: Compliance Differences Explained", description: "Key differences between interstate and intrastate trucking compliance. Which regulations apply, exemptions, and how to determine your operation type.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Regulations" title="Interstate vs Intrastate: Which Rules Apply to You?" date="February 9, 2026" readTime="6 min read" relatedPosts={[{ slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide" }, { slug: "state-dot-compliance-requirements", title: "State DOT Compliance Requirements" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Understanding <strong>interstate commerce (transporting goods or passengers across state lines — or even within a single state if the shipment originated from or is destined for another state)</strong> vs <strong>intrastate commerce (transporting goods or passengers entirely within one state, with no connection to another state)</strong> determines which regulations apply to your operation. Interstate carriers follow federal FMCSA rules. Intrastate-only carriers follow their state DOT rules, which may differ significantly.</p>
+            </div>
+
             <p>This question comes up constantly: &quot;I only haul within my state — do federal DOT rules still apply to me?&quot; Short answer: maybe. Longer answer: it depends on what you&apos;re hauling, how big your truck is, and what your state says.</p>
 
             <h2>The Basic Distinction</h2>

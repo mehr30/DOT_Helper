@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
 import type { Metadata } from "next";
 import GreenlightLogo from "../components/GreenlightLogo";
+import Footer from "../components/Footer";
 import styles from "./blog.module.css";
 
 export const metadata: Metadata = {
@@ -242,6 +243,8 @@ export default function BlogIndexPage() {
                     <ArrowRight size={18} />
                 </Link>
             </div>
+
+            <Footer />
         </div>
     );
 }

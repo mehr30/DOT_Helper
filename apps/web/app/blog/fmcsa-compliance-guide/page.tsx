@@ -27,8 +27,13 @@ export default function FmcsaComplianceGuidePost() {
                 { slug: "csa-scores-explained", title: "CSA Scores Explained" },
             ]}
         >
+                    <div className={styles.calloutAmber}>
+                        <h4>Who does this apply to?</h4>
+                        <p>This guide covers FMCSA (Federal Motor Carrier Safety Administration) requirements for motor carriers operating CMVs (commercial motor vehicles — any vehicle over 10,001 lbs GVWR) in interstate commerce. Requirements differ depending on whether your drivers hold CDLs (Commercial Driver&apos;s Licenses) — we&apos;ll note where.</p>
+                    </div>
+
                     <p>
-                        If you operate commercial trucks, vans, or equipment vehicles, there&apos;s a federal agency keeping an eye on you: the <strong>FMCSA</strong> (Federal Motor Carrier Safety Administration). They&apos;re the ones who set the rules for who can drive commercially, how long they can drive, how vehicles must be maintained, and a lot more.
+                        If you operate commercial trucks, vans, or equipment vehicles, there&apos;s a federal agency keeping an eye on you: the <strong>FMCSA</strong>. They&apos;re the ones who set the rules for who can drive commercially, how long they can drive, how vehicles must be maintained, and a lot more.
                     </p>
                     <p>
                         Understanding FMCSA compliance isn&apos;t just about avoiding fines (though those can be brutal — up to <strong>$16,864 per violation</strong>). It&apos;s about protecting your drivers, your business, and keeping your authority to operate.
@@ -40,7 +45,7 @@ export default function FmcsaComplianceGuidePost() {
                     <h2>Do FMCSA Rules Apply to Me?</h2>
                     <p>You fall under FMCSA rules if you do any of the following:</p>
                     <ul>
-                        <li>Operate vehicles with a gross vehicle weight rating (GVWR) over <strong>10,001 lbs</strong> — that&apos;s the total weight the vehicle is rated for, not what it currently weighs. Check the sticker on the driver&apos;s side door.</li>
+                        <li>Operate vehicles with a GVWR (Gross Vehicle Weight Rating — the maximum total weight a vehicle is rated for; check the sticker on the driver&apos;s side door) over <strong>10,001 lbs</strong></li>
                         <li>Transport <strong>9 or more passengers</strong> for compensation (like a shuttle service)</li>
                         <li>Transport <strong>hazardous materials</strong> in quantities that require placards</li>
                     </ul>
@@ -60,7 +65,7 @@ export default function FmcsaComplianceGuidePost() {
 
                     <h2>CSA Scores: Your Safety Report Card</h2>
                     <p>
-                        Think of your <strong>CSA score</strong> as your trucking company&apos;s credit score — except instead of banks, it&apos;s shippers, brokers, and insurance companies checking it. CSA stands for Compliance, Safety, Accountability. FMCSA tracks your performance across seven categories:
+                        Think of your <strong>CSA (Compliance, Safety, Accountability) score</strong> as your trucking company&apos;s credit score — except instead of banks, it&apos;s shippers, brokers, and insurance companies checking it. FMCSA tracks your performance across seven categories:
                     </p>
                     <ul>
                         <li><strong>Unsafe Driving</strong> — Speeding, reckless driving, lane violations</li>
@@ -73,15 +78,15 @@ export default function FmcsaComplianceGuidePost() {
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>📊 Why This Matters to Your Bottom Line</h4>
+                        <h4>Why This Matters to Your Bottom Line</h4>
                         <p>Bad CSA scores don&apos;t just trigger government attention — many shippers and brokers check your scores before giving you loads. Poor scores can directly cost you revenue. Insurance companies also use them to set your rates. Better scores = lower premiums.</p>
                     </div>
 
                     <h2>The Big Five: What You&apos;re Responsible For</h2>
 
-                    <h3>1. Driver Files</h3>
+                    <h3>1. Driver Files (DQF — Driver Qualification File)</h3>
                     <p>
-                        For every driver, you need a complete qualification file: application with full work history, CDL copy, medical card, annual driving record, road test, background checks from previous employers, and drug/alcohol database queries. It sounds like a lot, but it&apos;s mostly a one-time setup with annual updates. The <Link href="/blog/driver-qualification-file-requirements">full breakdown is here</Link>.
+                        For every driver, you need a complete DQF: application with full work history, CDL copy, medical card, annual driving record, road test, background checks from previous employers, and drug/alcohol database queries. It sounds like a lot, but it&apos;s mostly a one-time setup with annual updates. The <Link href="/blog/driver-qualification-file-requirements">full breakdown is here</Link>.
                     </p>
 
                     <h3>2. Hours of Service</h3>
@@ -95,8 +100,12 @@ export default function FmcsaComplianceGuidePost() {
                     </p>
 
                     <h3>4. Drug &amp; Alcohol Testing</h3>
+                    <div className={styles.calloutAmber}>
+                        <h4>CDL drivers only</h4>
+                        <p>Drug &amp; alcohol testing is required only for drivers who hold a CDL and operate CMVs over 26,001 lbs (or 16+ passengers, or hazmat). Non-CDL drivers in the 10,001-26,000 lb range are NOT subject to these testing requirements.</p>
+                    </div>
                     <p>
-                        If your drivers need a CDL, you need a drug and alcohol testing program. That means testing before you hire someone, random testing throughout the year, testing after serious accidents, and checking the FMCSA&apos;s drug/alcohol database. Most small fleets partner with a testing consortium to handle the logistics.
+                        If your drivers hold a CDL and operate CMVs that require one (over 26,001 lbs GVWR, 16+ passengers, or hazmat), you need a drug and alcohol testing program. That means testing before you hire someone, random testing throughout the year, testing after serious accidents, and checking the FMCSA&apos;s Clearinghouse (the online database tracking CDL driver drug and alcohol violations). Most small fleets partner with a testing consortium to handle the logistics.
                     </p>
 
                     <h3>5. Insurance</h3>

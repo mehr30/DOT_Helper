@@ -1,23 +1,29 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Do You Need a DOT Compliance Officer? Roles, Costs & Alternatives", description: "Should your small fleet hire a compliance officer or outsource? Covers the compliance officer role, typical salaries, and software alternatives for small carriers.", alternates: { canonical: "/blog/dot-compliance-officer-role" }, openGraph: { title: "Do You Need a DOT Compliance Officer? Roles, Costs & Alternatives", description: "Should your small fleet hire a compliance officer or outsource? Covers the compliance officer role, typical salaries, and software alternatives for small carriers.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Regulations" title="DOT Compliance Officer: Do You Actually Need One?" date="February 1, 2026" readTime="6 min read" relatedPosts={[{ slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide" }, { slug: "dot-compliance-owner-operators", title: "DOT Compliance for Owner-Operators" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Any motor carrier operating CMVs (commercial motor vehicles — any vehicle over 10,001 lbs GVWR) needs someone managing compliance. This guide helps you decide whether that&apos;s a dedicated hire, a shared role, or an outside service.</p>
+            </div>
+
             <p>Every carrier with more than 3-4 trucks eventually asks this question: do we need to hire a full-time compliance person? The answer depends on your fleet size, your tolerance for risk, and your budget. Let&apos;s talk real numbers.</p>
 
             <h2>What a Compliance Officer Does</h2>
             <p>A DOT compliance officer (sometimes called a safety manager or safety director) handles:</p>
             <ul>
                 <li>Maintaining driver qualification files for every driver</li>
-                <li>Reviewing ELD logs daily</li>
+                <li>Reviewing ELD (Electronic Logging Device — the device in the truck that automatically records driving time) logs daily</li>
                 <li>Managing the drug &amp; alcohol testing program</li>
                 <li>Scheduling and tracking vehicle inspections and maintenance</li>
                 <li>Preparing for and managing DOT audits</li>
                 <li>Training drivers on regulations and company policies</li>
-                <li>Managing CSA scores and DataQs challenges</li>
+                <li>Managing CSA (Compliance, Safety, Accountability — the FMCSA&apos;s system for monitoring carrier safety) scores and DataQs challenges</li>
                 <li>Staying current on regulatory changes</li>
             </ul>
 
@@ -27,7 +33,7 @@ export default function Page() {
 
             <h2>Alternatives for Small Fleets</h2>
             <p><strong>Part-time or shared compliance person.</strong> Some small carriers share a safety manager with another company, or hire someone part-time. This works if the person is experienced and your fleet is basic (no hazmat, no specialized operations).</p>
-            <p><strong>Outsourced compliance consultants.</strong> Monthly retainer of <strong>$500-$2,000</strong> depending on fleet size and scope. They&apos;ll manage your DQFs, log reviews, and audit prep. Good option for 5-20 truck fleets.</p>
+            <p><strong>Outsourced compliance consultants.</strong> Monthly retainer of <strong>$500-$2,000</strong> depending on fleet size and scope. They&apos;ll manage your DQFs (Driver Qualification Files), log reviews, and audit prep. Good option for 5-20 truck fleets.</p>
             <p><strong>Compliance management software.</strong> Tools like Greenlight USDOT cost <strong>$49-99/month</strong> and automate the tracking, alerting, and documentation that a compliance officer does manually. You still need someone to act on the alerts, but the tracking is handled for you.</p>
 
             <h2>When You Really Do Need a Dedicated Person</h2>

@@ -21,7 +21,12 @@ export default function DotComplianceCostsFinesPost() {
                 { slug: "common-dot-violations", title: "10 Most Common DOT Violations" },
             ]}
         >
-                    <p>Many small fleet owners think of <strong>DOT compliance</strong> as just another cost of doing business. But the cost of <em>non-compliance</em> can be staggering — from fines up to <strong>$16,864 per violation</strong> to losing your operating authority entirely. Here&apos;s a complete breakdown of what DOT violations really cost.</p>
+                    <div className={styles.calloutAmber}>
+                        <h4>Who does this apply to?</h4>
+                        <p>These fines and costs apply to any motor carrier operating CMVs (commercial motor vehicles — any vehicle over 10,001 lbs GVWR) subject to FMCSA (Federal Motor Carrier Safety Administration) regulations.</p>
+                    </div>
+
+                    <p>Many small fleet owners think of <strong>DOT compliance</strong> as just another cost of doing business. But the cost of <em>non-compliance</em> can be staggering — from fines up to <strong>$16,864 per violation</strong> to losing your operating authority entirely. GVWR (Gross Vehicle Weight Rating) is the maximum total weight a vehicle is rated for — check the sticker on the driver&apos;s side door. Here&apos;s a complete breakdown of what DOT violations really cost.</p>
 
                     <h2>Federal Fine Amounts (2026)</h2>
                     <p>FMCSA adjusts civil penalty amounts annually for inflation. Here are the current maximum fines:</p>
@@ -37,14 +42,14 @@ export default function DotComplianceCostsFinesPost() {
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>💡 These Are Per-Violation Fines</h4>
+                        <h4>These Are Per-Violation Fines</h4>
                         <p>If an auditor finds the same issue across multiple drivers or vehicles, each instance is a separate violation. A missing MVR for 5 drivers = 5 violations = up to $63,475 in potential fines.</p>
                     </div>
 
                     <h2>Beyond Fines: The Hidden Costs</h2>
 
                     <h3>Out-of-Service (OOS) Orders</h3>
-                    <p>An OOS order immediately removes a driver or vehicle from operation. For a small fleet, having even one truck sidelined means:</p>
+                    <p>An OOS order immediately removes a driver or vehicle from operation — they&apos;re pulled off the road until the violation is corrected. For a small fleet, having even one truck sidelined means:</p>
                     <ul>
                         <li>Lost revenue: <strong>$500-$2,000+ per day</strong> in missed loads</li>
                         <li>Load rescheduling and customer relationship damage</li>
@@ -53,7 +58,7 @@ export default function DotComplianceCostsFinesPost() {
                     </ul>
 
                     <h3>Insurance Premium Increases</h3>
-                    <p>Insurance carriers review CSA scores and violation history. Poor scores can result in:</p>
+                    <p>Insurance carriers review CSA (Compliance, Safety, Accountability — the FMCSA&apos;s system for monitoring carrier safety) scores and violation history. Poor scores can result in:</p>
                     <ul>
                         <li>Premium increases of <strong>10-50%</strong></li>
                         <li>Carrier refusal to renew coverage</li>
@@ -62,7 +67,7 @@ export default function DotComplianceCostsFinesPost() {
                     </ul>
 
                     <h3>Loss of Freight Contracts</h3>
-                    <p>Many shippers and brokers check your CSA scores and SAFER snapshot before awarding freight. High violation rates can:</p>
+                    <p>Many shippers and brokers check your CSA scores and SAFER (Safety and Fitness Electronic Records — the public database where your company&apos;s safety record is visible) snapshot before awarding freight. High violation rates can:</p>
                     <ul>
                         <li>Disqualify you from freight boards and broker panels</li>
                         <li>Cause existing customers to switch carriers</li>
@@ -86,7 +91,7 @@ export default function DotComplianceCostsFinesPost() {
                     <h2>How to Protect Your Business</h2>
                     <ul>
                         <li><strong>Use compliance management software</strong> to track every requirement and deadline</li>
-                        <li><strong>Conduct quarterly internal audits</strong> of DQFs, vehicle records, and HOS logs</li>
+                        <li><strong>Conduct quarterly internal audits</strong> of DQFs (Driver Qualification Files), vehicle records, and HOS logs</li>
                         <li><strong>Set automated alerts</strong> for expirations 90, 60, and 30 days in advance</li>
                         <li><strong>Train your team</strong> — drivers and dispatchers should understand the rules</li>
                         <li><strong>Document everything</strong> — if it&apos;s not documented, it didn&apos;t happen</li>

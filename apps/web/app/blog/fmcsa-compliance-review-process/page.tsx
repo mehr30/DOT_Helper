@@ -1,16 +1,22 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "FMCSA Compliance Review Process: Step-by-Step Breakdown", description: "Detailed walkthrough of the FMCSA compliance review process. What triggers a review, what happens during one, timelines, and how to respond to findings.", alternates: { canonical: "/blog/fmcsa-compliance-review-process" }, openGraph: { title: "FMCSA Compliance Review Process: Step-by-Step Breakdown", description: "Detailed walkthrough of the FMCSA compliance review process. What triggers a review, what happens during one, timelines, and how to respond to findings.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Regulations" title="Inside an FMCSA Compliance Review: What Actually Happens" date="February 4, 2026" readTime="8 min read" relatedPosts={[{ slug: "how-to-pass-dot-audit", title: "How to Pass a DOT Audit" }, { slug: "fmcsa-safety-ratings", title: "FMCSA Safety Ratings Explained" }]}>
-            <p>A compliance review (CR) is FMCSA&apos;s formal investigation of your operation. Unlike a new entrant audit, a CR is more thorough, takes longer, and carries heavier consequences. If you&apos;ve never been through one, here&apos;s what to expect.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Any motor carrier with a USDOT number can be selected for a compliance review. This guide walks you through what happens during the review and how to prepare.</p>
+            </div>
+
+            <p>A compliance review (CR) is FMCSA (Federal Motor Carrier Safety Administration)&apos;s formal investigation of your operation. Unlike a new entrant audit, a CR is more thorough, takes longer, and carries heavier consequences. If you&apos;ve never been through one, here&apos;s what to expect.</p>
 
             <h2>What Triggers a Compliance Review?</h2>
             <ul>
-                <li><strong>High CSA scores</strong> — Exceeding intervention thresholds in one or more BASICs</li>
+                <li><strong>High CSA (Compliance, Safety, Accountability — the FMCSA&apos;s system for monitoring carrier safety) scores</strong> — Exceeding intervention thresholds in one or more BASICs (Behavior Analysis and Safety Improvement Categories — the seven safety areas FMCSA tracks)</li>
                 <li><strong>Crashes</strong> — A pattern of crashes or a single fatal crash</li>
                 <li><strong>Complaints</strong> — Driver or public complaints filed with FMCSA</li>
                 <li><strong>Follow-up</strong> — A previous conditional or unsatisfactory rating that needs re-evaluation</li>
@@ -23,8 +29,8 @@ export default function Page() {
             <p>The auditor introduces themselves, explains the process, and asks for key documents. They&apos;ll want to see your company overview, fleet size, and organizational structure. Be professional. Answer what they ask. Don&apos;t volunteer extra information.</p>
 
             <h3>Days 1-3: Document Review</h3>
-            <p>The auditor digs into your records across all six compliance areas: general, driver, operational, vehicle, HOS, and drug &amp; alcohol. They&apos;ll typically sample a subset of your drivers and vehicles — maybe 3-5 drivers out of 10, a few vehicles, 6 months of logs.</p>
-            <p>They&apos;re looking for patterns, not isolated mistakes. One missing MVR is a finding. Five missing MVRs is a pattern that will affect your rating.</p>
+            <p>The auditor digs into your records across all six compliance areas: general, driver, operational, vehicle, HOS (Hours of Service — the rules limiting how long drivers can be on the road), and drug &amp; alcohol. They&apos;ll typically sample a subset of your drivers and vehicles — maybe 3-5 drivers out of 10, a few vehicles, 6 months of logs.</p>
+            <p>They&apos;re looking for patterns, not isolated mistakes. One missing MVR (Motor Vehicle Record — a driving history report pulled from the state) is a finding. Five missing MVRs is a pattern that will affect your rating.</p>
 
             <h3>Final Day: Closing Conference</h3>
             <p>The auditor reviews their findings with you, explains each violation, and gives you a preliminary indication of what the safety rating will be. You can ask questions and provide additional documentation if you have it readily available.</p>

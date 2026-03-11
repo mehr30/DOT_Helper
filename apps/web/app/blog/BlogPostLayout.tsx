@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Calendar, Clock, ChevronLeft } from "lucide-react";
 import GreenlightLogo from "../components/GreenlightLogo";
+import Footer from "../components/Footer";
 import styles from "./blog.module.css";
 
 interface BlogPostLayoutProps {
@@ -102,6 +103,8 @@ export default function BlogPostLayout({
                     </Link>
                 </div>
             </article>
+
+            <Footer />
         </div>
     );
 }

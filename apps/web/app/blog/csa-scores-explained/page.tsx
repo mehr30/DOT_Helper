@@ -1,15 +1,21 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "CSA Scores Explained: What They Mean for Your Trucking Business", description: "Understand FMCSA CSA scores — how they're calculated, the 7 BASICs, intervention thresholds, and how to improve your safety scores.", alternates: { canonical: "/blog/csa-scores-explained" }, openGraph: { title: "CSA Scores Explained: What They Mean for Your Trucking Business", description: "Understand FMCSA CSA scores — how they're calculated, the 7 BASICs, intervention thresholds, and how to improve your safety scores.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Regulations" title="CSA Scores Explained: What They Are, Why They Matter, and How to Fix Them" date="February 24, 2026" readTime="9 min read" relatedPosts={[{ slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide" }, { slug: "common-dot-violations", title: "10 Most Common DOT Violations" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>CSA (Compliance, Safety, Accountability) scores apply to all motor carriers registered with a USDOT number. Your scores are based on roadside inspections, crash reports, and investigation results.</p>
+            </div>
+
             <p>Your CSA scores follow you everywhere in this industry. Shippers check them. Brokers check them. Insurance underwriters <em>definitely</em> check them. And most carriers we talk to don&apos;t fully understand how the system works until they&apos;re already in trouble.</p>
 
             <h2>What Are CSA Scores?</h2>
-            <p>CSA stands for <strong>Compliance, Safety, Accountability</strong> — FMCSA&apos;s safety measurement system. It collects data from roadside inspections, crash reports, and compliance reviews, then calculates percentile scores across seven categories called BASICs.</p>
+            <p>CSA stands for <strong>Compliance, Safety, Accountability</strong> — FMCSA&apos;s safety measurement system. It collects data from roadside inspections, crash reports, and compliance reviews, then calculates percentile (how your carrier compares to similar carriers &mdash; higher percentile means worse performance) scores across seven categories called BASICs (Behavior Analysis and Safety Improvement Categories &mdash; the 7 scoring categories the FMCSA uses to evaluate carrier safety).</p>
             <p>Higher percentile = worse safety performance. You&apos;re being ranked against similar-sized carriers. A 90th percentile score means you&apos;re performing worse than 90% of comparable carriers. Not great.</p>
 
             <h2>The 7 BASICs</h2>

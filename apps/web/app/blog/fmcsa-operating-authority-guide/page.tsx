@@ -1,12 +1,18 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "FMCSA Operating Authority: MC Number, Broker Authority & More", description: "Complete guide to FMCSA operating authority types — MC numbers, broker authority, freight forwarder. How to apply, activation timeline, and maintaining your authority.", alternates: { canonical: "/blog/fmcsa-operating-authority-guide" }, openGraph: { title: "FMCSA Operating Authority: MC Number, Broker Authority & More", description: "Complete guide to FMCSA operating authority types — MC numbers, broker authority, freight forwarder. How to apply, activation timeline, and maintaining your authority.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Regulations" title="FMCSA Operating Authority: Everything You Need to Know About Your MC Number" date="February 21, 2026" readTime="8 min read" relatedPosts={[{ slug: "fmcsa-compliance-guide", title: "FMCSA Compliance Guide" }, { slug: "boc-3-filing-guide", title: "BOC-3 Filing Guide" }]}>
-            <p>Everybody talks about their &quot;MC number&quot; like it&apos;s a single thing. But operating authority is actually more nuanced than most carriers realize. Get it wrong and FMCSA can fine you up to <strong>$16,864 per trip</strong> you operate without proper authority. Per trip.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p><strong>Operating authority (the federal permission to transport goods or passengers for compensation across state lines)</strong> — also known as an MC number — is required if you haul freight or passengers for hire in interstate commerce. Private carriers (hauling your own goods) generally don&apos;t need an MC number — just a USDOT number.</p>
+            </div>
+
+            <p>Everybody talks about their &quot;<strong>MC (Motor Carrier number — your operating authority to haul for hire)</strong>&quot; like it&apos;s a single thing. But operating authority is actually more nuanced than most carriers realize. Get it wrong and FMCSA can fine you up to <strong>$16,864 per trip</strong> you operate without proper authority. Per trip.</p>
 
             <h2>Types of Operating Authority</h2>
             <ul>

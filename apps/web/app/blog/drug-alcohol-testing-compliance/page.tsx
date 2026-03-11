@@ -22,7 +22,12 @@ export default function DrugAlcoholTestingPost() {
                 { slug: "fmcsa-clearinghouse-guide", title: "FMCSA Clearinghouse Guide" },
             ]}
         >
-                    <p><strong>FMCSA Part 382</strong> requires every motor carrier to implement a comprehensive <strong>drug and alcohol testing program</strong> for all CDL holders who operate commercial motor vehicles. Failing to have a compliant program is one of the most expensive violations — up to <strong>$16,864 per offense</strong> — and it&apos;s one of the first things auditors check.</p>
+                    <p><strong>FMCSA (Federal Motor Carrier Safety Administration) Part 382</strong> requires every motor carrier to implement a comprehensive <strong>drug and alcohol testing program</strong> for all CDL (Commercial Driver&apos;s License) holders who operate CMVs (commercial motor vehicles — vehicles over 26,001 lbs, buses with 16+ passengers, or those carrying hazardous materials). Failing to have a compliant program is one of the most expensive violations — up to <strong>$16,864 per offense</strong> — and it&apos;s one of the first things auditors check.</p>
+
+                    <div className={styles.calloutAmber}>
+                        <h4>Who does this apply to?</h4>
+                        <p>These federal drug &amp; alcohol testing requirements apply only to drivers who hold a <strong>CDL (Commercial Driver&apos;s License)</strong> and operate <strong>CMVs (commercial motor vehicles — vehicles over 26,001 lbs, buses with 16+ passengers, or hazmat)</strong>. Non-CDL drivers operating vehicles in the 10,001–26,000 lb range are <strong>NOT</strong> subject to these testing requirements.</p>
+                    </div>
 
                     <h2>Types of Required Testing</h2>
 
@@ -52,10 +57,10 @@ export default function DrugAlcoholTestingPost() {
                     <p><em>Related: <Link href="/blog/reasonable-suspicion-training-guide">Reasonable Suspicion Training: What Supervisors Must Know</Link></em></p>
 
                     <h3>5. Return-to-Duty and Follow-Up Testing</h3>
-                    <p>A driver who tests positive or refuses a test must complete the return-to-duty process with a <strong>Substance Abuse Professional (SAP)</strong> before returning to safety-sensitive duties. Follow-up testing (minimum 6 tests in the first 12 months) is then required.</p>
+                    <p>A driver who tests positive or refuses a test must complete the return-to-duty process with a <strong>SAP (Substance Abuse Professional — a qualified counselor who evaluates drivers after a drug or alcohol violation)</strong> before returning to safety-sensitive duties. Follow-up testing (minimum 6 tests in the first 12 months) is then required.</p>
 
                     <h2>FMCSA Clearinghouse Requirements</h2>
-                    <p>The FMCSA Drug &amp; Alcohol Clearinghouse is a database that tracks all drug and alcohol violations. As a carrier, you must:</p>
+                    <p>The FMCSA Drug &amp; Alcohol Clearinghouse (the FMCSA&apos;s online database that tracks CDL driver drug and alcohol violations) is a database that tracks all drug and alcohol violations. As a carrier, you must:</p>
                     <ul>
                         <li><strong>Register as an employer</strong> in the Clearinghouse</li>
                         <li>Conduct a <strong>full query</strong> for every new hire (requires driver consent)</li>
@@ -64,17 +69,17 @@ export default function DrugAlcoholTestingPost() {
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>⚠️ Clearinghouse Queries Are NOT Optional</h4>
-                        <p>Since January 2023, Clearinghouse queries have fully replaced previous employer drug/alcohol inquiries (§391.23(e)). If you&apos;re not running annual limited queries for all drivers, you are out of compliance.</p>
+                        <h4>Clearinghouse Queries Are NOT Optional</h4>
+                        <p>Since January 2023, Clearinghouse queries have fully replaced previous employer drug/alcohol inquiries (the old requirement under section 391.23(e)). If you&apos;re not running annual limited queries for all CDL drivers, you are out of compliance.</p>
                     </div>
 
                     <h2>Building Your Testing Program</h2>
                     <p>Every carrier must have:</p>
                     <ul>
-                        <li><strong>Written policy</strong> — Distributed to every driver with signed acknowledgment</li>
-                        <li><strong>Designated Employer Representative (DER)</strong> — Person who receives test results and manages the program</li>
-                        <li><strong>Third-Party Administrator (TPA)</strong> — Optional but recommended for small fleets; manages random selections and collection</li>
-                        <li><strong>Medical Review Officer (MRO)</strong> — Licensed physician who reviews lab results</li>
+                        <li><strong>Written policy</strong> — Distributed to every CDL driver with signed acknowledgment</li>
+                        <li><strong>DER (Designated Employer Representative — the person at your company who receives test results and manages the testing program)</strong> — Person who receives test results and manages the program</li>
+                        <li><strong>TPA (Third-Party Administrator — an outside company that manages your random selections, scheduling, and documentation)</strong> — Optional but recommended for small fleets; manages random selections and collection</li>
+                        <li><strong>MRO (Medical Review Officer — a licensed physician who reviews lab results before they&apos;re reported to the employer)</strong> — Licensed physician who reviews lab results</li>
                         <li><strong>Collection site(s)</strong> — DOT-certified collection facilities</li>
                         <li><strong>Substance Abuse Professional (SAP)</strong> — Required only if a driver tests positive</li>
                     </ul>

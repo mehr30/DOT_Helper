@@ -1,15 +1,21 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "IFTA Reporting Guide for Small Fleets: Quarterly Filing Made Simple", description: "Step-by-step guide to IFTA fuel tax reporting for trucking companies. Covers registration, quarterly filing, record keeping, and avoiding common mistakes.", alternates: { canonical: "/blog/ifta-reporting-guide" }, openGraph: { title: "IFTA Reporting Guide: Quarterly Filing Made Simple", description: "Step-by-step guide to IFTA fuel tax reporting for trucking companies. Covers registration, quarterly filing, record keeping, and avoiding common mistakes.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Compliance" title="IFTA Reporting for Small Fleets: A No-Nonsense Guide" date="February 10, 2026" readTime="7 min read" relatedPosts={[{ slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" }, { slug: "dot-compliance-costs-fines", title: "DOT Compliance Costs & Fines" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p><strong>IFTA (International Fuel Tax Agreement)</strong> applies to motor carriers operating <strong>qualified motor vehicles (vehicles over 26,001 lbs GVWR or with 3+ axles, regardless of weight)</strong> across state lines. Note: the IFTA weight threshold (26,001 lbs) is different from the USDOT threshold (10,001 lbs).</p>
+            </div>
+
             <p>IFTA. Four letters that make most owner-operators groan. But the International Fuel Tax Agreement doesn&apos;t have to be a nightmare. Once you understand the basics, quarterly filing takes about an hour. Maybe less.</p>
 
             <h2>Do You Need an IFTA License?</h2>
-            <p>Yes, if you operate a <strong>qualified motor vehicle</strong> (26,001+ lbs GVWR, or 3+ axles regardless of weight, or combination vehicle over 26,000 lbs) in <strong>two or more IFTA jurisdictions</strong>. Basically: if you drive a semi across state lines, you need IFTA.</p>
+            <p>Yes, if you operate a qualified motor vehicle (26,001+ lbs <strong>GVWR — Gross Vehicle Weight Rating, the maximum allowable weight of a vehicle including cargo, passengers, and fuel as set by the manufacturer</strong>, or 3+ axles regardless of weight, or combination vehicle over 26,000 lbs) in <strong>two or more IFTA jurisdictions</strong>. Basically: if you drive a semi across state lines, you need IFTA.</p>
             <p>Exceptions: government vehicles, recreational vehicles, and vehicles under the weight threshold operating intrastate only.</p>
 
             <h2>How IFTA Works</h2>

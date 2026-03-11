@@ -1,28 +1,34 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Drug Testing Consortiums: What They Are, How to Choose, and What to Pay", description: "Guide to drug testing consortiums and TPAs for small fleets. How they work, what to look for, typical costs, and red flags.", alternates: { canonical: "/blog/drug-testing-consortium-guide" }, openGraph: { title: "Drug Testing Consortiums: What They Are, How to Choose & What to Pay", description: "Guide to drug testing consortiums and TPAs for small fleets. How they work, what to look for, typical costs, and red flags.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Drug & Alcohol Testing" title="Drug Testing Consortiums: A Small Fleet's Best Friend" date="February 7, 2026" readTime="5 min read" relatedPosts={[{ slug: "drug-alcohol-testing-compliance", title: "Drug & Alcohol Testing Guide" }, { slug: "random-drug-testing-requirements", title: "Random Drug Testing Requirements" }]}>
-            <p>If you have fewer than 50 drivers, managing your own random drug testing program is technically possible but practically a headache. That&apos;s where consortiums (also called Third Party Administrators or TPAs) come in. They pool multiple carriers together for random testing, handle selection, scheduling, and documentation.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Consortiums are used by motor carriers with <strong>CDL (Commercial Driver&apos;s License) drivers</strong> who need to meet federal drug &amp; alcohol testing requirements. If your drivers hold CDLs and operate <strong>CMVs (commercial motor vehicles over 26,001 lbs, 16+ passengers, or hazmat)</strong>, a consortium is the easiest way for a small fleet to stay compliant.</p>
+            </div>
+
+            <p>If you have fewer than 50 CDL drivers, managing your own random drug testing program is technically possible but practically a headache. That&apos;s where consortiums (also called <strong>TPAs, or Third-Party Administrators — outside companies that manage your random selections, scheduling, and documentation</strong>) come in. They pool multiple carriers together for random testing, handle selection, scheduling, and documentation.</p>
 
             <h2>How Consortiums Work</h2>
-            <p>You sign up with a consortium provider. They add your drivers to their random pool — which might have hundreds or thousands of drivers from dozens of carriers. When your driver gets selected, the consortium notifies you (or the driver directly), and the driver reports to a collection site for testing.</p>
+            <p>You sign up with a consortium provider. They add your CDL drivers to their random pool — which might have hundreds or thousands of drivers from dozens of carriers. When your driver gets selected, the consortium notifies you (or the driver directly), and the driver reports to a collection site for testing.</p>
             <p>The consortium handles:</p>
             <ul>
                 <li>Random selection using a compliant method</li>
                 <li>Notification to you and/or the driver</li>
                 <li>Scheduling with a certified collection site</li>
-                <li>MRO review of results</li>
+                <li><strong>MRO (Medical Review Officer — a licensed physician who reviews lab results before they&apos;re reported to the employer)</strong> review of results</li>
                 <li>Documentation and record keeping</li>
             </ul>
 
             <h2>What It Costs</h2>
             <p>Typical consortium pricing:</p>
             <ul>
-                <li><strong>Annual enrollment:</strong> $50-$150 per driver</li>
+                <li><strong>Annual enrollment:</strong> $50-$150 per CDL driver</li>
                 <li><strong>Per-test fee:</strong> $35-$65 (includes collection and lab)</li>
                 <li><strong>MRO review:</strong> Sometimes included, sometimes $15-$25 extra</li>
                 <li><strong>Pre-employment tests:</strong> Usually same per-test fee</li>
@@ -31,11 +37,11 @@ export default function Page() {
 
             <h2>What to Look For</h2>
             <ul>
-                <li><strong>Uses SAMHSA-certified labs</strong> — non-negotiable</li>
+                <li><strong>Uses SAMHSA (Substance Abuse and Mental Health Services Administration — the federal agency that certifies drug testing labs)-certified labs</strong> — non-negotiable</li>
                 <li><strong>Has a qualified MRO on staff or contract</strong></li>
                 <li><strong>Provides audit-ready documentation</strong> — if your auditor asks for records, can the consortium produce them quickly?</li>
-                <li><strong>Has collection sites near your drivers</strong> — especially important for OTR drivers</li>
-                <li><strong>Reports to the FMCSA Clearinghouse</strong> — some do this for you, others require you to do it yourself</li>
+                <li><strong>Has collection sites near your CDL drivers</strong> — especially important for OTR drivers</li>
+                <li><strong>Reports to the FMCSA Clearinghouse (the FMCSA&apos;s online database that tracks CDL driver drug and alcohol violations)</strong> — some do this for you, others require you to do it yourself</li>
             </ul>
 
             <h2>Red Flags</h2>

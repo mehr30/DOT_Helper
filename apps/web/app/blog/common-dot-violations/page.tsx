@@ -1,16 +1,23 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "10 Most Common DOT Violations and How to Avoid Them", description: "The 10 most frequently cited DOT violations during roadside inspections and audits, with practical tips on how to prevent each one.", alternates: { canonical: "/blog/common-dot-violations" }, openGraph: { title: "10 Most Common DOT Violations and How to Avoid Them", description: "The 10 most frequently cited DOT violations during roadside inspections and audits, with practical tips on how to prevent each one.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Compliance" title="10 Most Common DOT Violations (and How to Make Sure You're Not One of Them)" date="February 3, 2026" readTime="9 min read" relatedPosts={[{ slug: "dot-compliance-checklist", title: "The Ultimate DOT Compliance Checklist" }, { slug: "how-to-pass-dot-audit", title: "How to Pass a DOT Audit" }]}>
-            <p>FMCSA and state DOT officers conducted over <strong>3.5 million roadside inspections</strong> last year. About 21% resulted in at least one vehicle out-of-service violation. Another 5% resulted in a driver out-of-service violation.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>These violations can affect any motor carrier operating CMVs (commercial motor vehicles — any vehicle over 10,001 lbs GVWR). Whether you&apos;re a one-truck operation or a 50-vehicle fleet, these are the most common findings from roadside inspections and audits.</p>
+            </div>
+
+            <p>FMCSA (Federal Motor Carrier Safety Administration) and state DOT officers conducted over <strong>3.5 million roadside inspections</strong> last year. About 21% resulted in at least one vehicle OOS (out-of-service — when a vehicle or driver is pulled off the road for a safety violation) violation. Another 5% resulted in a driver OOS violation.</p>
+            <p>GVWR (Gross Vehicle Weight Rating) is the maximum total weight a vehicle is rated for — check the sticker on the driver&apos;s side door. Any vehicle with a GVWR over 10,001 lbs is considered a CMV.</p>
             <p>Want to stay off the wrong side of those statistics? Here are the violations we see most often — and what you can do about each one.</p>
 
             <h2>1. Brake Adjustment (Out of Adjustment)</h2>
-            <p>This is the #1 vehicle OOS violation year after year. Brakes naturally go out of adjustment with use. The fix? Check pushrod stroke at every PM service and train drivers to spot signs of brake issues during pre-trips. A 5-minute check can prevent a 2-day shutdown.</p>
+            <p>This is the #1 vehicle OOS violation year after year. Brakes naturally go out of adjustment with use. The fix? Check pushrod stroke at every PM (preventive maintenance) service and train drivers to spot signs of brake issues during pre-trips. A 5-minute check can prevent a 2-day shutdown.</p>
 
             <h2>2. Inoperable Required Lamps</h2>
             <p>Burned-out headlights, tail lights, or marker lights. It sounds minor, but it&apos;s a violation — and multiple inoperable lamps can trigger an OOS order. Drivers should check all lights during their pre-trip. Every single time.</p>
@@ -19,7 +26,7 @@ export default function Page() {
             <p>Steer tires need <strong>4/32&quot; minimum</strong> tread. Drive and trailer tires need <strong>2/32&quot;</strong>. Worn tires are an OOS violation. Exposed cords, sidewall damage, or flat tires are immediate OOS. Check tires with a tread depth gauge, not your eyeballs.</p>
 
             <h2>4. Hours of Service — Log Not Current</h2>
-            <p>The driver&apos;s ELD must be current to the last change of duty status. Logs that are hours behind, have unconfirmed edits, or show unidentified driving events get flagged every time. Dispatch should review logs daily — not weekly, not &quot;whenever.&quot;</p>
+            <p>The driver&apos;s ELD (Electronic Logging Device — the device in the truck that automatically records driving time) must be current to the last change of duty status. Logs that are hours behind, have unconfirmed edits, or show unidentified driving events get flagged every time. Dispatch should review logs daily — not weekly, not &quot;whenever.&quot;</p>
 
             <h2>5. No/Expired Medical Certificate</h2>
             <p>Driving with an expired medical card is a driver OOS violation. The driver cannot legally operate the CMV until they have a valid certificate. We&apos;ve lost count of how many drivers we&apos;ve talked to who thought their med card was good for &quot;a few more months&quot; when it had actually expired last quarter.</p>
@@ -31,7 +38,7 @@ export default function Page() {
             <p>Every CMV needs a current annual inspection report or decal. No report on the vehicle and none at the terminal? That&apos;s a violation. Keep a copy in the truck AND at your office.</p>
 
             <h2>8. Insufficient Load Securement</h2>
-            <p>Cargo that isn&apos;t properly tied down is dangerous and illegal. The rules in Part 393 are specific about the number of tiedowns based on cargo length and weight. Flatbed carriers: this is your #1 exposure area.</p>
+            <p>Cargo that isn&apos;t properly tied down is dangerous and illegal. The rules under Part 393 (the FMCSA regulation covering vehicle parts and accessories, including cargo securement) are specific about the number of tiedowns based on cargo length and weight. Flatbed carriers: this is your #1 exposure area.</p>
 
             <h2>9. Brake Hose/Tubing Chafed</h2>
             <p>Rubber brake hoses rubbing against frame members wear through over time. Once the inner liner is compromised, you&apos;ve got an air leak and an OOS violation. Visual inspection during pre-trips catches this every time — if the driver actually looks.</p>

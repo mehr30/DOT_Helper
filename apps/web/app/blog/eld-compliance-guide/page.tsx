@@ -1,19 +1,25 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "ELD Compliance Guide: Requirements, Exemptions & Best Practices", description: "Complete ELD compliance guide for motor carriers. Covers the mandate, approved devices, exemptions, driver training, and troubleshooting common issues.", alternates: { canonical: "/blog/eld-compliance-guide" }, openGraph: { title: "ELD Compliance Guide: Requirements, Exemptions & Best Practices", description: "Complete ELD compliance guide for motor carriers. Covers the mandate, approved devices, exemptions, driver training, and troubleshooting common issues.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Driver Management" title="ELD Compliance: The Rules, the Exemptions, and the Headaches" date="February 13, 2026" readTime="8 min read" relatedPosts={[{ slug: "hos-rules-explained", title: "Hours of Service Rules Explained" }, { slug: "driver-qualification-file-requirements", title: "Driver Qualification File Requirements" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>ELD (Electronic Logging Device) requirements apply to most CMV (commercial motor vehicle) drivers who are required to keep RODS (Records of Duty Status &mdash; the official log of your driving and on-duty time). Some exemptions exist for short-haul drivers and certain vehicle types.</p>
+            </div>
+
             <p>The ELD mandate has been in full effect since December 2019, and at this point, there&apos;s no excuse for not being compliant. But &quot;having an ELD plugged in&quot; and &quot;being ELD compliant&quot; are two very different things. Let&apos;s talk about what actually matters.</p>
 
             <h2>Who Must Use an ELD?</h2>
-            <p>Any driver required to keep Records of Duty Status (RODS) under Part 395 must use an ELD. That covers most CMV drivers in interstate commerce.</p>
+            <p>Any driver required to keep RODS under Part 395 must use an ELD. That covers most CMV drivers in interstate commerce.</p>
             <p>Exemptions exist for:</p>
             <ul>
                 <li><strong>Short-haul drivers</strong> within 150 air-miles who return to their work reporting location daily</li>
-                <li><strong>Drivers of vehicles manufactured before 2000</strong> (no engine ECM to connect to)</li>
+                <li><strong>Drivers of vehicles manufactured before 2000</strong> (no engine ECM (Engine Control Module &mdash; the truck&apos;s onboard computer that provides data to the ELD) to connect to)</li>
                 <li><strong>Drivers operating under the timecard exception</strong> (non-CDL, short-haul)</li>
                 <li><strong>Agricultural driveaway-towaway operations</strong> during specific periods</li>
             </ul>
@@ -42,7 +48,7 @@ export default function Page() {
             <p>Don&apos;t just hand a driver an ELD and say &quot;figure it out.&quot; Train them on:</p>
             <ul>
                 <li>How to log in and change duty status correctly</li>
-                <li>How to annotate and edit logs (within allowable rules)</li>
+                <li>How to annotate and edit logs (within allowable HOS (Hours of Service &mdash; the federal rules limiting how long a driver can be on duty and behind the wheel) rules)</li>
                 <li>How to handle malfunction situations</li>
                 <li>How to transfer data to an inspector</li>
                 <li>What <em>not</em> to do (disconnecting, driving in yard-move mode on public roads)</li>

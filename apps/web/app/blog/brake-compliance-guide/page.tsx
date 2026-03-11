@@ -1,15 +1,21 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Brake Compliance: The #1 Out-of-Service Violation and How to Fix It", description: "Deep dive into brake compliance for CMVs. Brake adjustment standards, common violations, measurement techniques, and maintaining compliant brakes.", alternates: { canonical: "/blog/brake-compliance-guide" }, openGraph: { title: "Brake Compliance: The #1 Out-of-Service Violation and How to Fix It", description: "Deep dive into brake compliance for CMVs. Brake adjustment standards, common violations, measurement techniques, and maintaining compliant brakes.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Vehicle Compliance" title="Brake Compliance: Why Brakes Are Your Biggest Exposure" date="February 12, 2026" readTime="7 min read" relatedPosts={[{ slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance Compliance Guide" }, { slug: "common-dot-violations", title: "Common DOT Violations" }]}>
-            <p>Brakes account for more out-of-service violations than any other vehicle component. By a lot. Over <strong>35% of all vehicle OOS orders</strong> are brake-related. If you do one thing to reduce your CSA vehicle maintenance score, focus on brakes.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Brake compliance requirements apply to all CMVs (commercial motor vehicles &mdash; any vehicle over 10,001 lbs GVWR). Brakes are the #1 out-of-service violation at roadside inspections.</p>
+            </div>
+
+            <p>Brakes account for more out-of-service violations than any other vehicle component. By a lot. Over <strong>35% of all vehicle OOS (Out of Service &mdash; when an inspector finds a violation severe enough to pull the vehicle off the road) orders</strong> are brake-related. If you do one thing to reduce your CSA vehicle maintenance score, focus on brakes.</p>
 
             <h2>The Adjustment Standard</h2>
-            <p>For S-cam brakes (the most common type on trucks), the maximum allowable pushrod stroke depends on the brake chamber type and size. Inspectors measure this with the brakes applied.</p>
+            <p>For S-cam brakes (the most common brake type on heavy trucks, named for the S-shaped cam that pushes the brake shoes apart), the maximum allowable pushrod stroke depends on the brake chamber type and size. Inspectors measure this with the brakes applied.</p>
             <ul>
                 <li><strong>Type 30 chamber (long stroke):</strong> Max 2.0&quot; stroke</li>
                 <li><strong>Type 30 chamber (standard):</strong> Max 2.0&quot; stroke</li>

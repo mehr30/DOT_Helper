@@ -1,4 +1,5 @@
 import BlogPostLayout from "../BlogPostLayout";
+import styles from "../blog.module.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Post-Accident Drug & Alcohol Testing: When, How & Documentation", description: "Guide to DOT post-accident drug and alcohol testing. When it's required, testing windows, decision flowchart, and documentation requirements.", alternates: { canonical: "/blog/post-accident-drug-testing" }, openGraph: { title: "Post-Accident Drug & Alcohol Testing: When, How & Documentation", description: "Guide to DOT post-accident drug and alcohol testing. When it's required, testing windows, decision flowchart, and documentation requirements.", type: "article" } };
@@ -8,8 +9,13 @@ export default function Page() {
         <BlogPostLayout category="Drug & Alcohol Testing" title="Post-Accident Testing: When You Must Test and When You Don't" date="February 17, 2026" readTime="7 min read" relatedPosts={[{ slug: "drug-alcohol-testing-compliance", title: "Drug & Alcohol Testing Guide" }, { slug: "accident-register-requirements", title: "Accident Register Requirements" }]}>
             <p>Not every accident triggers post-accident testing. But missing one that <em>does</em> require testing? That&apos;s a violation that can follow you for years. The rules are specific — and they trip up carriers who rely on &quot;gut feeling&quot; instead of the actual regulation.</p>
 
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Post-accident drug &amp; alcohol testing applies to <strong>CDL (Commercial Driver&apos;s License) drivers operating CMVs (commercial motor vehicles</strong> — vehicles over 26,001 lbs, 16+ passengers, or hazmat). Non-CDL drivers of smaller commercial vehicles are not subject to federal post-accident testing requirements.</p>
+            </div>
+
             <h2>When Post-Accident Testing Is Required</h2>
-            <p>Under <strong>§382.303</strong>, you must perform post-accident testing on any surviving CMV driver when the accident involves:</p>
+            <p>Under <strong>§382.303</strong> (the FMCSA regulation governing post-accident testing), you must perform post-accident testing on any surviving CMV (commercial motor vehicle) driver when the accident involves:</p>
             <ul>
                 <li><strong>A fatality</strong> — testing required regardless of fault. Period.</li>
                 <li><strong>Bodily injury requiring medical treatment away from the scene</strong> AND the driver received a citation — testing required.</li>

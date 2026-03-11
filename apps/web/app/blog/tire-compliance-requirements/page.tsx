@@ -1,17 +1,23 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Tire Compliance: DOT Tread Depth Minimums & Inspection Rules", description: "Guide to DOT tire compliance requirements. Covers minimum tread depths, steer vs drive tire rules, inspection criteria, and OOS conditions.", alternates: { canonical: "/blog/tire-compliance-requirements" }, openGraph: { title: "Tire Compliance: DOT Tread Depth Minimums & Inspection Rules", description: "Guide to DOT tire compliance requirements. Covers minimum tread depths, steer vs drive tire rules, inspection criteria, and OOS conditions.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Vehicle Compliance" title="Tire Compliance: Tread Depths, Conditions, and When You're Out of Service" date="February 10, 2026" readTime="5 min read" relatedPosts={[{ slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance Compliance Guide" }, { slug: "brake-compliance-guide", title: "Brake Compliance Guide" }]}>
-            <p>Tires are the third most common OOS violation. And unlike brakes, tire problems are visible to the naked eye. A driver who does a proper pre-trip should catch every tire issue before it becomes a violation. Should.</p>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Tire compliance requirements apply to all CMVs (commercial motor vehicles &mdash; any vehicle over 10,001 lbs GVWR). Tires are the third most common out-of-service violation at roadside inspections.</p>
+            </div>
+
+            <p>Tires are the third most common OOS (Out of Service &mdash; when an inspector finds a violation severe enough to pull the vehicle off the road) violation. And unlike brakes, tire problems are visible to the naked eye. A driver who does a proper pre-trip should catch every tire issue before it becomes a violation. Should.</p>
 
             <h2>Minimum Tread Depths</h2>
             <ul>
-                <li><strong>Steer tires:</strong> 4/32&quot; in any major groove</li>
-                <li><strong>Drive and trailer tires:</strong> 2/32&quot; in any major groove</li>
+                <li><strong>Steer tires (front axle tires that control steering):</strong> 4/32&quot; in any major groove</li>
+                <li><strong>Drive tires (rear axle tires that power the vehicle) and trailer tires:</strong> 2/32&quot; in any major groove</li>
             </ul>
             <p>Measure with a tread depth gauge — not a penny. Penny tests are fine for your personal car. For commercial vehicles, use the right tool and document it.</p>
 

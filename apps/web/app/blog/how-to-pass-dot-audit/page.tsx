@@ -26,6 +26,11 @@ export default function HowToPassDotAuditPost() {
                 { slug: "driver-qualification-file-requirements", title: "Driver Qualification File Requirements" },
             ]}
         >
+                    <div className={styles.calloutAmber}>
+                        <h4>Who does this apply to?</h4>
+                        <p>DOT audits can happen to any motor carrier with a USDOT number. If you operate CMVs (commercial motor vehicles — any vehicle over 10,001 lbs GVWR) in interstate commerce, you&apos;re subject to FMCSA (Federal Motor Carrier Safety Administration) audits.</p>
+                    </div>
+
                     <p>
                         Getting a letter that says &quot;DOT audit&quot; is enough to ruin your whole week. We get it. But here&apos;s the thing — <strong>the audit itself isn&apos;t as scary as it sounds</strong> if you know what they&apos;re checking and you&apos;ve got your paperwork in order. Most carriers who fail don&apos;t fail because they&apos;re doing something dangerous. They fail because they forgot to file something or didn&apos;t keep a record they were supposed to.
                     </p>
@@ -33,7 +38,7 @@ export default function HowToPassDotAuditPost() {
 
                     <h2>Wait — What Even Is a DOT Audit?</h2>
                     <p>
-                        It&apos;s a review of your records by the FMCSA (the federal agency that oversees trucking) or your state&apos;s DOT office. They&apos;re checking whether you&apos;re following the safety rules. There are a few types:
+                        It&apos;s a review of your records by the FMCSA or your state&apos;s DOT office. They&apos;re checking whether you&apos;re following the safety rules. There are a few types:
                     </p>
                     <ul>
                         <li><strong>Full review</strong> — They look at <em>everything</em>. Driver files, vehicle records, drug testing, hours of service, insurance. This is what most people mean when they say &quot;DOT audit.&quot;</li>
@@ -46,16 +51,16 @@ export default function HowToPassDotAuditPost() {
                     <p>Auditors check six main areas. Here&apos;s what each one means in plain terms:</p>
                     <ul>
                         <li><strong>Company paperwork</strong> — Do you have valid insurance? Is your USDOT active? Do you keep an accident log?</li>
-                        <li><strong>Driver files</strong> — For each driver: do you have their application, CDL copy, medical card, driving record, drug test results, and background checks? Is everything current?</li>
+                        <li><strong>Driver files (DQF — Driver Qualification File)</strong> — For each driver: do you have their application, CDL (Commercial Driver&apos;s License) copy, medical card, driving record, drug test results, and background checks? Is everything current?</li>
                         <li><strong>Operations</strong> — Are loads secured properly? Do you have policies for distracted driving?</li>
                         <li><strong>Vehicle records</strong> — Annual inspections, daily pre-trip reports, maintenance records. Is there a paper trail showing your trucks are being maintained?</li>
-                        <li><strong>Hours of service</strong> — Are your drivers using ELDs? Are you reviewing their logs? Are there violations you missed?</li>
-                        <li><strong>Drug &amp; alcohol testing</strong> — Do you have a testing program? Are you in the random pool? Are you checking the FMCSA database?</li>
+                        <li><strong>Hours of service</strong> — Are your drivers using ELDs (Electronic Logging Devices — the devices in the truck that automatically record driving time)? Are you reviewing their logs? Are there violations you missed?</li>
+                        <li><strong>Drug &amp; alcohol testing</strong> — Do you have a testing program for your CDL drivers? Are they in the random pool? Are you checking the FMCSA Clearinghouse (the FMCSA&apos;s online database tracking CDL driver drug and alcohol violations)?</li>
                     </ul>
 
                     <div className={styles.callout}>
-                        <h4>⚠️ The 5 Most Common Audit Failures</h4>
-                        <p>1) No driving record (MVR) on file for a driver. 2) Missing drug test results. 3) Incomplete driver applications. 4) No annual vehicle inspection on record. 5) Issues with hours of service logs. Notice a pattern? It&apos;s all about keeping paperwork current.</p>
+                        <h4>The 5 Most Common Audit Failures</h4>
+                        <p>1) No driving record (MVR — Motor Vehicle Record) on file for a driver. 2) Missing drug test results. 3) Incomplete driver applications. 4) No annual vehicle inspection on record. 5) Issues with hours of service logs. Notice a pattern? It&apos;s all about keeping paperwork current.</p>
                     </div>
 
                     <h2>How to Prepare: A Simple Checklist</h2>
@@ -64,10 +69,10 @@ export default function HowToPassDotAuditPost() {
                     <p>Gather these before anything else. They&apos;re quick to find if you know where to look:</p>
                     <ul>
                         <li>Your USDOT registration confirmation</li>
-                        <li>Operating authority letter (if you have MC authority)</li>
+                        <li>Operating authority letter (if you have MC — Motor Carrier — authority)</li>
                         <li>Proof of insurance (your insurer should have this on file with FMCSA)</li>
-                        <li>BOC-3 filing confirmation</li>
-                        <li>UCR receipt for this year</li>
+                        <li>BOC-3 filing confirmation (your designated process agent in every state)</li>
+                        <li>UCR (Unified Carrier Registration — an annual registration for interstate carriers) receipt for this year</li>
                         <li>Your accident log for the past 3 years (every recordable crash)</li>
                     </ul>
 
@@ -81,7 +86,7 @@ export default function HowToPassDotAuditPost() {
                         <li>Road test certificate or CDL proof</li>
                         <li>Previous employer inquiry letters (covering last 3 years)</li>
                         <li>Annual violations certificate (signed within the last 12 months)</li>
-                        <li>Drug &amp; alcohol database query results</li>
+                        <li>Drug &amp; alcohol Clearinghouse query results (for CDL drivers)</li>
                     </ul>
                     <p>If anything is missing or expired, fix it <strong>now</strong> — not the morning of the audit.</p>
 
@@ -102,12 +107,13 @@ export default function HowToPassDotAuditPost() {
                     </ul>
 
                     <h3>Step 5: Drug &amp; Alcohol Program</h3>
+                    <p>This section applies to CDL drivers only. If your drivers hold CDLs and operate CMVs over 26,001 lbs (or transport 16+ passengers, or haul hazmat), you need a drug and alcohol testing program for them.</p>
                     <ul>
-                        <li>Verify you&apos;re registered in the FMCSA drug/alcohol database (Clearinghouse)</li>
+                        <li>Verify you&apos;re registered in the FMCSA Clearinghouse</li>
                         <li>Confirm your random testing pool enrollment and rates (50% drug, 10% alcohol)</li>
-                        <li>Pre-employment test results on file for every driver</li>
+                        <li>Pre-employment test results on file for every CDL driver</li>
                         <li>At least one supervisor has completed reasonable suspicion training</li>
-                        <li>Every driver has signed your drug &amp; alcohol policy</li>
+                        <li>Every CDL driver has signed your drug &amp; alcohol policy</li>
                     </ul>
 
                     <h2>What Happens After the Audit?</h2>

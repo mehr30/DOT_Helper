@@ -1,11 +1,17 @@
 import BlogPostLayout from "../BlogPostLayout";
 import type { Metadata } from "next";
+import styles from "../blog.module.css";
 
 export const metadata: Metadata = { title: "Fleet Maintenance Record Keeping: What to Track and How Long to Keep It", description: "Guide to fleet maintenance record keeping requirements under Part 396. What records to keep, retention periods, digital vs paper, and audit preparation.", alternates: { canonical: "/blog/fleet-maintenance-records" }, openGraph: { title: "Fleet Maintenance Record Keeping: What to Track & Retain", description: "Guide to fleet maintenance record keeping requirements under Part 396. What records to keep, retention periods, digital vs paper, and audit preparation.", type: "article" } };
 
 export default function Page() {
     return (
         <BlogPostLayout category="Vehicle Compliance" title="Fleet Maintenance Records: What to Keep, How Long, and Why It Matters" date="February 2, 2026" readTime="5 min read" relatedPosts={[{ slug: "vehicle-maintenance-compliance-guide", title: "Vehicle Maintenance Guide" }, { slug: "preventive-maintenance-program-guide", title: "Preventive Maintenance Guide" }]}>
+            <div className={styles.calloutAmber}>
+                <h4>Who does this apply to?</h4>
+                <p>Maintenance record requirements under Part 396 (the FMCSA regulation covering vehicle inspection, repair, and maintenance) apply to any motor carrier operating CMVs (commercial motor vehicles &mdash; any vehicle over 10,001 lbs GVWR).</p>
+            </div>
+
             <p>Maintenance records win audits. Not having them loses audits. It&apos;s really that straightforward. The truck could be in perfect mechanical condition, but without records proving you maintained it, an auditor has no evidence of compliance.</p>
 
             <h2>What 396.3 Requires</h2>

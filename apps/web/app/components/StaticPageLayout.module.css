@@ -1,0 +1,230 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5) var(--space-8);
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+}
+
+.logoText {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.navLink {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.navLink:hover {
+    color: var(--text-primary);
+}
+
+.loginBtn {
+    padding: var(--space-2) var(--space-5);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    color: white;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6) var(--space-16);
+    flex: 1;
+    width: 100%;
+}
+
+.pageTitle {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-3);
+}
+
+.pageSubtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-8);
+    line-height: 1.6;
+}
+
+.body {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.body h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+    color: var(--text-primary);
+}
+
+.body h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+}
+
+.body p {
+    margin-bottom: var(--space-5);
+}
+
+.body ul,
+.body ol {
+    margin-bottom: var(--space-5);
+    padding-left: var(--space-6);
+}
+
+.body li {
+    margin-bottom: var(--space-2);
+}
+
+.body strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.body a {
+    color: var(--color-primary-600);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.body a:hover {
+    text-decoration: underline;
+}
+
+.lastUpdated {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-8);
+}
+
+/* Help center specific */
+.helpGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+}
+
+@media (max-width: 640px) {
+    .helpGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .navLinks {
+        display: none;
+    }
+}
+
+.helpCard {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.helpCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-200);
+}
+
+.helpCardIcon {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-3);
+}
+
+.helpCardTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.helpCardDesc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Contact form */
+.contactGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    margin-top: var(--space-6);
+}
+
+@media (max-width: 640px) {
+    .contactGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.contactItem {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+}
+
+.contactItemIcon {
+    color: var(--color-primary-600);
+    margin-top: 2px;
+}
+
+.contactItemTitle {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.contactItemText {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}

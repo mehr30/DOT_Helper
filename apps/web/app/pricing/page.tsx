@@ -11,6 +11,7 @@ import {
     Star,
 } from "lucide-react";
 import GreenlightLogo from "../components/GreenlightLogo";
+import Footer from "../components/Footer";
 import { createCheckoutSession } from "../actions/stripe";
 import styles from "./page.module.css";
 
@@ -243,6 +244,8 @@ export default function PricingPage() {
                     <ArrowRight size={18} />
                 </Link>
             </div>
+
+            <Footer />
         </div>
     );
 }

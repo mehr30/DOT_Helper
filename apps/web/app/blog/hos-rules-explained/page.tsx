@@ -21,10 +21,15 @@ export default function HOSRulesExplainedPost() {
                 { slug: "short-haul-exemption-guide", title: "Short-Haul Exemption Guide" },
             ]}
         >
+                    <div className={styles.calloutAmber}>
+                        <h4>Who does this apply to?</h4>
+                        <p>Federal HOS (Hours of Service) rules apply to drivers of CMVs (commercial motor vehicles &mdash; any vehicle over 10,001 lbs GVWR) in interstate commerce. Intrastate drivers may follow different state-specific HOS rules.</p>
+                    </div>
+
                     <p><strong>Hours of Service (HOS)</strong> regulations are among the most important — and most frequently violated — FMCSA rules. They exist to prevent fatigued driving, which is a leading cause of commercial vehicle accidents. Understanding these rules is critical for both drivers and carriers.</p>
 
                     <h2>The Four Duty Statuses</h2>
-                    <p>Under HOS rules, a driver&apos;s time is recorded in four categories:</p>
+                    <p>Under HOS rules, a driver&apos;s time is recorded in four duty statuses (the four categories of a driver&apos;s time: driving, on-duty not driving, sleeper berth, and off-duty):</p>
                     <ul>
                         <li><strong>Off Duty</strong> — Free from all work responsibilities. Time to rest and recover.</li>
                         <li><strong>Sleeper Berth</strong> — Resting in the vehicle&apos;s sleeper berth compartment.</li>
@@ -41,7 +46,7 @@ export default function HOSRulesExplainedPost() {
                     <p>A driver may not drive after the <strong>14th consecutive hour</strong> after coming on duty, regardless of breaks taken during that time. The 14-hour clock starts when you go on duty and does not stop for off-duty time (except qualifying sleeper berth splits).</p>
 
                     <div className={styles.callout}>
-                        <h4>⚠️ Key Difference</h4>
+                        <h4>Key Difference</h4>
                         <p>The 11-hour driving limit stops when you&apos;re not driving. The 14-hour window does NOT stop — it runs continuously from your first on-duty moment. This is the most misunderstood HOS rule.</p>
                     </div>
 
@@ -73,7 +78,7 @@ export default function HOSRulesExplainedPost() {
                         <li>Do not exceed 11 hours of driving</li>
                         <li>Have operated this way for at least 8 days in the past 30</li>
                     </ul>
-                    <p>Short-haul drivers are <strong>exempt from the ELD mandate</strong> and do not need to keep RODS (Records of Duty Status).</p>
+                    <p>Short-haul drivers are <strong>exempt from the ELD (Electronic Logging Device &mdash; the federally mandated device that connects to the truck&apos;s engine to automatically record driving time) mandate</strong> and do not need to keep RODS (Records of Duty Status &mdash; the official log of a driver&apos;s driving and on-duty time).</p>
 
                     <h2>ELD Requirements</h2>
                     <p>Since the ELD mandate went into full effect, all drivers required to keep RODS must use a registered <strong>Electronic Logging Device</strong>. The ELD must be:</p>
