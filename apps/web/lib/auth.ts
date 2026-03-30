@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const APP_NAME = "Greenlight USDOT";
-const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight USDOT <noreply@greenlightdot.com>";
+const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight USDOT <onboarding@resend.dev>";
 
 async function sendEmail(to: string, subject: string, html: string) {
     const apiKey = process.env.RESEND_API_KEY;
