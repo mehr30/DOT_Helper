@@ -20,15 +20,31 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 const baseURL = process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app";
 
+// Every origin the app is actually served from must be trusted, or better-auth
+// rejects the request with "Invalid origin". This covers: the custom domain
+// (apex + www), the canonical Vercel production URL, all Vercel preview
+// deployments for this project (wildcard — `*` matches any non-slash chars),
+// local dev, and whatever BETTER_AUTH_URL / NEXT_PUBLIC_APP_URL are set to.
+const trustedOrigins = Array.from(
+    new Set([
+        baseURL,
+        "https://greenlightusdot.com",
+        "https://www.greenlightusdot.com",
+        "https://dot-helper-web.vercel.app",
+        "https://dot-helper-web-*.vercel.app",
+        "http://localhost:3000",
+        ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+        // Optional comma-separated overrides without a redeploy.
+        ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS
+            ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",").map((o) => o.trim())
+            : []),
+    ]),
+).filter(Boolean);
+
 export const auth = betterAuth({
     baseURL,
     trustHost: true,
-    trustedOrigins: [
-        baseURL,
-        "https://dot-helper-web.vercel.app",
-        "http://localhost:3000",
-        ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
-    ],
+    trustedOrigins,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
