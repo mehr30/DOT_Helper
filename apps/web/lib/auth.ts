@@ -28,6 +28,10 @@ const baseURL = process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.ap
 const trustedOrigins = Array.from(
     new Set([
         baseURL,
+        // Live production domain (currently attached to this Vercel project).
+        "https://greenlightdot.com",
+        "https://www.greenlightdot.com",
+        // Alternate brand domain (owned; attach later if the brand moves to "usdot").
         "https://greenlightusdot.com",
         "https://www.greenlightusdot.com",
         "https://dot-helper-web.vercel.app",

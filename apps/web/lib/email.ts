@@ -1,4 +1,6 @@
-const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight USDOT <noreply@greenlightdot.com>";
+// Fallback matches lib/auth.ts: use Resend's shared verified sender until a
+// branded domain is verified in Resend, then set EMAIL_FROM in the environment.
+const FROM_EMAIL = process.env.EMAIL_FROM ?? "Greenlight USDOT <onboarding@resend.dev>";
 
 /**
  * Send an email via Resend. Silently skips if RESEND_API_KEY is not set.
