@@ -61,7 +61,7 @@ export default function TermsPage() {
             <p>We may update these terms from time to time. We will notify you of material changes via email or in-app notification. Continued use after changes constitutes acceptance.</p>
 
             <h2>Contact</h2>
-            <p>Questions about these terms? Contact us at <a href="mailto:legal@greenlightusdot.com">legal@greenlightusdot.com</a>.</p>
+            <p>Questions about these terms? Contact us at <a href="mailto:legal@greenlightdot.com">legal@greenlightdot.com</a>.</p>
         </StaticPageLayout>
     );
 }

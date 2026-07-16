@@ -101,7 +101,7 @@ export default function PricingPage() {
 
     const handleCheckout = async (planKey: string) => {
         if (planKey === "fleet") {
-            window.location.href = "mailto:sales@greenlightusdot.com?subject=Fleet Plan Inquiry";
+            window.location.href = "mailto:sales@greenlightdot.com?subject=Fleet Plan Inquiry";
             return;
         }
 

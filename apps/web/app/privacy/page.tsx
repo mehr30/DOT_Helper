@@ -56,7 +56,7 @@ export default function PrivacyPage() {
             </ul>
 
             <h2>Contact</h2>
-            <p>Questions about this policy? Contact us at <a href="mailto:privacy@greenlightusdot.com">privacy@greenlightusdot.com</a>.</p>
+            <p>Questions about this policy? Contact us at <a href="mailto:privacy@greenlightdot.com">privacy@greenlightdot.com</a>.</p>
         </StaticPageLayout>
     );
 }

@@ -18,7 +18,7 @@ async function sendEmail(to: string, subject: string, html: string) {
     await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
 }
 
-const baseURL = process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app";
+const baseURL = process.env.BETTER_AUTH_URL || "https://greenlightdot.com";
 
 // Every origin the app is actually served from must be trusted, or better-auth
 // rejects the request with "Invalid origin". This covers: the custom domain

@@ -3,7 +3,7 @@ import "./globals.css";
 import AuthProvider from "./components/AuthProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://greenlightusdot.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://greenlightdot.com"),
   title: {
     default: "Greenlight USDOT — DOT Compliance, Plain and Simple",
     template: "%s | Greenlight USDOT",

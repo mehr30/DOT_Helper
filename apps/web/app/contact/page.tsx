@@ -23,7 +23,7 @@ export default function ContactPage() {
                         <div>
                             <div className={styles.contactItemTitle}>Email</div>
                             <div className={styles.contactItemText}>
-                                <a href="mailto:support@greenlightusdot.com">support@greenlightusdot.com</a>
+                                <a href="mailto:support@greenlightdot.com">support@greenlightdot.com</a>
                             </div>
                         </div>
                     </div>

@@ -48,7 +48,7 @@ export async function createSigningRequest(data: SigningRequestData) {
         },
     });
 
-    const baseUrl = process.env.BETTER_AUTH_URL || "https://dot-helper-web.vercel.app";
+    const baseUrl = process.env.BETTER_AUTH_URL || "https://greenlightdot.com";
     const signingUrl = `${baseUrl}/sign/${request.token}`;
 
     // Send email if driver has an email

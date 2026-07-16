@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://dothelper.com";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://greenlightdot.com";
 
 const pillarSlugs = [
     "dot-compliance-checklist",
